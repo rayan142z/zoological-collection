@@ -1,0 +1,114 @@
+/* AS: Die Navigationsleiste soll immer oben auf der Seite sichtbar sein und die wichtigsten Links enthalten.
+    Es soll ein Logo, die Übersicht, die Objekte, die Möglichkeit ein neues Objekt zu erstellen und einen Login-Bereich geben. */
+
+
+/* AS: hier wird Optik der navigationsleiste an sich festgelegt */
+.navbar {
+  height: 76px;
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+
+  /* AS: display grid teil die Navigationsleiste in drei Bereiche ein, und die Inhalte immer zentriert behält */
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+
+  padding: 0 32px;
+}
+
+/* AS: hier wird die Logo und Titelsektion der Navbar festgelegt */
+.navbar-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+/* AS: hier wird das Logo festgelegt */
+.logo-box {
+  width: 52px;
+  height: 52px;
+  border-radius: 10px;
+  background: var(--color-primary);
+  color: white;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 26px;
+  box-shadow: 0 4px 10px rgba(31, 94, 59, 0.25);
+}
+
+/* AS: hier wird die Schriftart und Farbe des Titels festgelegt */
+.brand-name {
+  font-size: 23px;
+  font-weight: 700;
+  color: var(--color-primary);
+}
+
+/* AS: hier wird die Mitte der Navbar festgelegt, wo die Links zur Übersicht, den Objekten und zum Erstellen eines neuen Objekts liegen */
+.navbar-center {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  gap: 34px;
+}
+
+/* AS: hier wird die Optik der Links festgelegt, damit sie immer zentriert in der Navbar sind und beim mit der Maus drüber gehen die Farbe wechseln */
+.nav-link {
+  height: 100%;
+  display: flex;
+  align-items: center;
+
+  color: var(--color-text);
+  text-decoration: none;
+  font-size: 15px;
+  font-weight: 600;
+
+  border-bottom: 3px solid transparent;
+}
+
+.nav-link:hover {
+  color: var(--color-primary);
+}
+
+.nav-link.active {
+  color: var(--color-primary);
+  border-bottom-color: var(--color-primary);
+}
+
+.navbar-right {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 8px;
+}
+
+/* AS: hier wid das Login-Symbol und Schrift festgelgt */
+.login-icon,
+.login-link {
+  color: var(--color-text);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+@media (max-width: 850px) {
+  .navbar {
+    grid-template-columns: 1fr;
+    height: auto;
+    gap: 14px;
+    padding: 16px 24px;
+  }
+
+  .navbar-left,
+  .navbar-center,
+  .navbar-right {
+    justify-content: center;
+  }
+
+  .navbar-center {
+    flex-wrap: wrap;
+    gap: 18px;
+  }
+}
