@@ -15,6 +15,18 @@
 
   <div class="navbar-right">
     <span class="login-icon">♙</span>
-    <a class="login-link" href="#">Login</a>
+
+    @if (currentUser(); as user) {
+      <a class="login-link" routerLink="/profile">
+        {{ user.username || user.email }}
+      </a>
+
+      <button class="logout-button" type="button" (click)="logout()">
+        Abmelden
+      </button>
+    } @else {
+      <a class="login-link" routerLink="/login">Login</a>
+      <a class="login-link" routerLink="/register">Registrieren</a>
+    }
   </div>
 </nav>

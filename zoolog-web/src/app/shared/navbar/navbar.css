@@ -93,6 +93,21 @@
   text-decoration: none;
 }
 
+/*Styling für den Abmelden Button*/
+.logout-button {
+  border: none;
+  background: transparent;
+  color: var(--color-text);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/*Hover Effekt für Abmelden und Login/Register*/
+.logout-button:hover,
+.login-link:hover {
+  color: var(--color-primary);
+}
+
 @media (max-width: 850px) {
   .navbar {
     grid-template-columns: 1fr;
