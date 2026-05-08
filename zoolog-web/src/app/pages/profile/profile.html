@@ -1,14 +1,26 @@
-<h1>Profil</h1>
+<div class="profile-page">
+    <section class="profile-card">
+        <h1>Profil</h1>
 
-@if (currentUser(); as user) {
-    <div>
-        <p><strong>Benutzername:</strong> {{ user.username || 'Kein Benutzername vorhanden' }}</p>
-        <p><strong>E-Mail:</strong> {{ user.email }}</p>
-        <p><strong>Rolle:</strong> {{ user.role }}</p>
+        @if (currentUser(); as user) {
+            <div class="profile-info">
+                <div class="info-row">
+                    <p><strong>Benutzername:</strong> {{ user.username || 'Kein Benutzername vorhanden' }}</p>
+                </div>
 
-        <button type="button" (click)="logout()">Abmelden</button>
-    </div>
-} @else {
-    <p>Du bist aktuell nicht eingeloggt.</p>
-    <a routerLink="/login">Zum Login</a>
-}
+                <div class="info-row">
+                    <p><strong>E-Mail:</strong> {{ user.email }}</p>
+                </div>
+
+                <div class="info-row">
+                    <p><strong>Rolle:</strong> {{ user.role }}</p>
+                </div>
+
+                <button class="secondary-button" type="button" (click)="logout()">Abmelden</button>
+            </div>
+        } @else {
+            <p class="error-message">Du bist aktuell nicht eingeloggt.</p>
+            <a class="profile-link" routerLink="/login">Zum Login</a>
+        }
+    </section>
+</div>
