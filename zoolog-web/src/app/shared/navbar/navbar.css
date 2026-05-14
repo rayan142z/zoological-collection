@@ -73,10 +73,14 @@
   color: var(--color-primary);
 }
 
+/* AS: Hier werden festgelegt, dass die ausgewähte Seite in der Navbar sichtbar wird durch leichten Hintergrund */
 .nav-link.active {
   color: var(--color-primary);
-  border-bottom-color: var(--color-primary);
+  background-color: rgba(0, 0, 0, 0.07);
+  border-radius: 6px;
+  padding: 0 12px;
 }
+
 
 .navbar-right {
   display: flex;

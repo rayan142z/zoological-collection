@@ -1,0 +1,67 @@
+<div class="objects-page">
+
+  <div class="page-header">
+    <h1>Objekte</h1>
+    <p>{{ filteredSpecimens.length }} Objekte gefunden</p>
+  </div>
+
+  <div class="filter-bar">
+    <input
+      class="search-input"
+      type="text"
+      placeholder="Suche nach Name oder Gattung..."
+      [(ngModel)]="searchTerm"
+    />
+    <select class="status-select" [(ngModel)]="selectedStatus">
+      <option value="">Alle Status</option>
+      <option value="verfügbar">Verfügbar</option>
+      <option value="ausgeliehen">Ausgeliehen</option>
+      <option value="verloren">Verloren</option>
+      <option value="zerstört">Zerstört</option>
+    </select>
+  </div>
+
+  <div class="specimen-grid">
+    @for (specimen of filteredSpecimens; track specimen.id) {
+      <div class="specimen-card">
+        <div class="card-image">
+            <img [src]="specimen.image" [alt]="specimen.name" class="specimen-img" />
+            <span class="status-badge {{ getStatusClass(specimen.status) }}">{{ specimen.status }}</span>
+        </div>
+        <div class="card-body">
+            <h3 class="specimen-name">{{ specimen.name }}</h3>
+            <p class="specimen-meta">
+                <em>{{ specimen.genus }} {{ specimen.species }}</em> · {{ specimen.dateCollected | date: 'yyyy' }}
+            </p>
+        </div>
+
+        <div class="info-panel">
+            <p class="info-panel-title">{{ specimen.name }}</p>
+            <div class="info-row">
+            <span class="info-label">Status</span>
+            <span class="info-value">{{ specimen.status }}</span>
+            </div>
+            <div class="info-row">
+            <span class="info-label">Gattung</span>
+            <span class="info-value">{{ specimen.genus }}</span>
+            </div>
+            <div class="info-row">
+            <span class="info-label">Art</span>
+            <span class="info-value">{{ specimen.species }}</span>
+            </div>
+            <div class="info-row">
+            <span class="info-label">Gesammelt am</span>
+            <span class="info-value">{{ specimen.dateCollected | date: 'dd.MM.yyyy' }}</span>
+            </div>
+            <div class="info-row">
+            <span class="info-label">ID</span>
+            <span class="info-value">#{{ specimen.id }}</span>
+            </div>
+        </div>
+        </div>
+
+    }
+  </div>
+
+
+</div>
