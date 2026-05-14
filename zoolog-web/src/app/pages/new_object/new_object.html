@@ -1,0 +1,175 @@
+<!-- AS: Diese Seite dient zum Erfassen eines neuen Präparats. Sie besteht aus einem Seitenkopf und
+     einem zweispaltigen Formular mit Grunddaten, Taxonomie, Fundort links und Foto/Vorschau/Speichern rechts. -->
+<div class="page-container">
+
+  <!-- AS: Seitenkopf mit Zurück-Link und Seitentitel -->
+  <div class="new-object-header">
+    <a class="back-link" routerLink="/objects">← Zurück zu Objekten</a>
+    <div class="header-text">
+      <h1 class="page-title">Neues Objekt erfassen</h1>
+      <p class="page-subtitle">Füge ein neues Präparat zur Sammlung hinzu</p>
+    </div>
+  </div>
+
+  <form class="form-layout">
+
+    <!-- AS: Linker Bereich mit den drei Formular-Sektionen -->
+    <div class="form-main">
+
+      <!-- AS: Grunddaten: Name, Beschreibung, Sammlungsdatum und Status des Präparats -->
+      <div class="form-section card">
+        <div class="section-header">
+          <h2 class="section-title">Grunddaten</h2>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Name <span class="required">*</span></label>
+          <input class="form-input" type="text" placeholder="z.B. Hirschkäfer" [(ngModel)]="name" name="name" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Beschreibung <span class="required">*</span></label>
+          <textarea class="form-textarea" rows="4" placeholder="Beschreibe das Objekt..."></textarea>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Sammlungsdatum <span class="required">*</span></label>
+            <input class="form-input" type="date" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Status <span class="required">*</span></label>
+            <select class="form-select" [(ngModel)]="status" name="status">
+              <option value="">Status wählen...</option>
+              <option value="available">Verfügbar</option>
+              <option value="on loan">Ausgeliehen</option>
+              <option value="lost">Verloren</option>
+              <option value="destroyrd">Zerstört</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- AS: Taxonomie: Wissenschaftliche Einordnung des Präparats nach dem Linnéschen System -->
+      <div class="form-section card">
+        <div class="section-header">
+          <h2 class="section-title">Taxonomie</h2>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Reich</label>
+            <input class="form-input" type="text" placeholder="z.B. Animalia" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Stamm</label>
+            <input class="form-input" type="text" placeholder="z.B. Arthropoda" />
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Klasse</label>
+            <input class="form-input" type="text" placeholder="z.B. Insecta" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Ordnung</label>
+            <input class="form-input" type="text" placeholder="z.B. Coleoptera" />
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Familie</label>
+            <input class="form-input" type="text" placeholder="z.B. Lucanidae" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Gattung <span class="required">*</span></label>
+            <input class="form-input" type="text" placeholder="z.B. Lucanus" [(ngModel)]="genus" name="genus" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Art <span class="required">*</span></label>
+          <input class="form-input" type="text" placeholder="z.B. cervus" [(ngModel)]="species" name="species" />
+          <p class="form-hint">Wissenschaftlicher Artname (wird kursiv dargestellt)</p>
+        </div>
+      </div>
+
+      <!-- AS: Fundort: Wo das Präparat gesammelt wurde, mit optionalen GPS-Koordinaten -->
+      <div class="form-section card">
+        <div class="section-header">
+          <h2 class="section-title">Fundort</h2>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Bezeichnung <span class="required">*</span></label>
+          <input class="form-input" type="text" placeholder="z.B. Schwarzwald, Naturschutzgebiet Teinach" />
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Land <span class="required">*</span></label>
+            <input class="form-input" type="text" placeholder="z.B. Deutschland" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Region <span class="required">*</span></label>
+            <input class="form-input" type="text" placeholder="z.B. Baden-Württemberg" />
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Breitengrad</label>
+            <input class="form-input" type="number" step="0.000001" placeholder="z.B. 48.371200" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Längengrad</label>
+            <input class="form-input" type="number" step="0.000001" placeholder="z.B. 8.557450" />
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- AS: Rechte Sidebar mit Foto-Upload, Live-Vorschau und Speichern-Button -->
+    <div class="form-sidebar">
+
+      <!-- AS: Foto-Upload: Der versteckte File-Input wird über das sichtbare Label ausgelöst -->
+      <div class="form-section card">
+        <div class="section-header">
+          <h2 class="section-title">Foto</h2>
+        </div>
+        <div class="upload-area">
+          <input type="file" id="foto-upload" accept="image/*" class="upload-input" />
+          <label for="foto-upload" class="upload-label">
+            <span class="upload-icon">🖼️</span>
+            <span class="upload-text">Foto auswählen</span>
+            <span class="upload-hint">JPG, PNG bis 10 MB</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- AS: Vorschau: Zeigt live wie die Objekt-Karte später aussehen wird, basierend auf den eingegebenen Daten -->
+      <div class="form-section card preview-card">
+        <div class="section-header">
+          <h2 class="section-title">Vorschau</h2>
+        </div>
+        <div class="preview-specimen">
+          <div class="preview-image-placeholder">
+            <span class="preview-icon">🦎</span>
+          </div>
+          <p class="preview-name">{{ name || 'Objektname' }}</p>
+          <p class="preview-taxon"><em>{{ (genus || 'Gattung') + ' ' + (species || 'species') }}</em></p>
+          @if (status) {
+            <span class="status-badge {{ getStatusClass() }}">{{ getStatusLabel() }}</span>
+          }
+        </div>
+      </div>
+
+      <!-- AS: Aktionsbereich mit Speichern- und Abbrechen-Button sowie Hinweis auf Pflichtfelder -->
+      <div class="form-actions card">
+        <button class="primary-button submit-btn" type="submit">
+          Objekt speichern
+        </button>
+        <button class="secondary-button cancel-btn" type="button" routerLink="/objects">
+          Abbrechen
+        </button>
+        <p class="required-hint"><span class="required">*</span> Pflichtfelder</p>
+      </div>
+
+    </div>
+
+  </form>
+
+</div>

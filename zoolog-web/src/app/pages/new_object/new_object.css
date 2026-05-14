@@ -1,0 +1,270 @@
+/* AS: Diese Seite ermöglicht das Erfassen eines neuen Präparats für die Sammlung.
+   Das Layout ist zweispaltig: links die Formularfelder, rechts eine sticky Sidebar mit Foto, Vorschau und Speichern-Button. */
+
+
+/* AS: Abstand unter dem Seitenkopf mit Titel und Zurück-Link */
+.new-object-header {
+  margin-bottom: 28px;
+}
+
+/* AS: Der Zurück-Link navigiert zurück zur Objektübersicht und ist dezent in Grün gehalten */
+.back-link {
+  display: inline-block;
+  color: var(--color-primary);
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 12px;
+  opacity: 0.8;
+  transition: opacity 0.15s;
+}
+
+.back-link:hover { opacity: 1; }
+
+/* AS: Das Hauptlayout teilt die Seite in zwei Spalten: breiten Formularbereich links und schmale Sidebar rechts */
+.form-layout {
+  display: grid;
+  grid-template-columns: 1fr 300px;
+  gap: 24px;
+  align-items: start;
+}
+
+/* AS: Der linke Bereich stapelt die Formular-Sektionen untereinander */
+.form-main {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* AS: Die Sidebar bleibt beim Scrollen sichtbar (sticky), damit der Speichern-Button immer erreichbar ist */
+.form-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  position: sticky;
+  top: 24px;
+}
+
+/* AS: Jede Formular-Sektion (Grunddaten, Taxonomie, etc.) bekommt einheitlichen Innenabstand */
+.form-section {
+  padding: 24px;
+}
+
+/* AS: Der Sektionskopf zeigt den Titel mit einem grünen Akzentbalken und einer Trennlinie darunter */
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+/* AS: Der grüne Balken vor dem Sektionstitel wird per CSS eingefügt, kein extra HTML-Element nötig */
+.section-title::before {
+  content: '';
+  display: inline-block;
+  width: 4px;
+  height: 16px;
+  background: var(--color-primary);
+  border-radius: 2px;
+  margin-right: 10px;
+  vertical-align: middle;
+}
+
+/* AS: Schriftgröße und Farbe des Sektionstitel */
+.section-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--color-text);
+  margin: 0;
+}
+
+/* AS: Jede Formularzeile (Label + Input) bekommt Abstand nach unten, außer die letzte */
+.form-group {
+  margin-bottom: 16px;
+}
+
+.form-group:last-child { margin-bottom: 0; }
+
+/* AS: Zwei Felder nebeneinander werden per Grid in zwei gleich breite Spalten aufgeteilt */
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.form-row .form-group { margin-bottom: 0; }
+
+/* AS: Das Label über jedem Eingabefeld ist klein und fett, damit es klar vom Eingabefeld abgegrenzt ist */
+.form-label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text);
+  margin-bottom: 6px;
+}
+
+/* AS: Hinweistext unter einem Eingabefeld, z.B. für den wissenschaftlichen Artnamen */
+.form-hint {
+  font-size: 11px;
+  color: var(--color-muted);
+  margin: 4px 0 0 0;
+}
+
+/* AS: Pflichtfelder werden mit einem roten Sternchen markiert */
+.required {
+  color: #dc2626;
+}
+
+/* AS: Alle Eingabefelder haben einen leicht grauen Hintergrund, damit sie sich von der weißen Card abheben */
+.form-input,
+.form-select,
+.form-textarea {
+  transition: border-color 0.15s, box-shadow 0.15s;
+  background: #fafafa;
+}
+
+/* AS: Beim Klick auf ein Eingabefeld wechselt die Rahmenfarbe zu Grün und ein leichter Schatten erscheint */
+.form-input:focus,
+.form-select:focus,
+.form-textarea:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  background: white;
+  box-shadow: 0 0 0 3px rgba(31, 94, 59, 0.08);
+}
+
+/* AS: Das Textfeld für die Beschreibung kann vom Nutzer in der Höhe vergrößert werden */
+.form-textarea {
+  resize: vertical;
+  min-height: 90px;
+}
+
+/* AS: Die Vorschau-Card zeigt zentriert eine verkleinerte Ansicht der späteren Objekt-Karte */
+.preview-card { text-align: center; }
+
+.preview-specimen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+/* AS: Platzhalter für das Foto in der Vorschau, bis ein echtes Bild hochgeladen wurde */
+.preview-image-placeholder {
+  width: 80px;
+  height: 80px;
+  background: #f0f4f1;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 4px;
+}
+
+.preview-icon { font-size: 36px; }
+
+.preview-name {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--color-text);
+  margin: 0;
+}
+
+/* AS: Der wissenschaftliche Name wird kursiv und in gedämpfter Farbe dargestellt */
+.preview-taxon {
+  font-size: 12px;
+  color: var(--color-muted);
+  margin: 0;
+}
+
+/* AS: Das Status-Badge zeigt den aktuellen Zustand des Objekts farbig an */
+.status-badge {
+  padding: 3px 10px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+  border-radius: 6px;
+}
+
+.status-available { background: #d1fae5; color: #065f46; }
+
+/* AS: Die Aktions-Buttons zum Speichern und Abbrechen werden untereinander angezeigt */
+.form-actions {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* AS: Beide Buttons nehmen die volle Breite der Sidebar ein */
+.submit-btn,
+.cancel-btn {
+  width: 100%;
+  padding: 12px;
+  font-size: 14px;
+}
+
+/* AS: Kleiner Hinweis unter den Buttons, dass Sternchen-Felder Pflichtfelder sind */
+.required-hint {
+  font-size: 11px;
+  color: var(--color-muted);
+  text-align: center;
+  margin: 4px 0 0 0;
+}
+
+/* AS: Der Foto-Upload Bereich ist unsichtbar, der klickbare Bereich wird über das Label gesteuert */
+.upload-input {
+  display: none;
+}
+
+.upload-area {
+  width: 100%;
+}
+
+/* AS: Das Upload-Label wirkt wie eine Schaltfläche mit gestricheltem Rahmen, der beim Hover grün wird */
+.upload-label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 28px 16px;
+  border: 2px dashed var(--color-border);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+  text-align: center;
+}
+
+.upload-label:hover {
+  border-color: var(--color-primary);
+  background: rgba(31, 94, 59, 0.04);
+}
+
+.upload-icon { font-size: 28px; }
+
+.upload-text {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-primary);
+}
+
+.upload-hint {
+  font-size: 11px;
+  color: var(--color-muted);
+}
+
+/* AS: Auf kleinen Bildschirmen wechselt das Layout zu einer einzelnen Spalte */
+@media (max-width: 900px) {
+  .form-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .form-sidebar {
+    position: static;
+  }
+}
