@@ -43,7 +43,7 @@ create table specimen(
   name varchar(150) not null,
   description text ,
   date_collected date,
-  status ENUM('available', 'lost', 'on loan', 'destroyrd' ),
+  status ENUM('available', 'lost', 'on loan', 'destroyed' ),
   location_id integer not null,
   constraint fk_location
   foreign key (location_id)
