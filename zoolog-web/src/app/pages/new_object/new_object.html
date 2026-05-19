@@ -152,7 +152,7 @@
           <p class="preview-name">{{ name || 'Objektname' }}</p>
           <p class="preview-taxon"><em>{{ (genus || 'Gattung') + ' ' + (species || 'species') }}</em></p>
           @if (status) {
-            <span class="status-badge {{ getStatusClass() }}">{{ getStatusLabel() }}</span>
+            <span class="status-badge {{ getStatusClass() }}">{{ status }}</span>
           }
         </div>
       </div>
