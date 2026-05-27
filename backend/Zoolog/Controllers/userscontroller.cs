@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Mspa.Data;
 using Mspa.Models;
+using BCrypt.Net;
 
 namespace Mspa.Controllers;
 
@@ -36,9 +37,35 @@ public class UsersController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Create(User user)
     {
+        user.Pass = BCrypt.Net.BCrypt.HashPassword(user.Pass);
+        
         _context.Users.Add(user);
         await _context.SaveChangesAsync();
         return CreatedAtAction(nameof(GetById), new { id = user.Id }, user);
+    }
+    
+    // POST /api/auth/login
+    [HttpPost("login")]
+    public async Task<IActionResult> Login([FromBody] User loginDaten)
+    {
+        
+        var user = await _context.Users.FirstOrDefaultAsync(u => 
+            u.Username == loginDaten.Username || u.Email == loginDaten.Username);
+
+        if (user is null)
+        {
+            return Unauthorized(new { message = "Ungültige Anmeldedaten" });
+        }
+
+       
+        bool isPasswordCorrect = BCrypt.Net.BCrypt.Verify(loginDaten.Pass, user.Pass);
+
+        if (!isPasswordCorrect)
+        {
+            return Unauthorized(new { message = "Ungültige Anmeldedaten" });
+        }
+
+        return Ok(new { message = "Login erfolgreich", username = user.Username });
     }
 
     // PUT /api/users/1
@@ -50,7 +77,7 @@ public class UsersController : ControllerBase
 
         user.Username = updatedUser.Username;
         user.Email = updatedUser.Email;
-        user.Pass = updatedUser.Pass;
+        user.Pass = BCrypt.Net.BCrypt.HashPassword(updatedUser.Pass);
         user.UserRole = updatedUser.UserRole;
 
         await _context.SaveChangesAsync();
