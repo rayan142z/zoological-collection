@@ -3,7 +3,8 @@
   <component name="ChangeListManager">
     <list default="true" id="0d62c2a6-c529-444d-bef9-e172916f8085" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../datenbank.sql" beforeDir="false" afterPath="$PROJECT_DIR$/../datenbank.sql" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Zoolog/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Zoolog/Program.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Zoolog/appsettings.Development.json" beforeDir="false" afterPath="$PROJECT_DIR$/Zoolog/appsettings.Development.json" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -14,9 +15,18 @@
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
   </component>
   <component name="HighlightingSettingsPerFile">
+    <setting file="file://$PROJECT_DIR$/Zoolog/Controllers/AuthController.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Zoolog/Controllers/HomeController.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Zoolog/Controllers/collectioncontroller.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Zoolog/Controllers/userscontroller.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Zoolog/Models/ErrorViewModel.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Zoolog/Program.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Zoolog/Views/Home/Index.cshtml" root0="FORCE_HIGHLIGHTING" root1="SKIP_HIGHLIGHTING" root2="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Zoolog/Views/Home/Privacy.cshtml" root0="FORCE_HIGHLIGHTING" root1="SKIP_HIGHLIGHTING" root2="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Zoolog/Views/_ViewStart.cshtml" root0="FORCE_HIGHLIGHTING" root1="SKIP_HIGHLIGHTING" root2="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Zoolog/bin/Debug/net10.0/Zoolog.deps.json" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/collectioncontroller.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/userscontroller.cs" root0="SKIP_HIGHLIGHTING" />
   </component>
   <component name="MetaFilesCheckinStateConfiguration" checkMetaFiles="true" />
   <component name="ProjectColorInfo">{
@@ -55,6 +65,10 @@
       <workItem from="1777733598040" duration="957000" />
       <workItem from="1777734924186" duration="2413000" />
       <workItem from="1778569212721" duration="312000" />
+      <workItem from="1779999986035" duration="367000" />
+      <workItem from="1780166755985" duration="252000" />
+      <workItem from="1780167814128" duration="2556000" />
+      <workItem from="1780171740112" duration="447000" />
     </task>
     <servers />
   </component>
