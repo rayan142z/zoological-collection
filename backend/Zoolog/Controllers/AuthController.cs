@@ -1,18 +1,18 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Mspa.Data;
-using Mspa.Models;
+using Zoolog;
+using Zoolog.Models;
 using BCrypt.Net;
 
-namespace Mspa.Controllers;
+namespace Zoolog.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
 public class AuthController : ControllerBase
 {
-    private readonly AppDbContext _context;
+    private readonly Group6DbContext _context;
 
-    public AuthController(AppDbContext context)
+    public AuthController(Group6DbContext context)
     {
         _context = context;
     }

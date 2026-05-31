@@ -2,9 +2,18 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="0d62c2a6-c529-444d-bef9-e172916f8085" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/Zoolog/Group6DbContext.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/dataSources.local.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources.local.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Zoolog/Controllers/AuthController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Zoolog/Controllers/AuthController.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Zoolog/Controllers/collectioncontroller.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Zoolog/Controllers/collectioncontroller.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Zoolog/Controllers/userscontroller.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Zoolog/Controllers/userscontroller.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Zoolog/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Zoolog/Program.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Zoolog/appsettings.Development.json" beforeDir="false" afterPath="$PROJECT_DIR$/Zoolog/appsettings.Development.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Zoolog/appsettings.json" beforeDir="false" afterPath="$PROJECT_DIR$/Zoolog/appsettings.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/collectioncontroller.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/userscontroller.cs" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -17,18 +26,22 @@
   <component name="HighlightingSettingsPerFile">
     <setting file="file://$PROJECT_DIR$/Zoolog/Controllers/AuthController.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Zoolog/Controllers/HomeController.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Zoolog/Controllers/collectioncontroller.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Zoolog/Controllers/collectioncontroller.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Zoolog/Controllers/userscontroller.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Zoolog/Group6DbContext.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Zoolog/Models/ErrorViewModel.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Zoolog/Program.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Zoolog/Views/Home/Index.cshtml" root0="FORCE_HIGHLIGHTING" root1="SKIP_HIGHLIGHTING" root2="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Zoolog/Views/Home/Privacy.cshtml" root0="FORCE_HIGHLIGHTING" root1="SKIP_HIGHLIGHTING" root2="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Zoolog/Views/Shared/_Layout.cshtml" root0="FORCE_HIGHLIGHTING" root1="SKIP_HIGHLIGHTING" root2="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Zoolog/Views/_ViewStart.cshtml" root0="FORCE_HIGHLIGHTING" root1="SKIP_HIGHLIGHTING" root2="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Zoolog/bin/Debug/net10.0/Zoolog.deps.json" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/collectioncontroller.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/userscontroller.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Zoolog/wwwroot/lib/jquery/dist/jquery.slim.min.map" root0="FORCE_HIGHLIGHTING" />
   </component>
   <component name="MetaFilesCheckinStateConfiguration" checkMetaFiles="true" />
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="SWEA" />
+  </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 4,
   &quot;fromUser&quot;: false
@@ -52,6 +65,7 @@
     &quot;codeWithMe.voiceChat.enabledByDefault&quot;: &quot;false&quot;,
     &quot;git-widget-placeholder&quot;: &quot;main&quot;,
     &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;configurable.group.appearance&quot;,
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
 }</component>
@@ -69,6 +83,9 @@
       <workItem from="1780166755985" duration="252000" />
       <workItem from="1780167814128" duration="2556000" />
       <workItem from="1780171740112" duration="447000" />
+      <workItem from="1780233239646" duration="5223000" />
+      <workItem from="1780241294250" duration="462000" />
+      <workItem from="1780241783165" duration="374000" />
     </task>
     <servers />
   </component>
@@ -77,6 +94,12 @@
   </component>
   <component name="UnityCheckinConfiguration" checkUnsavedScenes="true" />
   <component name="UnityProjectConfiguration" hasMinimizedUI="false" />
+  <component name="UnknownFeatures">
+    <option featureType="dependencySupport" implementationName="dotnet:Microsoft.Identity.Client" />
+    <option featureType="dependencySupport" implementationName="dotnet:Microsoft.EntityFrameworkCore.Abstractions" />
+    <option featureType="dependencySupport" implementationName="dotnet:Microsoft.EntityFrameworkCore.Relational" />
+    <option featureType="dependencySupport" implementationName="dotnet:Microsoft.EntityFrameworkCore" />
+  </component>
   <component name="VcsManagerConfiguration">
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
   </component>
@@ -95,6 +118,19 @@
           <properties exception="System.Threading.ThreadAbortException" breakIfHandledByOtherCode="false" displayValue="System.Threading.ThreadAbortException" />
           <option name="timeStamp" value="3" />
         </breakpoint>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/Zoolog/Program.cs</url>
+          <line>11</line>
+          <properties documentPath="$PROJECT_DIR$/Zoolog/Program.cs" containingFunctionPresentation="">
+            <startOffsets>
+              <option value="305" />
+            </startOffsets>
+            <endOffsets>
+              <option value="453" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="4" />
+        </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
   </component>
