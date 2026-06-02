@@ -2,18 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="0d62c2a6-c529-444d-bef9-e172916f8085" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Zoolog/Group6DbContext.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources.local.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources.local.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Zoolog/Controllers/AuthController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Zoolog/Controllers/AuthController.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Zoolog/Controllers/collectioncontroller.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Zoolog/Controllers/collectioncontroller.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Zoolog/Controllers/userscontroller.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Zoolog/Controllers/userscontroller.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Zoolog/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Zoolog/Program.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Zoolog/appsettings.Development.json" beforeDir="false" afterPath="$PROJECT_DIR$/Zoolog/appsettings.Development.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Zoolog/appsettings.json" beforeDir="false" afterPath="$PROJECT_DIR$/Zoolog/appsettings.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/collectioncontroller.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/userscontroller.cs" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -85,7 +74,7 @@
       <workItem from="1780171740112" duration="447000" />
       <workItem from="1780233239646" duration="5223000" />
       <workItem from="1780241294250" duration="462000" />
-      <workItem from="1780241783165" duration="374000" />
+      <workItem from="1780241783165" duration="1056000" />
     </task>
     <servers />
   </component>
