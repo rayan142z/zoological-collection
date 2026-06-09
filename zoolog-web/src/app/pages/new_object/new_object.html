@@ -1,175 +1,229 @@
-<!-- AS: Diese Seite dient zum Erfassen eines neuen Präparats. Sie besteht aus einem Seitenkopf und
-     einem zweispaltigen Formular mit Grunddaten, Taxonomie, Fundort links und Foto/Vorschau/Speichern rechts. -->
 <div class="page-container">
 
-  <!-- AS: Seitenkopf mit Zurück-Link und Seitentitel -->
   <div class="new-object-header">
-    <a class="back-link" routerLink="/objects">← Zurück zu Objekten</a>
-    <div class="header-text">
-      <h1 class="page-title">Neues Objekt erfassen</h1>
-      <p class="page-subtitle">Füge ein neues Präparat zur Sammlung hinzu</p>
+    <a class="back-link" routerLink="/objects">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+      Zurück zu Sammlungen
+    </a>
+    <h1 class="new-object-title serif">Neues Objekt erfassen</h1>
+    <p class="new-object-subtitle">Füge ein neues Präparat zur Sammlung hinzu</p>
+  </div>
+
+  <!-- Wizard steps -->
+  <div class="wizard-steps">
+    <div class="step" [class.step-active]="currentStep() === 1" [class.step-done]="currentStep() > 1" (click)="goToStep(1)">
+      <div class="step-circle">{{ currentStep() > 1 ? '✓' : '1' }}</div>
+      <div class="step-info">
+        <span class="step-number">Schritt 1</span>
+        <span class="step-label">Grunddaten</span>
+      </div>
+    </div>
+    <div class="step-line" [class.step-line-done]="currentStep() > 1"></div>
+    <div class="step" [class.step-active]="currentStep() === 2" [class.step-done]="currentStep() > 2" (click)="goToStep(2)">
+      <div class="step-circle">{{ currentStep() > 2 ? '✓' : '2' }}</div>
+      <div class="step-info">
+        <span class="step-number">Schritt 2</span>
+        <span class="step-label">Taxonomie</span>
+      </div>
+    </div>
+    <div class="step-line" [class.step-line-done]="currentStep() > 2"></div>
+    <div class="step" [class.step-active]="currentStep() === 3" (click)="goToStep(3)">
+      <div class="step-circle">3</div>
+      <div class="step-info">
+        <span class="step-number">Schritt 3</span>
+        <span class="step-label">Foto & Speichern</span>
+      </div>
     </div>
   </div>
 
-  <form class="form-layout">
+  <div class="form-layout">
+    <form class="form-main" (ngSubmit)="onSubmit()">
+      <!-- Hidden input moved here so it is always available in the DOM -->
+      <input id="photo-input" type="file" accept="image/*" style="display:none" (change)="onFileSelected($event)"/>
 
-    <!-- AS: Linker Bereich mit den drei Formular-Sektionen -->
-    <div class="form-main">
-
-      <!-- AS: Grunddaten: Name, Beschreibung, Sammlungsdatum und Status des Präparats -->
-      <div class="form-section card">
-        <div class="section-header">
+      <!-- STEP 1 -->
+      @if (currentStep() === 1) {
+        <div class="section-card">
           <h2 class="section-title">Grunddaten</h2>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Name <span class="required">*</span></label>
-          <input class="form-input" type="text" placeholder="z.B. Hirschkäfer" [(ngModel)]="name" name="name" />
-        </div>
-        <div class="form-group">
-          <label class="form-label">Beschreibung <span class="required">*</span></label>
-          <textarea class="form-textarea" rows="4" placeholder="Beschreibe das Objekt..."></textarea>
-        </div>
-        <div class="form-row">
           <div class="form-group">
-            <label class="form-label">Sammlungsdatum <span class="required">*</span></label>
-            <input class="form-input" type="date" />
+            <label class="form-label">Name <span class="required">*</span></label>
+            <input class="form-input" type="text" placeholder="z.B. Hirschkäfer"
+              [ngModel]="name()" (ngModelChange)="name.set($event)" name="name"/>
           </div>
           <div class="form-group">
-            <label class="form-label">Status <span class="required">*</span></label>
-            <select class="form-select" [(ngModel)]="status" name="status">
-              <option value="">Status wählen...</option>
-              <option value="available">Verfügbar</option>
-              <option value="on loan">Ausgeliehen</option>
-              <option value="lost">Verloren</option>
-              <option value="destroyrd">Zerstört</option>
-            </select>
+            <label class="form-label">Beschreibung <span class="required">*</span></label>
+            <textarea class="form-textarea" placeholder="Beschreibe das Objekt…"
+              [ngModel]="description()" (ngModelChange)="description.set($event)" name="description"></textarea>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Sammlungsdatum <span class="required">*</span></label>
+              <input class="form-input" type="date"
+                [ngModel]="dateCollected()" (ngModelChange)="dateCollected.set($event)" name="dateCollected"/>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Status <span class="required">*</span></label>
+              <select class="form-select"
+                [ngModel]="status()" (ngModelChange)="status.set($event)" name="status">
+                <option value="">Status wählen…</option>
+                <option value="verfügbar">Verfügbar</option>
+                <option value="ausgeliehen">Ausgeliehen</option>
+                <option value="verloren">Verloren</option>
+                <option value="zerstört">Zerstört</option>
+              </select>
+            </div>
+          </div>
+          <div class="step-nav">
+            <span></span>
+            <button class="primary-button" type="button" (click)="nextStep()">
+              Weiter
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </button>
           </div>
         </div>
-      </div>
+      }
 
-      <!-- AS: Taxonomie: Wissenschaftliche Einordnung des Präparats nach dem Linnéschen System -->
-      <div class="form-section card">
-        <div class="section-header">
+      <!-- STEP 2 -->
+      @if (currentStep() === 2) {
+        <div class="section-card">
           <h2 class="section-title">Taxonomie</h2>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Reich</label>
+              <input class="form-input" type="text" placeholder="z.B. Animalia"
+                [ngModel]="reich()" (ngModelChange)="reich.set($event)" name="reich"/>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Stamm</label>
+              <input class="form-input" type="text" placeholder="z.B. Arthropoda"
+                [ngModel]="stamm()" (ngModelChange)="stamm.set($event)" name="stamm"/>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Klasse</label>
+              <input class="form-input" type="text" placeholder="z.B. Insecta"
+                [ngModel]="klasse()" (ngModelChange)="klasse.set($event)" name="klasse"/>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Ordnung</label>
+              <input class="form-input" type="text" placeholder="z.B. Coleoptera"
+                [ngModel]="ordnung()" (ngModelChange)="ordnung.set($event)" name="ordnung"/>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Familie</label>
+              <input class="form-input" type="text" placeholder="z.B. Lucanidae"
+                [ngModel]="familie()" (ngModelChange)="familie.set($event)" name="familie"/>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Gattung <span class="required">*</span></label>
+              <input class="form-input" type="text" placeholder="z.B. Lucanus"
+                [ngModel]="genus()" (ngModelChange)="genus.set($event)" name="genus"/>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Art <span class="required">*</span></label>
+            <input class="form-input" type="text" placeholder="z.B. cervus"
+              [ngModel]="species()" (ngModelChange)="species.set($event)" name="species"/>
+          </div>
+          <div class="step-nav">
+            <button class="secondary-button" type="button" (click)="prevStep()">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+              Zurück
+            </button>
+            <button class="primary-button" type="button" (click)="nextStep()">
+              Weiter
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </button>
+          </div>
         </div>
-        <div class="form-row">
-          <div class="form-group">
-            <label class="form-label">Reich</label>
-            <input class="form-input" type="text" placeholder="z.B. Animalia" />
-          </div>
-          <div class="form-group">
-            <label class="form-label">Stamm</label>
-            <input class="form-input" type="text" placeholder="z.B. Arthropoda" />
-          </div>
-        </div>
-        <div class="form-row">
-          <div class="form-group">
-            <label class="form-label">Klasse</label>
-            <input class="form-input" type="text" placeholder="z.B. Insecta" />
-          </div>
-          <div class="form-group">
-            <label class="form-label">Ordnung</label>
-            <input class="form-input" type="text" placeholder="z.B. Coleoptera" />
-          </div>
-        </div>
-        <div class="form-row">
-          <div class="form-group">
-            <label class="form-label">Familie</label>
-            <input class="form-input" type="text" placeholder="z.B. Lucanidae" />
-          </div>
-          <div class="form-group">
-            <label class="form-label">Gattung <span class="required">*</span></label>
-            <input class="form-input" type="text" placeholder="z.B. Lucanus" [(ngModel)]="genus" name="genus" />
-          </div>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Art <span class="required">*</span></label>
-          <input class="form-input" type="text" placeholder="z.B. cervus" [(ngModel)]="species" name="species" />
-          <p class="form-hint">Wissenschaftlicher Artname (wird kursiv dargestellt)</p>
-        </div>
-      </div>
+      }
 
-      <!-- AS: Fundort: Wo das Präparat gesammelt wurde, mit optionalen GPS-Koordinaten -->
-      <div class="form-section card">
-        <div class="section-header">
-          <h2 class="section-title">Fundort</h2>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Bezeichnung <span class="required">*</span></label>
-          <input class="form-input" type="text" placeholder="z.B. Schwarzwald, Naturschutzgebiet Teinach" />
-        </div>
-        <div class="form-row">
-          <div class="form-group">
-            <label class="form-label">Land <span class="required">*</span></label>
-            <input class="form-input" type="text" placeholder="z.B. Deutschland" />
+      <!-- STEP 3 -->
+      @if (currentStep() === 3) {
+        <div class="section-card">
+          <h2 class="section-title">Foto hochladen</h2>
+          <label class="upload-zone" for="photo-input">
+            @if (previewUrl()) {
+              <img [src]="previewUrl()" class="upload-preview-img" alt="Vorschau"/>
+              <span class="upload-change-hint">Klicken zum Ändern</span>
+            } @else {
+              <div class="upload-icon">🖼️</div>
+              <span class="upload-text">Foto auswählen oder hierher ziehen</span>
+              <span class="upload-hint">JPG, PNG bis 10 MB</span>
+            }
+          </label>
+          <div class="step-nav">
+            <button class="secondary-button" type="button" (click)="prevStep()">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+              Zurück
+            </button>
+            <button class="primary-button" type="submit">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v14z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+              Objekt speichern
+            </button>
           </div>
-          <div class="form-group">
-            <label class="form-label">Region <span class="required">*</span></label>
-            <input class="form-input" type="text" placeholder="z.B. Baden-Württemberg" />
-          </div>
+          <p class="required-hint"><span class="required">*</span> Pflichtfelder</p>
         </div>
-        <div class="form-row">
-          <div class="form-group">
-            <label class="form-label">Breitengrad</label>
-            <input class="form-input" type="number" step="0.000001" placeholder="z.B. 48.371200" />
-          </div>
-          <div class="form-group">
-            <label class="form-label">Längengrad</label>
-            <input class="form-input" type="number" step="0.000001" placeholder="z.B. 8.557450" />
-          </div>
-        </div>
-      </div>
+      }
 
-    </div>
+    </form>
 
-    <!-- AS: Rechte Sidebar mit Foto-Upload, Live-Vorschau und Speichern-Button -->
+    <!-- Sidebar -->
     <div class="form-sidebar">
 
-      <!-- AS: Foto-Upload: Der versteckte File-Input wird über das sichtbare Label ausgelöst -->
-      <div class="form-section card">
-        <div class="section-header">
-          <h2 class="section-title">Foto</h2>
-        </div>
-        <div class="upload-area">
-          <input type="file" id="foto-upload" accept="image/*" class="upload-input" />
-          <label for="foto-upload" class="upload-label">
-            <span class="upload-icon">🖼️</span>
-            <span class="upload-text">Foto auswählen</span>
-            <span class="upload-hint">JPG, PNG bis 10 MB</span>
-          </label>
-        </div>
-      </div>
-
-      <!-- AS: Vorschau: Zeigt live wie die Objekt-Karte später aussehen wird, basierend auf den eingegebenen Daten -->
-      <div class="form-section card preview-card">
-        <div class="section-header">
-          <h2 class="section-title">Vorschau</h2>
-        </div>
-        <div class="preview-specimen">
-          <div class="preview-image-placeholder">
-            <span class="preview-icon">🦎</span>
+      <!-- Clickable preview image -->
+      <div class="preview-card section-card">
+        <h2 class="section-title">Vorschau</h2>
+        <div class="preview-body">
+          <div class="preview-img-area" (click)="triggerFileInput()" title="Foto hinzufügen">
+            @if (previewUrl()) {
+              <img [src]="previewUrl()" class="preview-photo" alt="Foto"/>
+            } @else {
+              <span class="preview-emoji">🦎</span>
+            }
+            <div class="preview-img-overlay">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+              <span>Foto hinzufügen</span>
+            </div>
           </div>
-          <p class="preview-name">{{ name || 'Objektname' }}</p>
-          <p class="preview-taxon"><em>{{ (genus || 'Gattung') + ' ' + (species || 'species') }}</em></p>
-          @if (status) {
-            <span class="status-badge {{ getStatusClass() }}">{{ status }}</span>
+          <p class="preview-name serif">{{ name() || 'Objektname' }}</p>
+          <p class="preview-latin"><em>{{ (genus() || 'Gattung') + ' ' + (species() || 'species') }}</em></p>
+          @if (status()) {
+            <span class="badge {{ getStatusClass() }}">{{ status() }}</span>
+          }
+          @if (dateCollected()) {
+            <p class="preview-date">{{ dateCollected() | date:'dd.MM.yyyy' }}</p>
           }
         </div>
       </div>
 
-      <!-- AS: Aktionsbereich mit Speichern- und Abbrechen-Button sowie Hinweis auf Pflichtfelder -->
-      <div class="form-actions card">
-        <button class="primary-button submit-btn" type="submit">
-          Objekt speichern
-        </button>
-        <button class="secondary-button cancel-btn" type="button" routerLink="/objects">
-          Abbrechen
-        </button>
-        <p class="required-hint"><span class="required">*</span> Pflichtfelder</p>
+      <!-- Progress -->
+      <div class="progress-card section-card">
+        <h2 class="section-title">Fortschritt</h2>
+        <div class="progress-bar-wrap">
+          <div class="progress-bar" [style.width.%]="(currentStep() / 3) * 100"></div>
+        </div>
+        <p class="progress-label">Schritt {{ currentStep() }} von 3</p>
+        <div class="progress-steps">
+          <div class="progress-step-row">
+            <div class="progress-dot" [class.done]="currentStep() > 1" [class.current]="currentStep() === 1"></div>
+            <span class="progress-step-label" [class.done]="currentStep() > 1" [class.current]="currentStep() === 1">Grunddaten</span>
+          </div>
+          <div class="progress-step-row">
+            <div class="progress-dot" [class.done]="currentStep() > 2" [class.current]="currentStep() === 2"></div>
+            <span class="progress-step-label" [class.done]="currentStep() > 2" [class.current]="currentStep() === 2">Taxonomie</span>
+          </div>
+          <div class="progress-step-row">
+            <div class="progress-dot" [class.current]="currentStep() === 3"></div>
+            <span class="progress-step-label" [class.current]="currentStep() === 3">Foto & Speichern</span>
+          </div>
+        </div>
       </div>
 
     </div>
-
-  </form>
+  </div>
 
 </div>

@@ -1,0 +1,178 @@
+<section class="about-hero">
+  <div class="hero-content">
+    <span class="hero-eyebrow">Über uns</span>
+    <h1 class="hero-title">
+      Wir bewahren,<br />
+      <em>was bleibt.</em>
+    </h1>
+    <p class="hero-subtitle">
+      Die Zoologische Sammlung ist ein lebendiges Archiv der Natur — ein Ort,
+      an dem wissenschaftliche Neugier auf jahrhundertealte Präparate trifft.
+    </p>
+  </div>
+  <div class="hero-visual">
+    <div class="specimen-orb orb-1">
+      <span class="orb-icon">🦋</span>
+    </div>
+    <div class="specimen-orb orb-2">
+      <span class="orb-icon">🪲</span>
+    </div>
+    <div class="specimen-orb orb-3">
+      <span class="orb-icon">🐍</span>
+    </div>
+    <div class="orb-connector connector-a"></div>
+    <div class="orb-connector connector-b"></div>
+  </div>
+  <div class="hero-scroll-hint">
+    <span>Mehr erfahren</span>
+    <div class="scroll-arrow"></div>
+  </div>
+</section>
+
+<section class="about-mission">
+  <div class="container">
+    <div class="mission-grid">
+      <div class="mission-text">
+        <h2 class="section-title">Unsere Mission</h2>
+        <p>
+          Seit ihrer Gründung widmet sich die Zoologische Sammlung der
+          systematischen Erfassung, Konservierung und wissenschaftlichen
+          Erschließung zoologischer Präparate. Unser Bestand umfasst
+          Tausende von Objekten aus allen Tierklassen — vom Insekt bis
+          zum Großsäuger.
+        </p>
+        <p>
+          Wir verstehen uns als Brücke zwischen Vergangenheit und
+          Gegenwart: Jedes Präparat erzählt eine Geschichte über
+          Ökosysteme, Artenvielfalt und den Wandel unserer Natur.
+        </p>
+        <div class="mission-cta">
+          <a href="/objekte" class="btn-primary">Sammlung entdecken</a>
+          <a href="/kontakt" class="btn-ghost">Kontakt aufnehmen</a>
+        </div>
+      </div>
+      <div class="mission-stats">
+        @for (stat of stats(); track stat.label) {
+          <div class="stat-card">
+            <span class="stat-number">{{ stat.value }}</span>
+            <span class="stat-label">{{ stat.label }}</span>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="about-values">
+  <div class="container">
+    <div class="values-header">
+      <h2 class="section-title center">Was uns antreibt</h2>
+      <p class="section-subtitle">
+        Drei Prinzipien leiten unsere Arbeit jeden Tag.
+      </p>
+    </div>
+    <div class="values-grid">
+      @for (value of values(); track value.title; let i = $index) {
+        <div class="value-card" [style.animation-delay]="i * 120 + 'ms'">
+          <div class="value-icon-wrap">
+            <span class="value-icon">{{ value.icon }}</span>
+          </div>
+          <h3 class="value-title">{{ value.title }}</h3>
+          <p class="value-desc">{{ value.description }}</p>
+        </div>
+      }
+    </div>
+  </div>
+</section>
+
+<section class="about-team">
+  <div class="container">
+    <div class="team-header">
+      <h2 class="section-title">Das Team</h2>
+      <p class="section-subtitle">
+        Menschen, die für Naturwissenschaft und Vermittlung brennen.
+      </p>
+    </div>
+    <div class="team-grid">
+      @for (member of team(); track member.name) {
+        <div class="team-card">
+          <div class="team-avatar">
+            <span class="avatar-initial">{{ member.name.charAt(0) }}</span>
+            <div class="avatar-ring"></div>
+          </div>
+          <div class="team-info">
+            <h3 class="team-name">{{ member.name }}</h3>
+            <span class="team-role">{{ member.role }}</span>
+            <p class="team-bio">{{ member.bio }}</p>
+          </div>
+          <div class="team-specialty">
+            @for (tag of member.specialties; track tag) {
+              <span class="specialty-tag">{{ tag }}</span>
+            }
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+</section>
+
+<section class="about-timeline">
+  <div class="container">
+    <h2 class="section-title center">Unsere Geschichte</h2>
+    <div class="timeline">
+      @for (event of history(); track event.title; let i = $index) {
+        <div class="timeline-item" [class.timeline-right]="i % 2 !== 0">
+          <div class="timeline-dot"></div>
+          <div class="timeline-card">
+            <span class="timeline-year">{{ event.year }}</span>
+            <h3 class="timeline-title">{{ event.title }}</h3>
+            <p class="timeline-desc">{{ event.description }}</p>
+          </div>
+        </div>
+      }
+      <div class="timeline-line"></div>
+    </div>
+  </div>
+</section>
+
+<section class="about-contact">
+  <div class="container">
+    <div class="contact-inner">
+      <div class="contact-text">
+        <h2 class="section-title">Besuchen Sie uns</h2>
+        <div class="contact-detail">
+          <span class="contact-icon">📍</span>
+          <div>
+            <strong>Adresse</strong>
+            <p>Adolf-Reichwein-Straße 2, 57076 Siegen</p>
+          </div>
+        </div>
+        <div class="contact-detail">
+          <span class="contact-icon">🕐</span>
+          <div>
+            <strong>Öffnungszeiten</strong>
+            <p>Di – Fr: 9–17 Uhr &nbsp;|&nbsp; Sa – So: 10–16 Uhr</p>
+          </div>
+        </div>
+        <div class="contact-detail">
+          <span class="contact-icon">✉️</span>
+          <div>
+            <strong>E-Mail</strong>
+            <p>info&#64;zoologische-sammlung.de</p>
+          </div>
+        </div>
+      </div>
+      <div class="contact-map-placeholder">
+        <iframe 
+          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2522.610574167119!2d8.025732176840742!3d50.91330965389659!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x47bc1d9e2a8740f9%3A0x8e8a609d9492190c!2sAdolf-Reichwein-Stra%C3%9Fe%202%2C%2057076%20Siegen!5e0!3m2!1sde!2sde!4v1717462000000!5m2!1sde!2sde" 
+          width="100%" 
+          height="100%" 
+          style="border:0;" 
+          allowfullscreen="" 
+          loading="lazy" 
+          referrerpolicy="no-referrer-when-downgrade">
+        </iframe>
+      </div>
+    </div>
+  </div>
+</section>

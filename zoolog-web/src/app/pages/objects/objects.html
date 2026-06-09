@@ -1,67 +1,165 @@
-<div class="objects-page">
+<div class="page-container">
 
-  <div class="page-header">
-    <h1>Objekte</h1>
-    <p>{{ filteredSpecimens.length }} Objekte gefunden</p>
-  </div>
-
-  <div class="filter-bar">
-    <input
-      class="search-input"
-      type="text"
-      placeholder="Suche nach Name oder Gattung..."
-      [(ngModel)]="searchTerm"
-    />
-    <select class="status-select" [(ngModel)]="selectedStatus">
-      <option value="">Alle Status</option>
-      <option value="verfügbar">Verfügbar</option>
-      <option value="ausgeliehen">Ausgeliehen</option>
-      <option value="verloren">Verloren</option>
-      <option value="zerstört">Zerstört</option>
-    </select>
-  </div>
-
-  <div class="specimen-grid">
-    @for (specimen of filteredSpecimens; track specimen.id) {
-      <div class="specimen-card">
-        <div class="card-image">
-            <img [src]="specimen.image" [alt]="specimen.name" class="specimen-img" />
-            <span class="status-badge {{ getStatusClass(specimen.status) }}">{{ specimen.status }}</span>
-        </div>
-        <div class="card-body">
-            <h3 class="specimen-name">{{ specimen.name }}</h3>
-            <p class="specimen-meta">
-                <em>{{ specimen.genus }} {{ specimen.species }}</em> · {{ specimen.dateCollected | date: 'yyyy' }}
-            </p>
-        </div>
-
-        <div class="info-panel">
-            <p class="info-panel-title">{{ specimen.name }}</p>
-            <div class="info-row">
-            <span class="info-label">Status</span>
-            <span class="info-value">{{ specimen.status }}</span>
-            </div>
-            <div class="info-row">
-            <span class="info-label">Gattung</span>
-            <span class="info-value">{{ specimen.genus }}</span>
-            </div>
-            <div class="info-row">
-            <span class="info-label">Art</span>
-            <span class="info-value">{{ specimen.species }}</span>
-            </div>
-            <div class="info-row">
-            <span class="info-label">Gesammelt am</span>
-            <span class="info-value">{{ specimen.dateCollected | date: 'dd.MM.yyyy' }}</span>
-            </div>
-            <div class="info-row">
-            <span class="info-label">ID</span>
-            <span class="info-value">#{{ specimen.id }}</span>
-            </div>
-        </div>
-        </div>
-
+  <!-- Breadcrumb -->
+  <div class="breadcrumb">
+    <a routerLink="/dashboard" class="breadcrumb-link">Übersicht</a>
+    <span class="breadcrumb-sep">›</span>
+    <span class="breadcrumb-current">Sammlungen</span>
+    @if (activeCollectionName) {
+      <span class="breadcrumb-sep">›</span>
+      <span class="breadcrumb-current">{{ activeCollectionName }}</span>
     }
   </div>
 
+  <!-- Header -->
+  <div class="objects-header">
+    <div>
+      <h1 class="objects-title serif">{{ activeCollectionName || 'Alle Objekte' }}</h1>
+      <p class="objects-subtitle">{{ filteredSpecimens.length }} Präparate in der Sammlung</p>
+    </div>
+    <div class="header-actions">
+      <div class="view-toggle">
+        <button class="toggle-btn" [class.active]="viewMode === 'grid'" (click)="viewMode = 'grid'" title="Rasteransicht">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+        </button>
+        <button class="toggle-btn" [class.active]="viewMode === 'list'" (click)="viewMode = 'list'" title="Listenansicht">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+        </button>
+      </div>
+      <!-- PRIMARY ACTION: Neues Objekt lives here now -->
+      <a routerLink="/new-object" class="primary-button new-obj-btn">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Neues Objekt
+      </a>
+    </div>
+  </div>
+
+  <!-- Stats bar -->
+  <div class="stats-bar">
+    <div class="stat-item">
+      <span class="stat-dot dot-available"></span>
+      <span class="stat-label">{{ countByStatus('verfügbar') }} Verfügbar</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-dot dot-loaned"></span>
+      <span class="stat-label">{{ countByStatus('ausgeliehen') }} Ausgeliehen</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-dot dot-lost"></span>
+      <span class="stat-label">{{ countByStatus('verloren') }} Verloren</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-dot dot-destroyed"></span>
+      <span class="stat-label">{{ countByStatus('zerstört') }} Zerstört</span>
+    </div>
+  </div>
+
+  <!-- Toolbar -->
+  <div class="toolbar">
+    <div class="search-wrapper">
+      <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input class="form-input search-input" type="text" placeholder="Name oder Gattung suchen…" [(ngModel)]="searchTerm"/>
+    </div>
+    <div class="filter-pills">
+      <button class="pill" [class.pill-active]="selectedStatus === ''"           (click)="selectedStatus = ''">Alle</button>
+      <button class="pill" [class.pill-active]="selectedStatus === 'verfügbar'"  (click)="selectedStatus = 'verfügbar'">Verfügbar</button>
+      <button class="pill" [class.pill-active]="selectedStatus === 'ausgeliehen'"(click)="selectedStatus = 'ausgeliehen'">Ausgeliehen</button>
+      <button class="pill" [class.pill-active]="selectedStatus === 'verloren'"   (click)="selectedStatus = 'verloren'">Verloren</button>
+      <button class="pill" [class.pill-active]="selectedStatus === 'zerstört'"   (click)="selectedStatus = 'zerstört'">Zerstört</button>
+    </div>
+  </div>
+
+  <!-- GRID VIEW -->
+  @if (viewMode === 'grid') {
+    <div class="grid grid-3">
+      @for (specimen of filteredSpecimens; track specimen.id) {
+        <div class="specimen-card card">
+          <div class="card-image-area">
+            <span class="badge {{ getStatusClass(specimen.status) }}">{{ specimen.status }}</span>
+            @if (specimen.image) {
+              <img [src]="specimen.image" [alt]="specimen.name" class="specimen-img"/>
+            } @else {
+              <div class="img-placeholder">🦎</div>
+            }
+          </div>
+          <div class="card-body-area">
+            <h3 class="specimen-name serif">{{ specimen.name }}</h3>
+            <p class="specimen-latin"><em>{{ specimen.genus }} {{ specimen.species }}</em></p>
+            <div class="specimen-footer">
+              <span class="specimen-year">{{ specimen.dateCollected | date:'yyyy' }}</span>
+              <span class="specimen-id">#{{ specimen.id }}</span>
+            </div>
+          </div>
+          <div class="hover-overlay">
+            <p class="overlay-title serif">{{ specimen.name }}</p>
+            <div class="overlay-row"><span>Status</span><span class="overlay-val">{{ specimen.status }}</span></div>
+            <div class="overlay-row"><span>Gattung</span><span class="overlay-val">{{ specimen.genus }}</span></div>
+            <div class="overlay-row"><span>Art</span><span class="overlay-val"><em>{{ specimen.species }}</em></span></div>
+            <div class="overlay-row"><span>Gesammelt</span><span class="overlay-val">{{ specimen.dateCollected | date:'dd.MM.yyyy' }}</span></div>
+            <div class="overlay-row"><span>ID</span><span class="overlay-val">#{{ specimen.id }}</span></div>
+          </div>
+        </div>
+      }
+
+      <!-- Inline "add object" card -->
+      <a routerLink="/new-object" class="specimen-card card add-object-card">
+        <div class="add-object-inner">
+          <div class="add-obj-icon">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          </div>
+          <span class="add-obj-label">Neues Objekt hinzufügen</span>
+        </div>
+      </a>
+    </div>
+  }
+
+  <!-- LIST VIEW -->
+  @if (viewMode === 'list') {
+    <div class="list-view">
+      <div class="list-header">
+        <span>Präparat</span>
+        <span>Taxonomie</span>
+        <span>Status</span>
+        <span>Gesammelt</span>
+        <span>ID</span>
+      </div>
+      @for (specimen of filteredSpecimens; track specimen.id) {
+        <div class="list-row">
+          <div class="list-name-cell">
+            <div class="list-thumb">
+              @if (specimen.image) {
+                <img [src]="specimen.image" [alt]="specimen.name"/>
+              } @else {
+                <span>🦎</span>
+              }
+            </div>
+            <span class="list-name serif">{{ specimen.name }}</span>
+          </div>
+          <span class="list-latin"><em>{{ specimen.genus }} {{ specimen.species }}</em></span>
+          <span><span class="badge {{ getStatusClass(specimen.status) }}">{{ specimen.status }}</span></span>
+          <span class="list-date">{{ specimen.dateCollected | date:'dd.MM.yyyy' }}</span>
+          <span class="list-id">#{{ specimen.id }}</span>
+        </div>
+      }
+      <!-- Add row in list view -->
+      <a routerLink="/new-object" class="list-row list-add-row">
+        <div class="list-name-cell">
+          <div class="list-thumb list-thumb-add">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          </div>
+          <span class="list-name" style="color: var(--green-dark)">Neues Objekt hinzufügen</span>
+        </div>
+      </a>
+    </div>
+  }
+
+  <!-- Empty state -->
+  @if (filteredSpecimens.length === 0) {
+    <div class="empty-state">
+      <div class="empty-icon">🔍</div>
+      <p class="empty-title serif">Keine Objekte gefunden</p>
+      <p class="empty-text">Versuche einen anderen Suchbegriff oder Filter.</p>
+    </div>
+  }
 
 </div>

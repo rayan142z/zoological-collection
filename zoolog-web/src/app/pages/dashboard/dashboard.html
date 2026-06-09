@@ -1,0 +1,147 @@
+<div class="page-container">
+
+  <!-- Hero greeting -->
+  <div class="dashboard-hero">
+    <div class="hero-text">
+      <p class="hero-eyebrow">Willkommen zurück</p>
+      <h1 class="dashboard-title serif">Übersicht</h1>
+      <p class="dashboard-subtitle">Deine zoologischen Sammlungen auf einen Blick</p>
+    </div>
+    <div class="hero-actions">
+      <a routerLink="/objects" class="primary-button">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+        Alle Sammlungen
+      </a>
+      <button class="secondary-button" (click)="showNewCollection = !showNewCollection">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Neue Sammlung
+      </button>
+    </div>
+  </div>
+
+  <!-- Quick stats strip -->
+  <div class="quick-stats">
+    <div class="qstat" *ngFor="let s of quickStats">
+      <span class="qstat-icon">{{ s.icon }}</span>
+      <div class="qstat-body">
+        <span class="qstat-val">{{ s.value }}</span>
+        <span class="qstat-lbl">{{ s.label }}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── EIGENE SAMMLUNGEN ── -->
+  <section class="dash-section">
+    <div class="section-header">
+      <div class="section-header-left">
+        <span class="section-icon">🗂️</span>
+        <div>
+          <h2 class="section-heading serif">Meine Sammlungen</h2>
+          <p class="section-meta">{{ myCollections.length }} Sammlungen · {{ totalObjects(myCollections) }} Objekte</p>
+        </div>
+      </div>
+      <a routerLink="/objects" class="section-link">
+        Alle anzeigen
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </a>
+    </div>
+
+    <div class="collections-grid">
+      @for (col of myCollections; track col.id) {
+        <a class="collection-card" [routerLink]="['/objects', col.id]">
+          <div class="col-card-top" [style.background]="col.color">
+            <span class="col-emoji">{{ col.emoji }}</span>
+            <div class="col-card-badge">{{ col.objectCount }} Obj.</div>
+          </div>
+          <div class="col-card-body">
+            <h3 class="col-name serif">{{ col.name }}</h3>
+            <p class="col-desc">{{ col.description }}</p>
+            <div class="col-meta-row">
+              <span class="col-tag" *ngFor="let tag of col.tags">{{ tag }}</span>
+            </div>
+          </div>
+          <div class="col-card-footer">
+            <span class="col-updated">Zuletzt: {{ col.lastUpdated }}</span>
+            <span class="col-arrow">→</span>
+          </div>
+        </a>
+      }
+
+      <!-- Add new collection card -->
+      <button class="collection-card collection-card-new" (click)="showNewCollection = true">
+        <div class="new-col-inner">
+          <div class="new-col-icon">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          </div>
+          <span class="new-col-label">Neue Sammlung erstellen</span>
+        </div>
+      </button>
+    </div>
+  </section>
+
+  <!-- ── FAVORISIERTE SAMMLUNGEN ── -->
+  <section class="dash-section">
+    <div class="section-header">
+      <div class="section-header-left">
+        <span class="section-icon">⭐</span>
+        <div>
+          <h2 class="section-heading serif">Favoriten</h2>
+          <p class="section-meta">{{ favCollections.length }} gespeicherte Sammlungen</p>
+        </div>
+      </div>
+      <button class="section-link" (click)="activeTab = 'favorites'">
+        Alle anzeigen
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </button>
+    </div>
+
+    <div class="collections-row">
+      @for (col of favCollections; track col.id) {
+        <a class="collection-tile" [routerLink]="['/objects', col.id]">
+          <div class="tile-left">
+            <div class="tile-orb" [style.background]="col.color">{{ col.emoji }}</div>
+            <div class="tile-info">
+              <span class="tile-name serif">{{ col.name }}</span>
+              <span class="tile-owner">{{ col.owner }}</span>
+            </div>
+          </div>
+          <div class="tile-right">
+            <span class="tile-count">{{ col.objectCount }}</span>
+            <span class="tile-count-lbl">Objekte</span>
+          </div>
+        </a>
+      }
+    </div>
+  </section>
+
+  <!-- ── BELIEBTE SAMMLUNGEN ── -->
+  <section class="dash-section">
+    <div class="section-header">
+      <div class="section-header-left">
+        <span class="section-icon">🔥</span>
+        <div>
+          <h2 class="section-heading serif">Beliebte Sammlungen</h2>
+          <p class="section-meta">Entdecke was andere erforschen</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="popular-grid">
+      @for (col of popularCollections; track col.id) {
+        <a class="popular-card" [routerLink]="['/objects', col.id]">
+          <div class="popular-rank">#{{ $index + 1 }}</div>
+          <div class="popular-orb" [style.background]="col.color">{{ col.emoji }}</div>
+          <div class="popular-body">
+            <h3 class="popular-name serif">{{ col.name }}</h3>
+            <p class="popular-desc">{{ col.description }}</p>
+            <div class="popular-footer">
+              <span class="popular-views">👁 {{ col.views }} Aufrufe</span>
+              <span class="popular-objects">{{ col.objectCount }} Objekte</span>
+            </div>
+          </div>
+        </a>
+      }
+    </div>
+  </section>
+
+</div>
