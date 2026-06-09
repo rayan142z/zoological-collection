@@ -1,34 +1,41 @@
-import { Component, inject } from '@angular/core';
-import { FormsModule  } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
-import { Auth } from './../../services/auth';
+import { Component, signal } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-login',
-  imports: [FormsModule, RouterLink],
+  standalone: true,
+  imports: [CommonModule, FormsModule, RouterLink],
   templateUrl: './login.html',
   styleUrl: './login.css',
 })
 export class Login {
-  // Zugriff auf Auth und Router
-  private auth= inject(Auth);
-  private router = inject(Router);
+  readonly loginData = signal({ email: '', password: '', remember: false });
+  readonly showPw = signal(false);
+  readonly emailFocused = signal(false);
+  readonly pwFocused = signal(false);
+  readonly isLoading = signal(false);
+  readonly errorMsg = signal('');
 
-  // Formularwerte
-  email = '';
-  password = '';
+  readonly specimens = signal([
+    { icon: '🦋', name: 'Schwalbenschwanz', latin: 'Papilio machaon' },
+    { icon: '🪲', name: 'Hirschkäfer', latin: 'Lucanus cervus' },
+    { icon: '🐭', name: 'Waldmaus', latin: 'Apodemus sylvaticus' },
+  ]);
 
-  // Fehlermeldung
-  errorMessage = '';
+  readonly panelStats = signal([
+    { value: '3.4k+', label: 'Präparate' },
+    { value: '18', label: 'Klassen' },
+    { value: '120', label: 'Jahre' },
+  ]);
 
-  onSubmit(): void {
-    const success = this.auth.login(this.email, this.password);
-
-    if (!success) {
-      this.errorMessage = 'Bitte E-Mail und Passwort eingeben';
-      return;
-    }
-    // Erfolgreiche Login leitet Nutzer zur Profilseite weiter
-    this.router.navigate(['/profile']);
+  onLogin() {
+    this.isLoading.set(true);
+    this.errorMsg.set('');
+    setTimeout(() => {
+      this.isLoading.set(false);
+      // Handle auth logic here
+    }, 1200);
   }
 }

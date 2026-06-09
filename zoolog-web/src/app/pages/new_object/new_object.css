@@ -1,27 +1,108 @@
-/* AS: Diese Seite ermöglicht das Erfassen eines neuen Präparats für die Sammlung.
-   Das Layout ist zweispaltig: links die Formularfelder, rechts eine sticky Sidebar mit Foto, Vorschau und Speichern-Button. */
+.new-object-header { margin-bottom: 32px; }
 
-
-/* AS: Abstand unter dem Seitenkopf mit Titel und Zurück-Link */
-.new-object-header {
-  margin-bottom: 28px;
-}
-
-/* AS: Der Zurück-Link navigiert zurück zur Objektübersicht und ist dezent in Grün gehalten */
 .back-link {
-  display: inline-block;
-  color: var(--color-primary);
-  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   font-size: 13px;
-  font-weight: 600;
-  margin-bottom: 12px;
-  opacity: 0.8;
-  transition: opacity 0.15s;
+  font-weight: 700;
+  color: var(--green-dark);
+  margin-bottom: 16px;
+  letter-spacing: 0.3px;
+  transition: gap 0.15s;
+}
+.back-link:hover { gap: 10px; }
+
+.new-object-title {
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: -0.4px;
+  margin-bottom: 6px;
 }
 
-.back-link:hover { opacity: 1; }
+.new-object-subtitle { font-size: 14px; color: var(--text-muted); }
 
-/* AS: Das Hauptlayout teilt die Seite in zwei Spalten: breiten Formularbereich links und schmale Sidebar rechts */
+/* ── Wizard steps ────────────────────────────────────────── */
+.wizard-steps {
+  display: flex;
+  align-items: center;
+  margin-bottom: 32px;
+  background: var(--surface);
+  border: 1px solid var(--cream-border);
+  border-radius: var(--radius-lg);
+  padding: 24px 40px;
+  box-shadow: var(--shadow-sm);
+}
+
+.step {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+}
+
+.step-circle {
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  background: var(--cream-dark);
+  color: var(--brown-dark);
+  font-size: 15px;
+  font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+  flex-shrink: 0;
+  border: 2px solid var(--cream-border);
+}
+
+.step-active .step-circle {
+  background: var(--green-dark);
+  color: #F0EAD6;
+  border-color: var(--green-dark);
+  box-shadow: 0 0 0 4px rgba(45,74,45,0.12);
+}
+
+.step-done .step-circle {
+  background: var(--green-mid);
+  color: #fff;
+  border-color: var(--green-mid);
+}
+
+.step-info { display: flex; flex-direction: column; gap: 2px; }
+
+.step-number {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--text-hint);
+}
+
+.step-active .step-number { color: var(--green-mid); }
+.step-done .step-number   { color: var(--green-mid); }
+
+.step-label {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-hint);
+  white-space: nowrap;
+}
+
+.step-active .step-label { color: var(--text); }
+.step-done .step-label   { color: var(--green-dark); }
+
+.step-line {
+  flex: 1;
+  height: 2px;
+  background: var(--cream-border);
+  margin: 0 20px;
+  border-radius: 2px;
+  transition: background 0.3s;
+}
+
+.step-line-done { background: var(--green-mid); }
+
+/* ── Layout ──────────────────────────────────────────────── */
 .form-layout {
   display: grid;
   grid-template-columns: 1fr 300px;
@@ -29,242 +110,212 @@
   align-items: start;
 }
 
-/* AS: Der linke Bereich stapelt die Formular-Sektionen untereinander */
-.form-main {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
+.form-main { min-width: 0; }
+
+/* ── Section card override for form ─────────────────────── */
+.section-card {
+  background: var(--surface);
+  border: 1px solid var(--cream-border);
+  border-radius: var(--radius-lg);
+  padding: 32px;
+  margin-bottom: 0;
+  box-shadow: var(--shadow-sm);
 }
 
-/* AS: Die Sidebar bleibt beim Scrollen sichtbar (sticky), damit der Speichern-Button immer erreichbar ist */
-.form-sidebar {
+/* ── Step nav ────────────────────────────────────────────── */
+.step-nav {
   display: flex;
-  flex-direction: column;
-  gap: 16px;
-  position: sticky;
-  top: 24px;
-}
-
-/* AS: Jede Formular-Sektion (Grunddaten, Taxonomie, etc.) bekommt einheitlichen Innenabstand */
-.form-section {
-  padding: 24px;
-}
-
-/* AS: Der Sektionskopf zeigt den Titel mit einem grünen Akzentbalken und einer Trennlinie darunter */
-.section-header {
-  display: flex;
+  justify-content: space-between;
   align-items: center;
-  gap: 10px;
-  margin-bottom: 20px;
-  padding-bottom: 14px;
-  border-bottom: 1px solid var(--color-border);
+  margin-top: 28px;
+  padding-top: 24px;
+  border-top: 1px solid var(--cream-dark);
 }
 
-/* AS: Der grüne Balken vor dem Sektionstitel wird per CSS eingefügt, kein extra HTML-Element nötig */
-.section-title::before {
-  content: '';
-  display: inline-block;
-  width: 4px;
-  height: 16px;
-  background: var(--color-primary);
-  border-radius: 2px;
-  margin-right: 10px;
-  vertical-align: middle;
-}
-
-/* AS: Schriftgröße und Farbe des Sektionstitel */
-.section-title {
-  font-size: 16px;
-  font-weight: 700;
-  color: var(--color-text);
-  margin: 0;
-}
-
-/* AS: Jede Formularzeile (Label + Input) bekommt Abstand nach unten, außer die letzte */
-.form-group {
-  margin-bottom: 16px;
-}
-
-.form-group:last-child { margin-bottom: 0; }
-
-/* AS: Zwei Felder nebeneinander werden per Grid in zwei gleich breite Spalten aufgeteilt */
-.form-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
-  margin-bottom: 16px;
-}
-
-.form-row .form-group { margin-bottom: 0; }
-
-/* AS: Das Label über jedem Eingabefeld ist klein und fett, damit es klar vom Eingabefeld abgegrenzt ist */
-.form-label {
-  display: block;
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--color-text);
-  margin-bottom: 6px;
-}
-
-/* AS: Hinweistext unter einem Eingabefeld, z.B. für den wissenschaftlichen Artnamen */
-.form-hint {
-  font-size: 11px;
-  color: var(--color-muted);
-  margin: 4px 0 0 0;
-}
-
-/* AS: Pflichtfelder werden mit einem roten Sternchen markiert */
-.required {
-  color: #dc2626;
-}
-
-/* AS: Alle Eingabefelder haben einen leicht grauen Hintergrund, damit sie sich von der weißen Card abheben */
-.form-input,
-.form-select,
-.form-textarea {
-  transition: border-color 0.15s, box-shadow 0.15s;
-  background: #fafafa;
-}
-
-/* AS: Beim Klick auf ein Eingabefeld wechselt die Rahmenfarbe zu Grün und ein leichter Schatten erscheint */
-.form-input:focus,
-.form-select:focus,
-.form-textarea:focus {
-  outline: none;
-  border-color: var(--color-primary);
-  background: white;
-  box-shadow: 0 0 0 3px rgba(31, 94, 59, 0.08);
-}
-
-/* AS: Das Textfeld für die Beschreibung kann vom Nutzer in der Höhe vergrößert werden */
-.form-textarea {
-  resize: vertical;
-  min-height: 90px;
-}
-
-/* AS: Die Vorschau-Card zeigt zentriert eine verkleinerte Ansicht der späteren Objekt-Karte */
-.preview-card { text-align: center; }
-
-.preview-specimen {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-}
-
-/* AS: Platzhalter für das Foto in der Vorschau, bis ein echtes Bild hochgeladen wurde */
-.preview-image-placeholder {
-  width: 80px;
-  height: 80px;
-  background: #f0f4f1;
-  border-radius: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 4px;
-}
-
-.preview-icon { font-size: 36px; }
-
-.preview-name {
-  font-size: 14px;
-  font-weight: 700;
-  color: var(--color-text);
-  margin: 0;
-}
-
-/* AS: Der wissenschaftliche Name wird kursiv und in gedämpfter Farbe dargestellt */
-.preview-taxon {
-  font-size: 12px;
-  color: var(--color-muted);
-  margin: 0;
-}
-
-/* AS: Das Status-Badge zeigt den aktuellen Zustand des Objekts farbig an */
-.status-badge {
-  padding: 3px 10px;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.3px;
-  text-transform: uppercase;
-  border-radius: 6px;
-}
-
-.status-available { background: #d1fae5; color: #065f46; }
-
-/* AS: Die Aktions-Buttons zum Speichern und Abbrechen werden untereinander angezeigt */
-.form-actions {
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-/* AS: Beide Buttons nehmen die volle Breite der Sidebar ein */
-.submit-btn,
-.cancel-btn {
-  width: 100%;
-  padding: 12px;
-  font-size: 14px;
-}
-
-/* AS: Kleiner Hinweis unter den Buttons, dass Sternchen-Felder Pflichtfelder sind */
 .required-hint {
-  font-size: 11px;
-  color: var(--color-muted);
+  font-size: 12px;
+  color: var(--text-hint);
+  margin-top: 14px;
+}
+
+/* ── Upload zone ─────────────────────────────────────────── */
+.upload-zone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  border: 2px dashed var(--cream-border);
+  border-radius: var(--radius-lg);
+  padding: 52px 20px;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+  background: #FAFAF7;
   text-align: center;
-  margin: 4px 0 0 0;
 }
 
-/* AS: Der Foto-Upload Bereich ist unsichtbar, der klickbare Bereich wird über das Label gesteuert */
-.upload-input {
-  display: none;
+.upload-zone:hover { border-color: var(--green-mid); background: var(--green-light); }
+
+.upload-icon { font-size: 40px; margin-bottom: 4px; }
+.upload-text { font-size: 15px; font-weight: 700; color: var(--text); }
+.upload-hint { font-size: 12px; color: var(--text-hint); }
+
+/* ── Sidebar ─────────────────────────────────────────────── */
+.form-sidebar { display: flex; flex-direction: column; gap: 16px; position: sticky; top: 88px; }
+
+/* ── Preview card ────────────────────────────────────────── */
+.preview-card {
+  text-align: center;
+  padding: 28px 24px;
+  background: linear-gradient(145deg, #f8f5ee, #ffffff);
+  border: 1px solid var(--cream-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
 }
 
-.upload-area {
-  width: 100%;
+.preview-card .section-title {
+  text-align: left;
+  margin-bottom: 24px;
 }
 
-/* AS: Das Upload-Label wirkt wie eine Schaltfläche mit gestricheltem Rahmen, der beim Hover grün wird */
-.upload-label {
+.preview-body { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+
+.preview-img-area {
+  width: 80px; height: 80px;
+  border-radius: 50%;
+  background: var(--green-light);
+  border: 3px solid var(--green-border);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 36px;
+  margin-bottom: 8px;
+}
+
+.preview-name  { font-size: 18px; font-weight: 700; color: var(--text); }
+.preview-latin { font-size: 13px; color: var(--brown); }
+.preview-date  { font-size: 12px; color: var(--text-hint); margin-top: 4px; }
+
+/* ── Progress card ───────────────────────────────────────── */
+.progress-card {
+  padding: 24px;
+  background: var(--surface);
+  border: 1px solid var(--cream-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+.progress-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 4px;
+}
+
+.progress-step-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.progress-dot {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  background: var(--cream-border);
+  flex-shrink: 0;
+  transition: background 0.2s;
+}
+
+.progress-dot.done    { background: var(--green-mid); }
+.progress-dot.current { background: var(--green-dark); box-shadow: 0 0 0 3px rgba(45,74,45,0.15); }
+
+.progress-step-label {
+  font-size: 13px;
+  color: var(--text-hint);
+  font-weight: 600;
+}
+
+.progress-step-label.current { color: var(--text); }
+.progress-step-label.done    { color: var(--green-dark); }
+
+.progress-bar-wrap {
+  height: 5px;
+  background: var(--cream-dark);
+  border-radius: 3px;
+  overflow: hidden;
+  margin: 16px 0 8px;
+}
+
+.progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, var(--green-dark), var(--green-mid));
+  border-radius: 3px;
+  transition: width 0.4s ease;
+}
+
+.progress-label { font-size: 12px; color: var(--text-hint); }
+
+@media (max-width: 860px) {
+  .form-layout { grid-template-columns: 1fr; }
+  .form-sidebar { position: static; order: -1; }
+  .wizard-steps { padding: 16px 20px; }
+  .step-info { display: none; }
+}
+
+/* ── Clickable preview image ─────────────────────────────── */
+.preview-img-area {
+  position: relative;
+  width: 100px; height: 100px;
+  border-radius: 50%;
+  background: var(--green-light);
+  border: 3px solid var(--green-border);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 40px;
+  margin: 0 auto 14px;
+  cursor: pointer;
+  overflow: hidden;
+  transition: border-color 0.2s;
+}
+
+.preview-img-area:hover { border-color: var(--green-mid); }
+
+.preview-photo {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.preview-emoji { font-size: 40px; }
+
+.preview-img-overlay {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: rgba(45,74,45,0.75);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  padding: 28px 16px;
-  border: 2px dashed var(--color-border);
-  border-radius: 10px;
-  cursor: pointer;
-  transition: border-color 0.15s, background 0.15s;
+  gap: 4px;
+  opacity: 0;
+  transition: opacity 0.2s;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
   text-align: center;
 }
 
-.upload-label:hover {
-  border-color: var(--color-primary);
-  background: rgba(31, 94, 59, 0.04);
+.preview-img-area:hover .preview-img-overlay { opacity: 1; }
+
+/* upload zone with image preview */
+.upload-preview-img {
+  width: 100%;
+  max-height: 220px;
+  object-fit: contain;
+  border-radius: var(--radius-md);
 }
 
-.upload-icon { font-size: 28px; }
-
-.upload-text {
+.upload-change-hint {
   font-size: 13px;
+  color: var(--text-muted);
   font-weight: 600;
-  color: var(--color-primary);
-}
-
-.upload-hint {
-  font-size: 11px;
-  color: var(--color-muted);
-}
-
-/* AS: Auf kleinen Bildschirmen wechselt das Layout zu einer einzelnen Spalte */
-@media (max-width: 900px) {
-  .form-layout {
-    grid-template-columns: 1fr;
-  }
-
-  .form-sidebar {
-    position: static;
-  }
+  margin-top: 8px;
 }

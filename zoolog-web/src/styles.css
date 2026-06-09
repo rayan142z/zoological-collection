@@ -1,127 +1,319 @@
-/* You can add global styles to this file, and also import other style files */
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Lato:ital,wght@0,300;0,400;0,700;1,400&display=swap');
 
-/* AS: Hier werden die primären Designdinge festgelegt wie Farben etc. */
+/* ── Tokens ─────────────────────────────────────────────── */
 :root {
-  --color-primary: #1F5E3B;
-  --color-primary-dark: #16472D;
-  --color-primary-light: #A8D5BA;
+  --green-dark:    #2D4A2D;
+  --green-mid:     #7BA05B;
+  --green-light:   #EAF0E3;
+  --green-border:  #A8C090;
 
-  --color-background: #F7F8F5;
-  --color-surface: #FFFFFF;
-  --color-text: #1F2933;
-  --color-muted: #6B7280;
-  --color-border: #E5E7EB;
+  --cream:         #F5F0E8;
+  --cream-dark:    #EDE6D6;
+  --cream-border:  #D6CBB8;
 
-  --radius-card: 14px;
-  --radius-button: 10px;
+  --brown:         #8B7355;
+  --brown-light:   #B0A08A;
+  --brown-dark:    #6B5E4A;
 
-  --shadow-card: 0 4px 14px rgba(0, 0, 0, 0.08);
+  --text:          #2D3A1E;
+  --text-muted:    #6B5E4A;
+  --text-hint:     #B0A08A;
+
+  --surface:       #FFFFFF;
+  --bg:            #F5F0E8;
+
+  --radius-sm:     4px;
+  --radius-md:     8px;
+  --radius-lg:     12px;
+  --radius-xl:     16px;
+
+  --shadow-sm:     0 1px 4px rgba(45,74,45,0.08);
+  --shadow-md:     0 4px 16px rgba(45,74,45,0.12);
+  --shadow-lg:     0 8px 32px rgba(45,74,45,0.16);
 }
 
-/* AS: Box Sizing auf Border Box festsetzen, damit Ihaltsbereich sich automatisch anpasst */
-* {
-  box-sizing: border-box;
-}
+/* ── Reset ───────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-/* AS: Im Body wird die Schriftart, Hintergrundfarbe und Textfarbe festgelegt. Wir wollen keine Standardränder, die Hintergrundfarbe Offwhite und den Text in Dunkelgrau */
+html { -webkit-font-smoothing: antialiased; }
+
 body {
-  margin: 0;
-  font-family: Arial, Helvetica, sans-serif;
-  background: var(--color-background);
-  color: var(--color-text);
+  font-family: 'Lato', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 15px;
+  line-height: 1.6;
 }
 
-/* AS: äußeren Rahmen der Seite festlegen */
+a { text-decoration: none; color: inherit; }
+
+/* ── Typography ──────────────────────────────────────────── */
+.serif { font-family: 'Playfair Display', serif; }
+
+.latin, .scientific-name, em.latin {
+  font-family: 'Lato', sans-serif;
+  font-style: italic;
+  color: var(--brown);
+}
+
+/* ── Layout ──────────────────────────────────────────────── */
 .page-container {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 32px 24px;
+  padding: 40px 32px;
 }
 
-.page-title {
-  font-size: 32px;
+/* ── Navbar ──────────────────────────────────────────────── */
+.navbar {
+  background: var(--green-dark);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 40px;
+  height: 68px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+}
+
+.navbar-left { display: flex; align-items: center; gap: 12px; }
+
+.logo-box {
+  width: 36px; height: 36px;
+  background: var(--green-mid);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+
+.brand-name {
+  font-family: 'Playfair Display', serif;
+  color: #F0EAD6;
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+}
+
+.navbar-center { display: flex; gap: 8px; }
+
+.nav-link {
+  color: #A8C090;
+  font-size: 12px;
   font-weight: 700;
-  margin: 0 0 8px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  padding: 6px 14px;
+  border-radius: var(--radius-sm);
+  transition: color 0.15s, background 0.15s;
 }
 
-.page-subtitle {
-  color: var(--color-muted);
-  margin: 0 0 24px;
+.nav-link:hover { color: #F0EAD6; background: rgba(255,255,255,0.06); }
+.nav-link.active { color: #F0EAD6; background: rgba(255,255,255,0.1); }
+
+.navbar-right { display: flex; align-items: center; gap: 10px; }
+
+.nav-user {
+  color: #F0EAD6;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 6px 12px;
 }
 
-/*AS: Eine Card soll ein weißen Kasten darstellen für z.B ein Tier */
-.card {
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-card);
-  box-shadow: var(--shadow-card);
+.btn-ghost {
+  color: #A8C090;
+  border: 1px solid #A8C090;
+  background: transparent;
+  border-radius: var(--radius-sm);
+  padding: 6px 16px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s, background 0.15s;
+  font-family: inherit;
 }
 
-/* AS: Der primary Button soll Hauptaktionen darstellen wie "Neues Objekt erfassen" */
-.primary-button {
-  background: var(--color-primary);
-  color: white;
+.btn-ghost:hover { color: #F0EAD6; border-color: #F0EAD6; }
+
+.btn-primary {
+  background: var(--green-mid);
+  color: #fff;
   border: none;
-  border-radius: var(--radius-button);
-  padding: 10px 18px;
-  font-weight: 600;
+  border-radius: var(--radius-sm);
+  padding: 7px 18px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
   cursor: pointer;
+  transition: background 0.15s;
+  font-family: inherit;
 }
 
-.primary-button:hover {
-  background: var(--color-primary-dark);
-}
+.btn-primary:hover { background: #6A8F4A; }
 
-/* AS: Der secondary Button soll sekundäre Aktionen darstellen wie "Details anzeigen" */
+/* ── Buttons (page level) ────────────────────────────────── */
+.primary-button {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: var(--green-dark);
+  color: #F0EAD6;
+  border: none;
+  border-radius: var(--radius-md);
+  padding: 11px 22px;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.primary-button:hover { background: #1e331e; }
+
 .secondary-button {
-  background: white;
-  color: var(--color-primary);
-  border: 1px solid var(--color-primary);
-  border-radius: var(--radius-button);
-  padding: 10px 18px;
-  font-weight: 600;
+  display: inline-flex; align-items: center; gap: 8px;
+  background: var(--surface);
+  color: var(--green-dark);
+  border: 1px solid var(--cream-border);
+  border-radius: var(--radius-md);
+  padding: 10px 22px;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
   cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
 }
+.secondary-button:hover { background: var(--cream); border-color: var(--brown-light); }
+
+/* ── Cards ───────────────────────────────────────────────── */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--cream-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+  transition: box-shadow 0.2s, transform 0.2s;
+}
+.card:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); }
+
+/* ── Status Badges ───────────────────────────────────────── */
+.badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.status-available  { background: #D4EAC8; color: #2D5A1B; }
+.status-loaned     { background: #FAE8C8; color: #7A4A10; }
+.status-lost       { background: #FAD8D8; color: #7A1B1B; }
+.status-destroyed  { background: #E8D8C8; color: #5A3A1B; }
+
+/* ── Forms ───────────────────────────────────────────────── */
+.form-group { margin-bottom: 18px; }
+
+.form-label {
+  display: block;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  color: var(--brown-dark);
+  margin-bottom: 6px;
+}
+
+.required { color: #C0392B; margin-left: 2px; }
 
 .form-input,
 .form-select,
 .form-textarea {
   width: 100%;
-  padding: 10px 12px;
-  border: 1px solid var(--color-border);
-  border-radius: 8px;
+  padding: 10px 14px;
+  border: 1px solid var(--cream-border);
+  border-radius: var(--radius-md);
+  font-family: inherit;
   font-size: 14px;
+  color: var(--text);
+  background: #FAFAF7;
+  transition: border-color 0.15s, box-shadow 0.15s;
 }
 
-/* AS: Alle Elemente sollen sauber und ordentlich nebeneinander angeordnet werden */
-.grid {
+.form-input::placeholder,
+.form-textarea::placeholder { color: var(--text-hint); }
+
+.form-input:focus,
+.form-select:focus,
+.form-textarea:focus {
+  outline: none;
+  border-color: var(--green-mid);
+  box-shadow: 0 0 0 3px rgba(123,160,91,0.15);
+  background: #fff;
+}
+
+.form-textarea { resize: vertical; min-height: 100px; }
+
+.form-row {
   display: grid;
-  gap: 24px;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
 }
 
-.grid-3 {
-  grid-template-columns: repeat(3, 1fr);
+/* ── Section Cards (forms) ───────────────────────────────── */
+.section-card {
+  background: var(--surface);
+  border: 1px solid var(--cream-border);
+  border-radius: var(--radius-lg);
+  padding: 28px;
+  margin-bottom: 20px;
 }
 
-.grid-4 {
-  grid-template-columns: repeat(4, 1fr);
+.section-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 20px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--cream-dark);
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
-/* AS: Für kleinere Bildschirme soll die Anzahl der Spalten reduziert werden, damit es besser aussieht */
-@media (max-width: 900px) {
-  .grid-3,
-  .grid-4 {
-    grid-template-columns: repeat(2, 1fr);
-  }
+.section-title::before {
+  content: '';
+  display: inline-block;
+  width: 3px; height: 18px;
+  background: var(--green-mid);
+  border-radius: 2px;
 }
 
+/* ── Grid ────────────────────────────────────────────────── */
+.grid { display: grid; gap: 20px; }
+.grid-3 { grid-template-columns: repeat(3, 1fr); }
+
+@media (max-width: 960px) {
+  .grid-3 { grid-template-columns: repeat(2, 1fr); }
+  .form-row { grid-template-columns: 1fr; }
+}
 @media (max-width: 600px) {
-  .page-container {
-    padding: 24px 16px;
-  }
+  .grid-3 { grid-template-columns: 1fr; }
+  .page-container { padding: 20px 16px; }
+}
 
-  .grid-3,
-  .grid-4 {
-    grid-template-columns: 1fr;
-  }
+/* ── Utility ─────────────────────────────────────────────── */
+.text-muted  { color: var(--text-muted); }
+.text-hint   { color: var(--text-hint); }
+.error-message {
+  background: #FAD8D8;
+  color: #7A1B1B;
+  padding: 10px 14px;
+  border-radius: var(--radius-md);
+  font-size: 13px;
+  margin-bottom: 14px;
 }

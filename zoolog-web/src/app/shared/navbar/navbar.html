@@ -1,36 +1,28 @@
-<!-- AS: Diese Datei definiert die Navigationsleiste (Navbar) der Webseite. Sie enthält den Titel der Sammlung und Links zu verschiedenen Seiten wie Übersicht, Kartenansicht und Artenanträge. -->
-
 <nav class="navbar">
+
   <div class="navbar-left">
-    <div class="logo-box">🌿</div>
+    <div class="logo-box">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="white">
+        <path d="M12 2C7 2 3 6 3 11c0 3 1.5 5.5 4 7v2h10v-2c2.5-1.5 4-4 4-7 0-5-4-9-9-9z"/>
+      </svg>
+    </div>
     <span class="brand-name">Zoologische Sammlung</span>
   </div>
 
   <div class="navbar-center">
     <a class="nav-link" routerLink="/dashboard" routerLinkActive="active">Übersicht</a>
-    <a class="nav-link" routerLink="/objects" routerLinkActive="active">Objekte</a>
-    <a class="nav-link" routerLink="/new-object" routerLinkActive="active">Neues Objekt</a>
-    <a class="nav-link" routerLink="/about-us" routerLinkActive="active">Über uns</a>
-
-
-
-
+    <a class="nav-link" routerLink="/objects"   routerLinkActive="active">Sammlungen</a>
+    <a class="nav-link" routerLink="/about-us"  routerLinkActive="active">Über uns</a>
   </div>
 
   <div class="navbar-right">
-    <span class="login-icon">♙</span>
-
     @if (currentUser(); as user) {
-      <a class="login-link" routerLink="/profile">
-        {{ user.username || user.email }}
-      </a>
-
-      <button class="logout-button" type="button" (click)="logout()">
-        Abmelden
-      </button>
+      <a class="nav-user" routerLink="/profile">{{ user.username || user.email }}</a>
+      <button class="btn-ghost" type="button" (click)="logout()">Abmelden</button>
     } @else {
-      <a class="login-link" routerLink="/login">Login</a>
-      <a class="login-link" routerLink="/register">Registrieren</a>
+      <a class="btn-ghost"   routerLink="/login">Login</a>
+      <a class="btn-primary" routerLink="/register">Registrieren</a>
     }
   </div>
+
 </nav>
