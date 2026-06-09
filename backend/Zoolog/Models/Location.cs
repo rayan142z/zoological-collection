@@ -1,6 +1,6 @@
 namespace Zoolog.Models;
 
-public class LocationModel
+public class Location
 {
     public int Id { get; set; }
     public string Name { get; set; }

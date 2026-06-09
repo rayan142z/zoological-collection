@@ -1,6 +1,6 @@
 namespace Zoolog.Models;
 
-public class TaxonomyModel
+public class Taxonomy
 {
     public int Id { get; set; }
     public string Kingdom { get; set; }

@@ -5,9 +5,9 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
-builder.Services.AddOpenApi();
+//builder.Services.AddOpenApi();
 
-var allowedOrigins = builder.Configuration.GetValue<string>("allowedOrigins")!.Split(",");
+var allowedOrigins = builder.Configuration.GetValue<string>("allowedOrigins")!.Split(",") ?? new[] {"http://localhost:4200"};
 
 builder.Services.AddDbContext<Group6DbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
@@ -29,7 +29,7 @@ if (!app.Environment.IsDevelopment())
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     //app.UseHsts();
 
-    app.MapOpenApi();
+    //app.MapOpenApi();
 }
 
 app.UseHttpsRedirection();

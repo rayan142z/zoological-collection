@@ -21,7 +21,7 @@ public class CollectionsController : ControllerBase
     public async Task<IActionResult> GetAll()
     {
         var collections = await _context.Collections
-            .Include(c => c.CreatedByNavigation)
+            .Include(c => c.Creator)
             .ToListAsync();
         return Ok(collections);
     }
@@ -31,7 +31,7 @@ public class CollectionsController : ControllerBase
     public async Task<IActionResult> GetById(int id)
     {
         var collection = await _context.Collections
-            .Include(c => c.CreatedByNavigation)
+            .Include(c => c.Creator)
             .FirstOrDefaultAsync(c => c.Id == id);
         return collection is null ? NotFound() : Ok(collection);
     }
