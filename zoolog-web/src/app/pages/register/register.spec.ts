@@ -47,36 +47,30 @@ describe('Register', () => {
   describe('checkStrength', () => {
     it('should rate short password as weak', () => {
       component.regData.set({ ...component.regData(), password: 'abc' });
-      component.checkStrength();
       expect(component.strengthLevel()).toBe('weak');
-      expect(component.strengthPct()).toBe(25);
+      expect(component.strengthPct()).toBe(0);
     });
 
     it('should rate medium password as fair', () => {
-      component.regData.set({ ...component.regData(), password: 'abcdefgh' });
-      component.checkStrength();
+      component.regData.set({ ...component.regData(), password: 'Abcdefgh' });
       expect(component.strengthLevel()).toBe('fair');
-      expect(component.strengthPct()).toBe(50); // Adjusted threshold logic
+      expect(component.strengthPct()).toBe(45);
     });
 
     it('should rate complex password as strong', () => {
       component.regData.set({ ...component.regData(), password: 'Abcdefgh1234' });
-      component.checkStrength();
       expect(component.strengthLevel()).toBe('strong');
-      expect(component.strengthPct()).toBe(80); // Adjusted threshold logic
+      expect(component.strengthPct()).toBe(100); // Adjusted threshold logic
     });
 
     it('should set strength text correctly', () => {
       component.regData.set({ ...component.regData(), password: 'abc' });
-      component.checkStrength();
       expect(component.strengthText()).toBe('Schwach');
 
-      component.regData.set({ ...component.regData(), password: 'abcdefgh' });
-      component.checkStrength();
+      component.regData.set({ ...component.regData(), password: 'Abcdefgh' });
       expect(component.strengthText()).toBe('Mittel');
 
       component.regData.set({ ...component.regData(), password: 'Abcdefgh1234' });
-      component.checkStrength();
       expect(component.strengthText()).toBe('Stark');
     });
   });
