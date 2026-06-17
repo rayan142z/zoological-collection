@@ -3,12 +3,13 @@ using Zoolog;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
-//builder.Services.AddOpenApi();
+builder.Services.AddOpenApi();
 
 var allowedOriginsConfig = builder.Configuration.GetValue<string>("allowedOrigins") ?? "http://localhost:4200";
 var allowedOrigins = allowedOriginsConfig.Split(",", StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
@@ -67,8 +68,16 @@ if (!app.Environment.IsDevelopment())
     //app.UseExceptionHandler("/Home/Error");
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     //app.UseHsts();
+}
 
-    //app.MapOpenApi();
+if (app.Environment.IsDevelopment())
+{
+    // OpenAPI JSON at /openapi/v1.json, browsable docs UI at /scalar/v1.
+    // No "Authorize" token field wired in here - the .NET 10 security-scheme APIs
+    // for that are currently broken upstream. Paste the Authorization header
+    // manually in the request panel for protected endpoints, same as with curl.
+    app.MapOpenApi();
+    app.MapScalarApiReference();
 }
 
 app.UseHttpsRedirection();
