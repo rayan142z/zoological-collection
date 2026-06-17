@@ -1,7 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
 using Zoolog;
 using Zoolog.Models;
+using System.Security.Claims;
 
 namespace Zoolog.Controllers;
 
@@ -17,6 +19,7 @@ public class CollectionsController : ControllerBase
     }
 
     // GET /api/collections
+    [AllowAnonymous]
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
@@ -43,6 +46,7 @@ public class CollectionsController : ControllerBase
     }
 
     // GET /api/collections/1
+    [AllowAnonymous]
     [HttpGet("{id}")]
     public async Task<IActionResult> GetById(int id)
     {
@@ -70,9 +74,21 @@ public class CollectionsController : ControllerBase
     }
 
     // POST /api/collections
+    [Authorize]
     [HttpPost]
     public async Task<IActionResult> Create(Collection collection)
     {
+        // The creator of a collection must come from the authenticated JWT,
+        // not from the request body. Otherwise a client could send any CreatedBy
+        // value and create a collection in the name of another user.
+        var userIdText = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+        if (!int.TryParse(userIdText, out var userId))
+        {
+            return Unauthorized();
+        }
+
+        collection.CreatedBy = userId;
         collection.CreatedAt = DateTime.Now;
         _context.Collections.Add(collection);
         await _context.SaveChangesAsync();
@@ -88,6 +104,7 @@ public class CollectionsController : ControllerBase
     }
 
     // PUT /api/collections/1
+    [Authorize]
     [HttpPut("{id}")]
     public async Task<IActionResult> Update(int id, Collection updatedCollection)
     {
@@ -103,6 +120,7 @@ public class CollectionsController : ControllerBase
     }
 
     // DELETE /api/collections/1
+    [Authorize(Roles = "admin,moderator")]
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(int id)
     {

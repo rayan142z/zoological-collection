@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
 using Zoolog;
 using Zoolog.Models;
 using BCrypt.Net;
@@ -18,6 +19,7 @@ public class UsersController : ControllerBase
     }
 
     // GET /api/users
+    [Authorize(Roles = "admin")]
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
@@ -36,6 +38,7 @@ public class UsersController : ControllerBase
     }
 
     // GET /api/users/1
+    [Authorize(Roles = "admin")]
     [HttpGet("{id}")]
     public async Task<IActionResult> GetById(int id)
     {
@@ -55,20 +58,14 @@ public class UsersController : ControllerBase
     }
 
     // POST /api/users
+    [AllowAnonymous]
     [HttpPost]
     public async Task<IActionResult> Create(User user)
     {
         user.Pass = BCrypt.Net.BCrypt.HashPassword(user.Pass);
+        user.UserRole = "user";
+        user.Status = "active";
 
-        if (string.IsNullOrWhiteSpace(user.UserRole))
-        {
-            user.UserRole = "user";
-        }
-
-        if (string.IsNullOrWhiteSpace(user.Status))
-        {
-            user.Status = "active";
-        }
         
         _context.Users.Add(user);
         await _context.SaveChangesAsync();
@@ -84,6 +81,7 @@ public class UsersController : ControllerBase
     }
 
     // PUT /api/users/1
+    [Authorize(Roles="admin")]
     [HttpPut("{id}")]
     public async Task<IActionResult> Update(int id, User updatedUser)
     {
@@ -105,6 +103,7 @@ public class UsersController : ControllerBase
     }
 
     // DELETE /api/users/1
+    [Authorize(Roles="admin")]
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(int id)
     {
