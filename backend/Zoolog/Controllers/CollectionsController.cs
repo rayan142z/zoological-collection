@@ -55,6 +55,7 @@ public class CollectionsController : ControllerBase
 
         collection.Name = updatedCollection.Name;
         collection.Description = updatedCollection.Description;
+        collection.IsPublic = updatedCollection.IsPublic;
 
         await _context.SaveChangesAsync();
         return NoContent();
