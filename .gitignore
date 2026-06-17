@@ -75,3 +75,13 @@ nunit-*.xml
 /dataSources/
 /dataSources.local.xml
 /.idea/dataSources
+
+# Local development configuration / secrets
+backend/Zoolog/appsettings.Development.json
+
+# IDE/user-specific files
+*.DotSettings.user
+*.user
+*.suo
+.vs/
+.idea/
