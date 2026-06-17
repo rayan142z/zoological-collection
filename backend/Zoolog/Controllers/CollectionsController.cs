@@ -21,7 +21,23 @@ public class CollectionsController : ControllerBase
     public async Task<IActionResult> GetAll()
     {
         var collections = await _context.Collections
-            .Include(c => c.Creator)
+            .Select(collection => new
+            {
+                collection.Id,
+                collection.Name,
+                collection.Description,
+                collection.IsPublic,
+                collection.CreatedBy,
+                Creator = new
+                {
+                    collection.Creator.Id,
+                    collection.Creator.Username,
+                    collection.Creator.Email,
+                    collection.Creator.UserRole,
+                    collection.Creator.Status
+                },
+                collection.CreatedAt
+            })
             .ToListAsync();
         return Ok(collections);
     }
@@ -31,8 +47,25 @@ public class CollectionsController : ControllerBase
     public async Task<IActionResult> GetById(int id)
     {
         var collection = await _context.Collections
-            .Include(c => c.Creator)
-            .FirstOrDefaultAsync(c => c.Id == id);
+            .Where(collection => collection.Id == id)
+            .Select(collection => new
+            {
+                collection.Id,
+                collection.Name,
+                collection.Description,
+                collection.IsPublic,
+                collection.CreatedBy,
+                Creator = new
+                {
+                    collection.Creator.Id,
+                    collection.Creator.Username,
+                    collection.Creator.Email,
+                    collection.Creator.UserRole,
+                    collection.Creator.Status
+                },
+                collection.CreatedAt
+            })
+            .FirstOrDefaultAsync();
         return collection is null ? NotFound() : Ok(collection);
     }
 
@@ -43,7 +76,15 @@ public class CollectionsController : ControllerBase
         collection.CreatedAt = DateTime.Now;
         _context.Collections.Add(collection);
         await _context.SaveChangesAsync();
-        return CreatedAtAction(nameof(GetById), new { id = collection.Id }, collection);
+        return CreatedAtAction(nameof(GetById), new { id = collection.Id }, new
+        {
+            collection.Id,
+            collection.Name,
+            collection.Description,
+            collection.IsPublic,
+            collection.CreatedBy,
+            collection.CreatedAt
+        });
     }
 
     // PUT /api/collections/1

@@ -21,7 +21,17 @@ public class UsersController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
-        var users = await _context.Users.ToListAsync();
+        var users = await _context.Users
+            .Select(user => new
+            {
+                user.Id,
+                user.Username,
+                user.Email,
+                user.UserRole,
+                user.Status,
+                user.CreatedAt
+            })
+            .ToListAsync();
         return Ok(users);
     }
 
@@ -29,7 +39,18 @@ public class UsersController : ControllerBase
     [HttpGet("{id}")]
     public async Task<IActionResult> GetById(int id)
     {
-        var user = await _context.Users.FindAsync(id);
+        var user = await _context.Users
+            .Where(user => user.Id == id)
+            .Select(user => new
+            {
+                user.Id,
+                user.Username,
+                user.Email,
+                user.UserRole,
+                user.Status,
+                user.CreatedAt
+            })
+            .FirstOrDefaultAsync();
         return user is null ? NotFound() : Ok(user);
     }
 
@@ -38,34 +59,28 @@ public class UsersController : ControllerBase
     public async Task<IActionResult> Create(User user)
     {
         user.Pass = BCrypt.Net.BCrypt.HashPassword(user.Pass);
+
+        if (string.IsNullOrWhiteSpace(user.UserRole))
+        {
+            user.UserRole = "user";
+        }
+
+        if (string.IsNullOrWhiteSpace(user.Status))
+        {
+            user.Status = "active";
+        }
         
         _context.Users.Add(user);
         await _context.SaveChangesAsync();
-        return CreatedAtAction(nameof(GetById), new { id = user.Id }, user);
-    }
-    
-    // POST /api/auth/login
-    [HttpPost("login")]
-    public async Task<IActionResult> Login([FromBody] User loginDaten)
-    {
-        
-        var user = await _context.Users.FirstOrDefaultAsync(u => 
-            u.Username == loginDaten.Username || u.Email == loginDaten.Username);
-
-        if (user is null)
+        return CreatedAtAction(nameof(GetById), new { id = user.Id }, new
         {
-            return Unauthorized(new { message = "Ungültige Anmeldedaten" });
-        }
-
-       
-        bool isPasswordCorrect = BCrypt.Net.BCrypt.Verify(loginDaten.Pass, user.Pass);
-
-        if (!isPasswordCorrect)
-        {
-            return Unauthorized(new { message = "Ungültige Anmeldedaten" });
-        }
-
-        return Ok(new { message = "Login erfolgreich", username = user.Username });
+            user.Id,
+            user.Username,
+            user.Email,
+            user.UserRole,
+            user.Status,
+            user.CreatedAt
+        });
     }
 
     // PUT /api/users/1
@@ -77,8 +92,13 @@ public class UsersController : ControllerBase
 
         user.Username = updatedUser.Username;
         user.Email = updatedUser.Email;
-        user.Pass = BCrypt.Net.BCrypt.HashPassword(updatedUser.Pass);
         user.UserRole = updatedUser.UserRole;
+        user.Status = updatedUser.Status;
+
+        if (!string.IsNullOrWhiteSpace(updatedUser.Pass))
+        {
+            user.Pass = BCrypt.Net.BCrypt.HashPassword(updatedUser.Pass);
+        }
 
         await _context.SaveChangesAsync();
         return NoContent();
