@@ -1,63 +1,70 @@
-import { Injectable, signal} from '@angular/core';
+import { Injectable, inject, signal } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable, map, switchMap } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 // Beschreibt die Nutzerdaten für eingeloggten Nutzer
 export interface User {
+  id: number;
   email: string;
-  username?: string;
+  username: string;
   role: 'user' | 'moderator' | 'admin';
+  status: string;
+}
+
+interface LoginResponse {
+  message: string;
+  token: string;
+  expiresInMinutes: number;
+  user: {
+    id: number;
+    username: string;
+    email: string;
+    role: string;
+    status: string;
+  };
+}
+
+interface RegisterResponse {
+  id: number;
+  username: string;
+  email: string;
+  userRole: string;
+  status: string;
+  createdAt: string;
 }
 
 @Injectable({
   providedIn: 'root',
 })
 export class Auth {
-  // Mit diesem Schlüsselname speichern wir den aktuellen Nutzer im Browser
-  private readonly storageKey = 'zoolog_current_user';
+  private readonly http = inject(HttpClient);
+
+  // Schlüsselnamen für die Daten im Browser
+  private readonly userStorageKey = 'zoolog_current_user';
+  private readonly tokenStorageKey = 'zoolog_token';
 
   // speichert den eingeloggten Nutzer. Wenn niemand eingeloggt ist, ist der Wert null
   currentUser = signal<User | null>(this.loadUserFromStorage());
 
-  // Aktuell ist es noch nicht mit dem Backend verbunden
-  login(email: string, password: string): boolean {
-    if (!email || !password) {
-      return false;
-    }
-
-    const user: User = {
-      email: email,
-      // Nur für Simulation wir der Username aus der Email abgeleitet
-      username: email.split('@')[0], 
-      role: 'user',
-    };
-
-    // Nutzer im Browser gespeichert
-    localStorage.setItem(this.storageKey, JSON.stringify(user)); 
-    // Ab hier gilt der Nutzer als eingeloggt
-    this.currentUser.set(user);
-
-    return true;
+  login(usernameOrEmail: string, password: string): Observable<User> {
+    return this.http
+      .post<LoginResponse>(`${environment.apiUrl}/auth/login`, { usernameOrEmail, password })
+      .pipe(map((response) => this.persistSession(response.token, response.user)));
   }
 
-  // Auch das ist aktuell nur eine Frontend-Simulation
-  register(email: string, password: string, username?: string): boolean {
-    if(!email || !password) {
-      return false;
-    }
-
-    const user: User = {
-      email: email,
-      username: username,
-      role: 'user',
-    };
-
-    localStorage.setItem(this.storageKey, JSON.stringify(user));
-    this.currentUser.set(user);
-
-    return true;
+  // Die Registrierung selbst liefert kein JWT zurück (siehe UsersController.Create),
+  // deshalb direkt im Anschluss einloggen, um das bisherige
+  // "Registrieren = sofort eingeloggt"-Verhalten zu erhalten.
+  register(username: string, email: string, password: string): Observable<User> {
+    return this.http
+      .post<RegisterResponse>(`${environment.apiUrl}/users`, { username, email, pass: password })
+      .pipe(switchMap(() => this.login(username, password)));
   }
 
   logout(): void {
-    localStorage.removeItem(this.storageKey);
+    localStorage.removeItem(this.tokenStorageKey);
+    localStorage.removeItem(this.userStorageKey);
     this.currentUser.set(null);
   }
 
@@ -65,8 +72,28 @@ export class Auth {
     return this.currentUser() !== null;
   }
 
+  getToken(): string | null {
+    return localStorage.getItem(this.tokenStorageKey);
+  }
+
+  private persistSession(token: string, rawUser: LoginResponse['user']): User {
+    const user: User = {
+      id: rawUser.id,
+      email: rawUser.email,
+      username: rawUser.username,
+      role: rawUser.role as User['role'],
+      status: rawUser.status,
+    };
+
+    localStorage.setItem(this.tokenStorageKey, token);
+    localStorage.setItem(this.userStorageKey, JSON.stringify(user));
+    this.currentUser.set(user);
+
+    return user;
+  }
+
   private loadUserFromStorage(): User | null {
-    const storedUser = localStorage.getItem(this.storageKey);
+    const storedUser = localStorage.getItem(this.userStorageKey);
 
     if (!storedUser) {
       return null;
@@ -76,7 +103,7 @@ export class Auth {
       return JSON.parse(storedUser) as User;
     } catch {
       // Falls die gespeicherten Daten beschädigt oder ungültig sind, werden sie gelöscht
-      localStorage.removeItem(this.storageKey);
+      localStorage.removeItem(this.userStorageKey);
       return null;
     }
   }

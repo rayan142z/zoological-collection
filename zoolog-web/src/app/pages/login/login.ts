@@ -1,7 +1,8 @@
-import { Component, signal } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
+import { Auth } from '../../services/auth';
 
 @Component({
   selector: 'app-login',
@@ -11,6 +12,9 @@ import { RouterLink } from '@angular/router';
   styleUrl: './login.css',
 })
 export class Login {
+  private readonly auth = inject(Auth);
+  private readonly router = inject(Router);
+
   readonly loginData = signal({ email: '', password: '', remember: false });
   readonly showPw = signal(false);
   readonly emailFocused = signal(false);
@@ -33,9 +37,18 @@ export class Login {
   onLogin() {
     this.isLoading.set(true);
     this.errorMsg.set('');
-    setTimeout(() => {
-      this.isLoading.set(false);
-      // Handle auth logic here
-    }, 1200);
+
+    const { email, password } = this.loginData();
+
+    this.auth.login(email, password).subscribe({
+      next: () => {
+        this.isLoading.set(false);
+        this.router.navigate(['/dashboard']);
+      },
+      error: (err) => {
+        this.isLoading.set(false);
+        this.errorMsg.set(err.error?.message ?? 'Anmeldung fehlgeschlagen. Bitte erneut versuchen.');
+      },
+    });
   }
 }

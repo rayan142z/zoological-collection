@@ -1,7 +1,8 @@
-import { Component, signal, computed } from '@angular/core';
+import { Component, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
+import { Auth } from '../../services/auth';
 
 @Component({
   selector: 'app-register',
@@ -11,6 +12,9 @@ import { RouterLink } from '@angular/router';
   styleUrl: './register.css',
 })
 export class Register {
+  private readonly auth = inject(Auth);
+  private readonly router = inject(Router);
+
   readonly regData = signal({
     username: '',
     email: '',
@@ -70,9 +74,17 @@ export class Register {
     this.isLoading.set(true);
     this.errorMsg.set('');
 
-    setTimeout(() => {
-      this.isLoading.set(false);
-      console.log('Registering user:', this.regData());
-    }, 1500);
+    const { username, email, password } = this.regData();
+
+    this.auth.register(username, email, password).subscribe({
+      next: () => {
+        this.isLoading.set(false);
+        this.router.navigate(['/dashboard']);
+      },
+      error: (err) => {
+        this.isLoading.set(false);
+        this.errorMsg.set(err.error?.message ?? 'Registrierung fehlgeschlagen. Bitte erneut versuchen.');
+      },
+    });
   }
 }
