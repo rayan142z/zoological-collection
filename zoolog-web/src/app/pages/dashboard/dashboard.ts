@@ -1,6 +1,9 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { forkJoin } from 'rxjs';
+import { ApiService } from '../../services/api.service';
+import { Auth } from '../../services/auth';
 
 interface Collection {
   id: number;
@@ -15,6 +18,18 @@ interface Collection {
   views?: number;
 }
 
+interface CollectionApiResponse {
+  id: number;
+  name: string;
+  description: string | null;
+  createdBy: number;
+  createdAt: string;
+}
+
+interface SpecimenApiResponse {
+  collectionId: number;
+}
+
 @Component({
   selector: 'app-dashboard',
   standalone: true,
@@ -23,48 +38,23 @@ interface Collection {
   styleUrl: './dashboard.css',
 })
 export class Dashboard {
+  private readonly api = inject(ApiService);
+  private readonly auth = inject(Auth);
+  private readonly cdr = inject(ChangeDetectorRef);
+
   showNewCollection = false;
   activeTab = 'mine';
 
+  // "Favoriten" und "Ausgeliehen" gibt es im Backend noch nicht (kein Favorites-Konzept,
+  // kein LoanController. Als "—" markiert statt einer falschen Zahl.
   quickStats = [
-    { icon: '🗂️', value: '3',    label: 'Meine Sammlungen' },
-    { icon: '🔬', value: '24',   label: 'Objekte gesamt' },
-    { icon: '⭐', value: '5',    label: 'Favoriten' },
-    { icon: '📤', value: '3',    label: 'Ausgeliehen' },
+    { icon: '🗂️', value: '0',  label: 'Meine Sammlungen' },
+    { icon: '🔬', value: '0',  label: 'Objekte gesamt' },
+    { icon: '⭐', value: '—',  label: 'Favoriten' },
+    { icon: '📤', value: '—',  label: 'Ausgeliehen' },
   ];
 
-  myCollections: Collection[] = [
-    {
-      id: 1,
-      name: 'Insekten Mitteleuropas',
-      description: 'Käfer, Schmetterlinge und Hautflügler aus der Region',
-      emoji: '🦋',
-      color: 'linear-gradient(135deg, #e8f5e9, #c8e6c9)',
-      objectCount: 12,
-      tags: ['Insecta', 'Mitteleuropa'],
-      lastUpdated: 'vor 2 Tagen',
-    },
-    {
-      id: 2,
-      name: 'Heimische Säugetiere',
-      description: 'Präparate einheimischer Säugetierarten',
-      emoji: '🐭',
-      color: 'linear-gradient(135deg, #fff8e1, #ffecb3)',
-      objectCount: 7,
-      tags: ['Mammalia', 'Heimisch'],
-      lastUpdated: 'vor 1 Woche',
-    },
-    {
-      id: 3,
-      name: 'Reptilien & Amphibien',
-      description: 'Schlangen, Eidechsen und Frösche',
-      emoji: '🦎',
-      color: 'linear-gradient(135deg, #e0f2f1, #b2dfdb)',
-      objectCount: 5,
-      tags: ['Reptilia', 'Amphibia'],
-      lastUpdated: 'vor 3 Wochen',
-    },
-  ];
+  myCollections: Collection[] = [];
 
   favCollections: Collection[] = [
     { id: 4,  name: 'Meeresschnecken',    description: '', emoji: '🐚', color: 'linear-gradient(135deg,#e3f2fd,#bbdefb)', objectCount: 31, tags: [], lastUpdated: '', owner: 'Prof. K. Huber' },
@@ -83,5 +73,44 @@ export class Dashboard {
 
   totalObjects(cols: Collection[]): number {
     return cols.reduce((sum, c) => sum + c.objectCount, 0);
+  }
+
+  ngOnInit(): void {
+    this.loadMyCollections();
+  }
+
+  private loadMyCollections(): void {
+    const userId = this.auth.currentUser()?.id;
+    if (!userId) return;
+
+    forkJoin({
+      collections: this.api.get<CollectionApiResponse[]>('collections'),
+      specimens: this.api.get<SpecimenApiResponse[]>('specimen'),
+    }).subscribe({
+      next: ({ collections, specimens }) => {
+        const mine = collections.filter((c) => c.createdBy === userId);
+        this.myCollections = mine.map((c) => ({
+          id: c.id,
+          name: c.name,
+          description: c.description ?? '',
+          emoji: '🗂️',
+          color: 'linear-gradient(135deg, #e8f5e9, #c8e6c9)',
+          objectCount: specimens.filter((s) => s.collectionId === c.id).length,
+          tags: [],
+          lastUpdated: new Date(c.createdAt).toLocaleDateString('de-DE'),
+        }));
+        this.quickStats[0].value = String(this.myCollections.length);
+        this.quickStats[1].value = String(
+          this.myCollections.reduce((sum, col) => sum + col.objectCount, 0)
+        );
+        // Erzwingt das Re-Rendern nach der asynchronen Antwort - sonst bleibt
+        // die Anzeige bei "0", bis irgendein anderes Browser-Event zufällig
+        // ein Re-Render auslöst (z.B. Klick auf einen Navigationslink).
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        console.error('Fehler beim Laden der Sammlungen:', err);
+      },
+    });
   }
 }

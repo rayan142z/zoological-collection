@@ -1,24 +1,42 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { DatePipe } from '@angular/common';
 import { RouterLink, ActivatedRoute } from '@angular/router';
+import { forkJoin } from 'rxjs';
+import { ApiService } from '../../services/api.service';
+import { STATUS_EN_TO_DE } from '../../utils/status-map';
 
 interface Specimen {
   id: number;
   name: string;
   genus: string;
   species: string;
-  status: 'verfügbar' | 'ausgeliehen' | 'verloren' | 'zerstört';
+  status: string;
   dateCollected: string;
-  image: string;
+  image: string | null;
+  collectionId: number;
 }
 
-// Minimal map so the page can show the collection name when routed via /objects/:id
-const COLLECTION_NAMES: Record<string, string> = {
-  '1': 'Insekten Mitteleuropas',
-  '2': 'Heimische Säugetiere',
-  '3': 'Reptilien & Amphibien',
-};
+interface SpecimenApiResponse {
+  id: number;
+  name: string;
+  dateCollected: string;
+  status: string;
+  photoPath: string | null;
+  taxonomyId: number;
+  collectionId: number;
+}
+
+interface TaxonomyApiResponse {
+  id: number;
+  genus: string;
+  species: string;
+}
+
+interface CollectionApiResponse {
+  id: number;
+  name: string;
+}
 
 @Component({
   selector: 'app-objects',
@@ -28,31 +46,74 @@ const COLLECTION_NAMES: Record<string, string> = {
   styleUrl: './objects.css',
 })
 export class Objects implements OnInit {
+  private readonly api = inject(ApiService);
+  private readonly cdr = inject(ChangeDetectorRef);
+
   searchTerm = '';
   selectedStatus = '';
   viewMode: 'grid' | 'list' = 'grid';
   activeCollectionName = '';
+  activeCollectionId: number | null = null;
+
+  specimens: Specimen[] = [];
 
   constructor(private route: ActivatedRoute) {}
 
   ngOnInit() {
-    this.route.paramMap.subscribe(params => {
+    this.route.paramMap.subscribe((params) => {
       const id = params.get('id');
-      this.activeCollectionName = id ? (COLLECTION_NAMES[id] ?? `Sammlung #${id}`) : '';
+      this.activeCollectionId = id ? Number(id) : null;
+      this.loadSpecimens();
     });
   }
 
-  specimens: Specimen[] = [
-    { id: 1, name: 'Hirschkäfer',      genus: 'Lucanus',     species: 'cervus',     status: 'verfügbar',   dateCollected: '2019-06-12', image: 'images/Hirschkaefer.png' },
-    { id: 2, name: 'Schwalbenschwanz', genus: 'Papilio',      species: 'machaon',    status: 'ausgeliehen', dateCollected: '2021-08-03', image: 'images/Schwalbenschwanz_Schmetterling.png' },
-    { id: 3, name: 'Waldmaus',         genus: 'Apodemus',     species: 'sylvaticus', status: 'verfügbar',   dateCollected: '2020-10-17', image: 'images/Maus.png' },
-    { id: 4, name: 'Ringelnatter',     genus: 'Natrix',       species: 'natrix',     status: 'verloren',    dateCollected: '2018-04-25', image: 'images/Schlange.png' },
-    { id: 5, name: 'Zilpzalp',         genus: 'Phylloscopus', species: 'collybita',  status: 'verfügbar',   dateCollected: '2022-02-09', image: 'images/Zilpzalp.png' },
-    { id: 6, name: 'Schneckenhaus',    genus: 'Helix',        species: 'pomatia',    status: 'zerstört',    dateCollected: '2017-09-30', image: 'images/Schneckenhaus.png' },
-  ];
+  private loadSpecimens(): void {
+    forkJoin({
+      specimens: this.api.get<SpecimenApiResponse[]>('specimen'),
+      taxonomies: this.api.get<TaxonomyApiResponse[]>('taxonomy'),
+      collections: this.api.get<CollectionApiResponse[]>('collections'),
+    }).subscribe({
+      next: ({ specimens, taxonomies, collections }) => {
+        const taxonomyById = new Map(taxonomies.map((t) => [t.id, t]));
+        const collectionById = new Map(collections.map((c) => [c.id, c]));
+
+        this.specimens = specimens.map((s) => {
+          const taxonomy = taxonomyById.get(s.taxonomyId);
+          return {
+            id: s.id,
+            name: s.name,
+            genus: taxonomy?.genus ?? '',
+            species: taxonomy?.species ?? '',
+            status: STATUS_EN_TO_DE[s.status] ?? s.status,
+            dateCollected: s.dateCollected,
+            image: s.photoPath,
+            collectionId: s.collectionId,
+          };
+        });
+
+        this.activeCollectionName =
+          this.activeCollectionId !== null
+            ? collectionById.get(this.activeCollectionId)?.name ?? `Sammlung #${this.activeCollectionId}`
+            : '';
+
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        console.error('Fehler beim Laden der Objekte:', err);
+        this.specimens = [];
+        this.cdr.detectChanges();
+      },
+    });
+  }
+
+  private get scopedToCollection(): Specimen[] {
+    return this.activeCollectionId === null
+      ? this.specimens
+      : this.specimens.filter((s) => s.collectionId === this.activeCollectionId);
+  }
 
   get filteredSpecimens() {
-    return this.specimens.filter(s => {
+    return this.scopedToCollection.filter((s) => {
       const matchesSearch =
         s.name.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
         s.genus.toLowerCase().includes(this.searchTerm.toLowerCase());
@@ -62,7 +123,7 @@ export class Objects implements OnInit {
   }
 
   countByStatus(status: string): number {
-    return this.specimens.filter(s => s.status === status).length;
+    return this.scopedToCollection.filter((s) => s.status === status).length;
   }
 
   getStatusClass(status: string): string {

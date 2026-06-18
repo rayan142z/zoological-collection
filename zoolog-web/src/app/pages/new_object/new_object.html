@@ -45,6 +45,23 @@
       @if (currentStep() === 1) {
         <div class="section-card">
           <h2 class="section-title">Grunddaten</h2>
+
+          @if (!collectionLocked) {
+            <div class="form-group">
+              <label class="form-label">Sammlung <span class="required">*</span></label>
+              <select class="form-select"
+                [ngModel]="collectionId()" (ngModelChange)="collectionId.set($event)" name="collectionId">
+                <option [ngValue]="null">Sammlung wählen…</option>
+                @for (col of collectionOptions(); track col.id) {
+                  <option [ngValue]="col.id">{{ col.name }}</option>
+                }
+              </select>
+              @if (collectionOptions().length === 0) {
+                <p class="form-hint">Du hast noch keine eigene Sammlung. Lege zuerst eine im Dashboard an.</p>
+              }
+            </div>
+          }
+
           <div class="form-group">
             <label class="form-label">Name <span class="required">*</span></label>
             <input class="form-input" type="text" placeholder="z.B. Hirschkäfer"
@@ -73,6 +90,16 @@
               </select>
             </div>
           </div>
+          <div class="form-group">
+            <label class="form-label">Fundort <span class="required">*</span></label>
+            <select class="form-select"
+              [ngModel]="locationId()" (ngModelChange)="locationId.set($event)" name="locationId">
+              <option [ngValue]="null">Fundort wählen…</option>
+              @for (loc of locationOptions(); track loc.id) {
+                <option [ngValue]="loc.id">{{ loc.name }} ({{ loc.region }}, {{ loc.country }})</option>
+              }
+            </select>
+          </div>
           <div class="step-nav">
             <span></span>
             <button class="primary-button" type="button" (click)="nextStep()">
@@ -87,47 +114,48 @@
       @if (currentStep() === 2) {
         <div class="section-card">
           <h2 class="section-title">Taxonomie</h2>
-          <div class="form-row">
-            <div class="form-group">
-              <label class="form-label">Reich</label>
-              <input class="form-input" type="text" placeholder="z.B. Animalia"
-                [ngModel]="reich()" (ngModelChange)="reich.set($event)" name="reich"/>
-            </div>
-            <div class="form-group">
-              <label class="form-label">Stamm</label>
-              <input class="form-input" type="text" placeholder="z.B. Arthropoda"
-                [ngModel]="stamm()" (ngModelChange)="stamm.set($event)" name="stamm"/>
-            </div>
-          </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label class="form-label">Klasse</label>
-              <input class="form-input" type="text" placeholder="z.B. Insecta"
-                [ngModel]="klasse()" (ngModelChange)="klasse.set($event)" name="klasse"/>
-            </div>
-            <div class="form-group">
-              <label class="form-label">Ordnung</label>
-              <input class="form-input" type="text" placeholder="z.B. Coleoptera"
-                [ngModel]="ordnung()" (ngModelChange)="ordnung.set($event)" name="ordnung"/>
-            </div>
-          </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label class="form-label">Familie</label>
-              <input class="form-input" type="text" placeholder="z.B. Lucanidae"
-                [ngModel]="familie()" (ngModelChange)="familie.set($event)" name="familie"/>
-            </div>
-            <div class="form-group">
-              <label class="form-label">Gattung <span class="required">*</span></label>
-              <input class="form-input" type="text" placeholder="z.B. Lucanus"
-                [ngModel]="genus()" (ngModelChange)="genus.set($event)" name="genus"/>
-            </div>
-          </div>
           <div class="form-group">
             <label class="form-label">Art <span class="required">*</span></label>
-            <input class="form-input" type="text" placeholder="z.B. cervus"
-              [ngModel]="species()" (ngModelChange)="species.set($event)" name="species"/>
+            <select class="form-select"
+              [ngModel]="taxonomyId()" (ngModelChange)="taxonomyId.set($event)" name="taxonomyId">
+              <option [ngValue]="null">Taxonomie wählen…</option>
+              @for (tax of taxonomyOptions(); track tax.id) {
+                <option [ngValue]="tax.id">{{ tax.genus }} {{ tax.species }}</option>
+              }
+            </select>
+            <p class="form-hint">
+              Fehlt die gesuchte Art? Neue Arten werden über einen Artenantrag von einem
+              Moderator freigegeben, bevor sie hier wählbar sind.
+            </p>
           </div>
+
+          @if (selectedTaxonomy()) {
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Reich</label>
+                <p class="preview-value">{{ selectedTaxonomy()!.kingdom }}</p>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Stamm</label>
+                <p class="preview-value">{{ selectedTaxonomy()!.phylum }}</p>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Klasse</label>
+                <p class="preview-value">{{ selectedTaxonomy()!.class }}</p>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Ordnung</label>
+                <p class="preview-value">{{ selectedTaxonomy()!.orders }}</p>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Familie</label>
+              <p class="preview-value">{{ selectedTaxonomy()!.family }}</p>
+            </div>
+          }
+
           <div class="step-nav">
             <button class="secondary-button" type="button" (click)="prevStep()">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
@@ -160,9 +188,12 @@
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
               Zurück
             </button>
-            <button class="primary-button" type="submit">
+            @if (saveError()) {
+              <p class="required-hint" style="color: var(--red, #c0392b);">{{ saveError() }}</p>
+            }
+            <button class="primary-button" type="submit" [disabled]="isSaving()">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v14z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-              Objekt speichern
+              {{ isSaving() ? 'Speichert…' : 'Objekt speichern' }}
             </button>
           </div>
           <p class="required-hint"><span class="required">*</span> Pflichtfelder</p>
@@ -190,7 +221,9 @@
             </div>
           </div>
           <p class="preview-name serif">{{ name() || 'Objektname' }}</p>
-          <p class="preview-latin"><em>{{ (genus() || 'Gattung') + ' ' + (species() || 'species') }}</em></p>
+          <p class="preview-latin">
+            <em>{{ selectedTaxonomy() ? (selectedTaxonomy()!.genus + ' ' + selectedTaxonomy()!.species) : 'Taxonomie wählen' }}</em>
+          </p>
           @if (status()) {
             <span class="badge {{ getStatusClass() }}">{{ status() }}</span>
           }
