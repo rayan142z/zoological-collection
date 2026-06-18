@@ -266,6 +266,7 @@ public class SpecimenRequest
     public DateOnly? DateCollected { get; set; }
 
     [StringLength(30)]
+    [RegularExpression("^(available|on loan|lost|destroyed)$", ErrorMessage = "Status muss einer der folgenden Werte sein: available, on loan, lost, destroyed.")]
     public string? Status { get; set; }
 
     [StringLength(100)]
