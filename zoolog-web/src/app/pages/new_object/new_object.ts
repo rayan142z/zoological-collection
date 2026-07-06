@@ -1,7 +1,7 @@
 import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { RouterLink, ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { DatePipe } from '@angular/common';
+import { DatePipe, CommonModule } from '@angular/common';
 import { ApiService } from '../../services/api.service';
 import { Auth } from '../../services/auth';
 import { STATUS_DE_TO_EN } from '../../utils/status-map';
@@ -32,7 +32,8 @@ interface CollectionOption {
 
 @Component({
   selector: 'app-new-object',
-  imports: [RouterLink, FormsModule, DatePipe],
+  standalone: true,
+  imports: [RouterLink, FormsModule, DatePipe, CommonModule],
   templateUrl: './new_object.html',
   styleUrl: './new_object.css'
 })
@@ -44,28 +45,63 @@ export class NewObject implements OnInit {
 
   currentStep = signal(1);
 
-  name        = signal('');
-  description = signal('');
+  // Formular-Signals für die Grunddaten
+  name          = signal('');
+  description   = signal('');
   dateCollected = signal('');
-  status      = signal('');
-  locationId  = signal<number | null>(null);
-  collectionId = signal<number | null>(null);
+  status        = signal('');
+  
+  collectionId  = signal<number | null>(null);
+  taxonomyId    = signal<number | null>(null);
+  locationId    = signal<number | null>(null);
   collectionLocked = false;
 
-  //Auswahl aus existierenden Taxonomien statt Freitext: das Backend
-  // erwartet eine TaxonomyId zu einer bestehenden Zeile, keine neue Klassifikation.
-  // Eine neue Art anzulegen läuft über den Artenantrag, nicht hier.
-  taxonomyId = signal<number | null>(null);
+  // Suchtexte für die drei Autocomplete-Eingabefelder
+  collectionSearch = signal<string>('');
+  taxonomySearch   = signal<string>('');
+  locationSearch   = signal<string>('');
 
-  taxonomyOptions = signal<TaxonomyOption[]>([]);
-  locationOptions = signal<LocationOption[]>([]);
+  // Optionen vom Backend geladen
+  taxonomyOptions   = signal<TaxonomyOption[]>([]);
+  locationOptions   = signal<LocationOption[]>([]);
   collectionOptions = signal<CollectionOption[]>([]);
 
+  // Live gefilterte Sammlungen via computed (sucht im Namen)
+  filteredCollections = computed(() => {
+    const query = this.collectionSearch().toLowerCase().trim();
+    if (!query) return this.collectionOptions();
+    return this.collectionOptions().filter(c => 
+      c.name.toLowerCase().includes(query)
+    );
+  });
+
+  // Live gefilterte Taxonomien (sucht in Gattung oder Artname)
+  filteredTaxonomies = computed(() => {
+    const query = this.taxonomySearch().toLowerCase().trim();
+    if (!query) return this.taxonomyOptions();
+    return this.taxonomyOptions().filter(t => 
+      t.genus.toLowerCase().includes(query) || 
+      t.species.toLowerCase().includes(query)
+    );
+  });
+
+  // Live gefilterte Fundorte (sucht in Name, Region oder Land)
+  filteredLocations = computed(() => {
+    const query = this.locationSearch().toLowerCase().trim();
+    if (!query) return this.locationOptions();
+    return this.locationOptions().filter(l => 
+      l.name.toLowerCase().includes(query) ||
+      l.region.toLowerCase().includes(query) ||
+      l.country.toLowerCase().includes(query)
+    );
+  });
+
+  // Liefert das aktuell ausgewählte Taxonomie-Objekt für die Sidebar-Vorschau
   selectedTaxonomy = computed(() =>
     this.taxonomyOptions().find((t) => t.id === this.taxonomyId()) ?? null
   );
 
-  // Photo
+  // Photo-Zustand
   previewUrl = signal<string | null>(null);
 
   saveError = signal('');
@@ -77,6 +113,12 @@ export class NewObject implements OnInit {
       if (routeCollectionId) {
         this.collectionId.set(Number(routeCollectionId));
         this.collectionLocked = true;
+        
+        // Falls die ID über die Route gesperrt ist, laden wir direkt den Namen für das Textfeld
+        this.api.get<CollectionOption[]>('collections').subscribe((data) => {
+          const matched = data.find(c => c.id === Number(routeCollectionId));
+          if (matched) this.collectionSearch.set(matched.name);
+        });
       }
     });
 
@@ -91,17 +133,33 @@ export class NewObject implements OnInit {
     }
   }
 
+  // Hilfsmethoden zur Auswahl aus den Autocomplete-Listen
+  selectCollection(col: CollectionOption): void {
+    this.collectionId.set(col.id);
+    this.collectionSearch.set(col.name);
+  }
+
+  selectTaxonomy(tax: TaxonomyOption): void {
+    this.taxonomyId.set(tax.id);
+    this.taxonomySearch.set(`${tax.genus} ${tax.species}`);
+  }
+
+  selectLocation(loc: LocationOption): void {
+    this.locationId.set(loc.id);
+    this.locationSearch.set(`${loc.name} (${loc.region}, ${loc.country})`);
+  }
+
   nextStep(): void { if (this.currentStep() < 3) this.currentStep.update(s => s + 1); }
   prevStep(): void  { if (this.currentStep() > 1) this.currentStep.update(s => s - 1); }
   goToStep(step: number): void { if (step < this.currentStep()) this.currentStep.set(step); }
 
   onSubmit(): void {
     const collectionId = this.collectionId();
-    const locationId = this.locationId();
     const taxonomyId = this.taxonomyId();
+    const locationId = this.locationId();
 
-    if (!collectionId || !locationId || !taxonomyId) {
-      this.saveError.set('Bitte Sammlung, Fundort und Taxonomie auswählen.');
+    if (!collectionId || !taxonomyId || !locationId) {
+      this.saveError.set('Bitte wähle eine Sammlung, eine Taxonomie und einen Fundort über die Suchvorschläge aus.');
       return;
     }
 
@@ -112,14 +170,12 @@ export class NewObject implements OnInit {
       name: this.name(),
       description: this.description(),
       dateCollected: this.dateCollected() || null,
-      locationId,
       taxonomyId,
       collectionId,
+      locationId,
+      photoPath: this.previewUrl() || null
     };
 
-    // Leeren Status nicht mitsenden - das Backend setzt sonst seinen eigenen
-    // Default; ein leerer String würde an der Status-Validierung scheitern.
-    // Das <select> zeigt deutsche Werte, das Backend speichert sie auf Englisch
     if (this.status()) {
       payload['status'] = STATUS_DE_TO_EN[this.status()] ?? this.status();
     }

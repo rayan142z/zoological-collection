@@ -24,7 +24,7 @@
     <div class="orb-connector connector-b"></div>
   </div>
   <div class="hero-scroll-hint">
-    <span>Mehr erfahren</span>
+    
     <div class="scroll-arrow"></div>
   </div>
 </section>
@@ -47,8 +47,8 @@
           Ökosysteme, Artenvielfalt und den Wandel unserer Natur.
         </p>
         <div class="mission-cta">
-          <a href="/objekte" class="btn-primary">Sammlung entdecken</a>
-          <a href="/kontakt" class="btn-ghost">Kontakt aufnehmen</a>
+          <a href="/dashboard" class="btn-primary">Sammlung entdecken</a>
+          
         </div>
       </div>
       <div class="mission-stats">
@@ -116,24 +116,7 @@
   </div>
 </section>
 
-<section class="about-timeline">
-  <div class="container">
-    <h2 class="section-title center">Unsere Geschichte</h2>
-    <div class="timeline">
-      @for (event of history(); track event.title; let i = $index) {
-        <div class="timeline-item" [class.timeline-right]="i % 2 !== 0">
-          <div class="timeline-dot"></div>
-          <div class="timeline-card">
-            <span class="timeline-year">{{ event.year }}</span>
-            <h3 class="timeline-title">{{ event.title }}</h3>
-            <p class="timeline-desc">{{ event.description }}</p>
-          </div>
-        </div>
-      }
-      <div class="timeline-line"></div>
-    </div>
-  </div>
-</section>
+
 
 <section class="about-contact">
   <div class="container">

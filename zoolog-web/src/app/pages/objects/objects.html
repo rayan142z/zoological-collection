@@ -73,7 +73,7 @@
   @if (viewMode === 'grid') {
     <div class="grid grid-3">
       @for (specimen of filteredSpecimens; track specimen.id) {
-        <div class="specimen-card card">
+        <a [routerLink]="['/object', specimen.id]" class="specimen-card card" style="text-decoration: none; color: inherit;">>
           <div class="card-image-area">
             <span class="badge {{ getStatusClass(specimen.status) }}">{{ specimen.status }}</span>
             @if (specimen.image) {
@@ -98,7 +98,7 @@
             <div class="overlay-row"><span>Gesammelt</span><span class="overlay-val">{{ specimen.dateCollected | date:'dd.MM.yyyy' }}</span></div>
             <div class="overlay-row"><span>ID</span><span class="overlay-val">#{{ specimen.id }}</span></div>
           </div>
-        </div>
+        </a>
       }
 
       <!-- Inline "add object" card -->
@@ -124,7 +124,7 @@
         <span>ID</span>
       </div>
       @for (specimen of filteredSpecimens; track specimen.id) {
-        <div class="list-row">
+        <a [routerLink]="['/object', specimen.id]" class="list-row" style="text-decoration: none; color: inherit;">
           <div class="list-name-cell">
             <div class="list-thumb">
               @if (specimen.image) {
@@ -139,7 +139,7 @@
           <span><span class="badge {{ getStatusClass(specimen.status) }}">{{ specimen.status }}</span></span>
           <span class="list-date">{{ specimen.dateCollected | date:'dd.MM.yyyy' }}</span>
           <span class="list-id">#{{ specimen.id }}</span>
-        </div>
+        </a>
       }
       <!-- Add row in list view -->
       <a routerLink="/new-object" class="list-row list-add-row">

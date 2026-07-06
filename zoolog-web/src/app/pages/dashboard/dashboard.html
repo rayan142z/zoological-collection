@@ -12,8 +12,10 @@
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
         Alle Sammlungen
       </a>
-      <button class="secondary-button" (click)="showNewCollection = !showNewCollection">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      <button routerLink="/collections/new" class="secondary-button">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+        </svg>
         Neue Sammlung
       </button>
     </div>
@@ -68,14 +70,16 @@
       }
 
       <!-- Add new collection card -->
-      <button class="collection-card collection-card-new" (click)="showNewCollection = true">
+      <a routerLink="/collections/new" class="collection-card collection-card-new" style="text-decoration: none; color: inherit;">
         <div class="new-col-inner">
           <div class="new-col-icon">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+            </svg>
           </div>
           <span class="new-col-label">Neue Sammlung erstellen</span>
         </div>
-      </button>
+      </a>
     </div>
   </section>
 

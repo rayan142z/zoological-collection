@@ -9,7 +9,6 @@
     <p class="new-object-subtitle">Füge ein neues Präparat zur Sammlung hinzu</p>
   </div>
 
-  <!-- Wizard steps -->
   <div class="wizard-steps">
     <div class="step" [class.step-active]="currentStep() === 1" [class.step-done]="currentStep() > 1" (click)="goToStep(1)">
       <div class="step-circle">{{ currentStep() > 1 ? '✓' : '1' }}</div>
@@ -38,24 +37,29 @@
 
   <div class="form-layout">
     <form class="form-main" (ngSubmit)="onSubmit()">
-      <!-- Hidden input moved here so it is always available in the DOM -->
       <input id="photo-input" type="file" accept="image/*" style="display:none" (change)="onFileSelected($event)"/>
 
-      <!-- STEP 1 -->
       @if (currentStep() === 1) {
         <div class="section-card">
           <h2 class="section-title">Grunddaten</h2>
 
           @if (!collectionLocked) {
-            <div class="form-group">
-              <label class="form-label">Sammlung <span class="required">*</span></label>
-              <select class="form-select"
-                [ngModel]="collectionId()" (ngModelChange)="collectionId.set($event)" name="collectionId">
-                <option [ngValue]="null">Sammlung wählen…</option>
-                @for (col of collectionOptions(); track col.id) {
-                  <option [ngValue]="col.id">{{ col.name }}</option>
-                }
-              </select>
+            <div class="form-group autocomplete-container">
+              <label class="form-label">Sammlung suchen <span class="required">*</span></label>
+              <input class="form-input" type="text" placeholder="Sammlung eingeben…"
+                [ngModel]="collectionSearch()" (ngModelChange)="collectionSearch.set($event); collectionId.set(null)" name="collectionSearch"/>
+              
+              @if (collectionSearch() && !collectionId()) {
+                <div class="autocomplete-dropdown">
+                  @for (col of filteredCollections(); track col.id) {
+                    <div class="autocomplete-item" (click)="selectCollection(col)">
+                      {{ col.name }}
+                    </div>
+                  } @empty {
+                    <div class="autocomplete-no-results">Keine Sammlung gefunden</div>
+                  }
+                </div>
+              }
               @if (collectionOptions().length === 0) {
                 <p class="form-hint">Du hast noch keine eigene Sammlung. Lege zuerst eine im Dashboard an.</p>
               }
@@ -67,11 +71,13 @@
             <input class="form-input" type="text" placeholder="z.B. Hirschkäfer"
               [ngModel]="name()" (ngModelChange)="name.set($event)" name="name"/>
           </div>
+
           <div class="form-group">
-            <label class="form-label">Beschreibung <span class="required">*</span></label>
-            <textarea class="form-textarea" placeholder="Beschreibe das Objekt…"
+            <label class="form-label">Notiz <span class="required">*</span></label>
+            <textarea class="form-textarea" placeholder="Schreibe eine Notiz..."
               [ngModel]="description()" (ngModelChange)="description.set($event)" name="description"></textarea>
           </div>
+
           <div class="form-row">
             <div class="form-group">
               <label class="form-label">Sammlungsdatum <span class="required">*</span></label>
@@ -90,16 +96,25 @@
               </select>
             </div>
           </div>
-          <div class="form-group">
-            <label class="form-label">Fundort <span class="required">*</span></label>
-            <select class="form-select"
-              [ngModel]="locationId()" (ngModelChange)="locationId.set($event)" name="locationId">
-              <option [ngValue]="null">Fundort wählen…</option>
-              @for (loc of locationOptions(); track loc.id) {
-                <option [ngValue]="loc.id">{{ loc.name }} ({{ loc.region }}, {{ loc.country }})</option>
-              }
-            </select>
+
+          <div class="form-group autocomplete-container">
+            <label class="form-label">Fundort suchen <span class="required">*</span></label>
+            <input class="form-input" type="text" placeholder="Ort, Region oder Land eingeben…"
+              [ngModel]="locationSearch()" (ngModelChange)="locationSearch.set($event); locationId.set(null)" name="locationSearch"/>
+            
+            @if (locationSearch() && !locationId()) {
+              <div class="autocomplete-dropdown">
+                @for (loc of filteredLocations(); track loc.id) {
+                  <div class="autocomplete-item" (click)="selectLocation(loc)">
+                    {{ loc.name }} <span style="color: #64748b; font-size: 0.85rem;">({{ loc.region }}, {{ loc.country }})</span>
+                  </div>
+                } @empty {
+                  <div class="autocomplete-no-results">Kein Fundort gefunden</div>
+                }
+              </div>
+            }
           </div>
+          
           <div class="step-nav">
             <span></span>
             <button class="primary-button" type="button" (click)="nextStep()">
@@ -110,22 +125,28 @@
         </div>
       }
 
-      <!-- STEP 2 -->
       @if (currentStep() === 2) {
         <div class="section-card">
           <h2 class="section-title">Taxonomie</h2>
-          <div class="form-group">
-            <label class="form-label">Art <span class="required">*</span></label>
-            <select class="form-select"
-              [ngModel]="taxonomyId()" (ngModelChange)="taxonomyId.set($event)" name="taxonomyId">
-              <option [ngValue]="null">Taxonomie wählen…</option>
-              @for (tax of taxonomyOptions(); track tax.id) {
-                <option [ngValue]="tax.id">{{ tax.genus }} {{ tax.species }}</option>
-              }
-            </select>
+          
+          <div class="form-group autocomplete-container">
+            <label class="form-label">Art / Gattung suchen <span class="required">*</span></label>
+            <input class="form-input" type="text" placeholder="z.B. Lucanus cervus…"
+              [ngModel]="taxonomySearch()" (ngModelChange)="taxonomySearch.set($event); taxonomyId.set(null)" name="taxonomySearch"/>
+            
+            @if (taxonomySearch() && !taxonomyId()) {
+              <div class="autocomplete-dropdown">
+                @for (tax of filteredTaxonomies(); track tax.id) {
+                  <div class="autocomplete-item" (click)="selectTaxonomy(tax)">
+                    <strong>{{ tax.genus }}</strong> <em>{{ tax.species }}</em>
+                  </div>
+                } @empty {
+                  <div class="autocomplete-no-results">Keine passende Art gefunden</div>
+                }
+              </div>
+            }
             <p class="form-hint">
-              Fehlt die gesuchte Art? Neue Arten werden über einen Artenantrag von einem
-              Moderator freigegeben, bevor sie hier wählbar sind.
+              Fehlt die gesuchte Art? Neue Arten werden über einen Artenantrag registriert.
             </p>
           </div>
 
@@ -169,7 +190,6 @@
         </div>
       }
 
-      <!-- STEP 3 -->
       @if (currentStep() === 3) {
         <div class="section-card">
           <h2 class="section-title">Foto hochladen</h2>
@@ -202,10 +222,7 @@
 
     </form>
 
-    <!-- Sidebar -->
     <div class="form-sidebar">
-
-      <!-- Clickable preview image -->
       <div class="preview-card section-card">
         <h2 class="section-title">Vorschau</h2>
         <div class="preview-body">
@@ -233,7 +250,6 @@
         </div>
       </div>
 
-      <!-- Progress -->
       <div class="progress-card section-card">
         <h2 class="section-title">Fortschritt</h2>
         <div class="progress-bar-wrap">
@@ -255,8 +271,7 @@
           </div>
         </div>
       </div>
-
     </div>
-  </div>
 
+  </div>
 </div>

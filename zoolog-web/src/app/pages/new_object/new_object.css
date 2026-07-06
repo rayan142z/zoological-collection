@@ -1,4 +1,8 @@
+@import "leaflet/dist/leaflet.css";
+
 .new-object-header { margin-bottom: 32px; }
+
+
 
 .back-link {
   display: inline-flex;
@@ -318,4 +322,104 @@
   color: var(--text-muted);
   font-weight: 600;
   margin-top: 8px;
+}
+
+/* 1. Zwingt das Leaflet-CSS, die Bilder für die Kacheln richtig zu laden */
+.leaflet-container {
+    background: #f1f5f9 !important; /* Etwas helleres Grau als Standard */
+}
+
+/* 2. Der absolute Fix für das graue Laden: */
+/* Zwingt alle Kachel-Bilder, sich sofort sichtbar zu schalten, sobald sie geladen sind */
+.leaflet-tile-container img {
+    box-shadow: none !important;
+    max-width: none !important;
+    max-height: none !important;
+}
+
+/* 3. Der Pin-Garant: Zwingt Leaflet, die Marker-Grafik anzuzeigen, */
+/* selbst wenn Angular die Styles beim Kompilieren isoliert (View Encapsulation) */
+::ng-deep .leaflet-marker-icon {
+    display: block !important;
+    width: 25px !important;
+    height: 41px !important;
+}
+
+::ng-deep .leaflet-marker-shadow {
+    display: block !important;
+    width: 41px !important;
+    height: 41px !important;
+}
+
+/* Container relativ setzen, damit sich das absolute Dropdown korrekt ausrichtet */
+.autocomplete-container {
+  position: relative;
+}
+
+/* Die schwebende Box für die Suchergebnisse */
+.autocomplete-dropdown {
+  position: absolute;
+  top: calc(100% + 6px); /* Kleiner Abstand direkt unter dem Input-Feld */
+  left: 0;
+  right: 0;
+  background: #ffffff;
+  border: 1px solid #e2e8f0; /* Moderner, weicher Grauton */
+  border-radius: 8px; /* Schön abgerundete Ecken */
+  max-height: 240px; /* Begrenzte Höhe, falls es viele Treffer gibt */
+  overflow-y: auto; /* Scrollbalken aktivieren */
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -4px rgba(0, 0, 0, 0.05); /* Sehr cleaner, weicher Schatten */
+  z-index: 100; /* Stellt sicher, dass das Menü über allen anderen Elementen schwebt */
+}
+
+/* Einzelnes Element in der Liste */
+.autocomplete-item {
+  padding: 0.75rem 1rem;
+  cursor: pointer;
+  font-size: 0.95rem;
+  color: #334155;
+  border-bottom: 1px solid #f1f5f9; /* Feine Trennlinie zwischen den Einträgen */
+  transition: all 0.15s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+/* Letzter Eintrag benötigt keine Trennlinie */
+.autocomplete-item:last-child {
+  border-bottom: none;
+}
+
+/* Hover-Effekt beim Drüberfahren */
+.autocomplete-item:hover {
+  background-color: #f8fafc; /* Sehr helles Grau-Blau */
+  color: #0f172a; /* Dunklerer Text für besseren Kontrast */
+  padding-left: 1.25rem; /* Ein minimaler "Slide-In" Effekt fürs Auge */
+}
+
+/* Style für den "Keine Ergebnisse"-Text */
+.autocomplete-no-results {
+  padding: 1rem;
+  color: #94a3b8;
+  font-size: 0.9rem;
+  font-style: italic;
+  text-align: center;
+  background-color: #f8fafc;
+}
+
+/* --- optionale Verschönerung für die Scrollbar innerhalb der Box --- */
+.autocomplete-dropdown::-webkit-scrollbar {
+  width: 6px;
+}
+
+.autocomplete-dropdown::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.autocomplete-dropdown::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+}
+
+.autocomplete-dropdown::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
 }
