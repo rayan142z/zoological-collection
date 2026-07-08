@@ -1,5 +1,8 @@
 ﻿using ZoologAPP.Models;
 using ZoologAPP.Services;
+//Alexander Stojek 08.07.2026: Shapes hinzugefügt
+using Microsoft.Maui.Controls.Shapes;
+
 
 namespace ZoologAPP;
 
@@ -69,8 +72,10 @@ public partial class MainPage : ContentPage
 		button.TextColor = view == target ? Colors.White : Color.FromArgb("#1B4332");
 		grid.Add(button, col, row);
 	}
-
-	void RenderHome()
+	
+	//Alexander Stojek 08.07.2026: Ersetzen der bisherigen RenderHome Methode durch eine neue Version
+	//Alt:
+	/* void RenderHome()
 	{
 		var mine = auth.CurrentUser is null ? [] : data.GetMyCollections(auth.CurrentUser.Id);
 		var myObjects = data.GetObjects().Where(o => mine.Any(c => c.Id == o.CollectionId)).ToList();
@@ -78,6 +83,36 @@ public partial class MainPage : ContentPage
 		RootStack.Add(Panel("Dashboard",
 			$"Sammlungen: {mine.Count}\nExponate: {myObjects.Count}\nAusgeliehen: {data.GetBorrowedCount(auth.CurrentUser!.Id)}\nFavoriten: {data.GetFavorites(auth.CurrentUser.Id).Count}"));
 
+		var popular = data.GetPopularCollections();
+		RootStack.Add(new Label { Text = "Populäre öffentliche Sammlungen", FontSize = 18, FontAttributes = FontAttributes.Bold });
+		if (popular.Count == 0)
+			RootStack.Add(Muted("Noch keine öffentlichen Sammlungen vorhanden."));
+		foreach (var collection in popular)
+			RootStack.Add(Row(collection.Name, $"{collection.OwnerName} · {data.GetObjectCountForCollection(collection.Id)} Exponate"));
+	} */
+
+	//Neu: 
+	void RenderHome()
+	{
+		var mine = auth.CurrentUser is null ? [] : data.GetMyCollections(auth.CurrentUser.Id);
+		var myObjects = data.GetObjects().Where(o => mine.Any(c => c.Id == o.CollectionId)).ToList();
+
+		RootStack.Add(new Label { Text = "Dashboard", FontSize = 20, FontAttributes = FontAttributes.Bold });
+
+		// 2x2-Raster aus vier Statistik-Kacheln
+		var stats = new Grid { ColumnSpacing = 12, RowSpacing = 12 };
+		stats.ColumnDefinitions.Add(new ColumnDefinition(GridLength.Star));
+		stats.ColumnDefinitions.Add(new ColumnDefinition(GridLength.Star));
+		stats.RowDefinitions.Add(new RowDefinition(GridLength.Auto));
+		stats.RowDefinitions.Add(new RowDefinition(GridLength.Auto));
+
+		stats.Add(StatCard("🗂️", mine.Count.ToString(), "Sammlungen"), 0, 0);
+		stats.Add(StatCard("🔬", myObjects.Count.ToString(), "Exponate"), 1, 0);
+		stats.Add(StatCard("📤", data.GetBorrowedCount(auth.CurrentUser!.Id).ToString(), "Ausgeliehen"), 0, 1);
+		stats.Add(StatCard("⭐", data.GetFavorites(auth.CurrentUser.Id).Count.ToString(), "Favoriten"), 1, 1);
+		RootStack.Add(stats);
+
+		// Populäre öffentliche Sammlungen (wie gehabt, jetzt als Karten mit Schatten)
 		var popular = data.GetPopularCollections();
 		RootStack.Add(new Label { Text = "Populäre öffentliche Sammlungen", FontSize = 18, FontAttributes = FontAttributes.Bold });
 		if (popular.Count == 0)
@@ -245,6 +280,7 @@ public partial class MainPage : ContentPage
 			BackgroundColor = danger ? Color.FromArgb("#C2413D") : Color.FromArgb("#2D6A4F"),
 			TextColor = Colors.White
 		};
+		button.Shadow = new Shadow { Brush = Brush.Black, Opacity = 0.20f, Radius = 6, Offset = new Point(0, 2) };
 		button.Clicked += (_, _) => action();
 		return button;
 	}
@@ -278,7 +314,7 @@ public partial class MainPage : ContentPage
 		stack.Add(new Label { Text = title, FontSize = 18, FontAttributes = FontAttributes.Bold });
 		foreach (var field in fields) stack.Add(field);
 		stack.Add(submit);
-		return stack;
+		return Wrap(stack);
 	}
 
 	View Panel(string title, string body, View? action = null)
@@ -287,7 +323,7 @@ public partial class MainPage : ContentPage
 		stack.Add(new Label { Text = title, FontSize = 18, FontAttributes = FontAttributes.Bold });
 		stack.Add(new Label { Text = body, TextColor = Color.FromArgb("#4B5563") });
 		if (action != null) stack.Add(action);
-		return stack;
+		return Wrap(stack);
 	}
 
 	View Row(string title, string detail, IEnumerable<View>? actions = null)
@@ -301,15 +337,46 @@ public partial class MainPage : ContentPage
 			foreach (var action in actions) row.Add(action);
 			stack.Add(row);
 		}
-		return stack;
+		return Wrap(stack);
 	}
 
 	VerticalStackLayout Card() => new()
 	{
 		Spacing = 10,
 		Padding = 14,
-		BackgroundColor = Colors.White
+		//Alexander Stojek 08.07.2026: Color auf Transparent gesetzt
+		BackgroundColor = Colors.Transparent
 	};
+
+
+	//Alexander Stojek 08.07.2026: Einfügen einer Wrap Methode die eine Karte anlegt die weiß und abgerundet ist und Schatten hat.
+	Border Wrap(View inner) => new()
+	{
+		Content = inner,
+		BackgroundColor = Colors.White,
+		StrokeThickness = 0,                                  // keine sichtbare Rahmenlinie
+		StrokeShape = new RoundRectangle { CornerRadius = 14 }, // runde Ecken
+		Shadow = new Shadow
+		{
+			Brush = Brush.Black,        // Farbe des Schattens
+			Opacity = 0.15f,            // 15% – dezent, nicht hart
+			Radius = 12,                // Weichzeichnung (je höher, desto weicher)
+			Offset = new Point(0, 4)    // 4 px nach unten versetzt → wirkt „schwebend"
+		}
+	};	
+
+	//Alexander Stojek 08.07.2026: Einfügen einer Kachel, die ein Emoji, einen Wert und eine Beschriftung anzeigt. 
+	View StatCard(string emoji, string value, string label)
+	{
+		var stack = new VerticalStackLayout { Spacing = 4, Padding = 14, HorizontalOptions = LayoutOptions.Center };
+		stack.Add(new Label { Text = emoji, FontSize = 30, HorizontalOptions = LayoutOptions.Center });
+		stack.Add(new Label { Text = value, FontSize = 26, FontAttributes = FontAttributes.Bold, TextColor = Color.FromArgb("#1B4332"), HorizontalOptions = LayoutOptions.Center });
+		stack.Add(new Label { Text = label, FontSize = 13, TextColor = Color.FromArgb("#6B7280"), HorizontalOptions = LayoutOptions.Center });
+		return Wrap(stack);
+	}
+
+
+
 
 	View LabeledSwitch(string text, Switch control) => new HorizontalStackLayout
 	{

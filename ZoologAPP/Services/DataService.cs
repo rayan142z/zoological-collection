@@ -112,6 +112,18 @@ public class DataService
         SaveObjects(list);
     }
 
+    //08.07.2026 Alexander Stojek: Aktualisiert ein vorhandenes Exponat (für die Bearbeiten-Funktion in der App).
+    public void UpdateObject(ZoologObject updated)
+    {
+        var list = GetObjects();
+        var index = list.FindIndex(o => o.Id == updated.Id);
+        if (index < 0)
+            return;
+
+        list[index] = updated;
+        SaveObjects(list);
+    }
+
     public List<ZoologObject> GetObjectsInCollection(string colId) =>
         GetObjects().Where(o => o.CollectionId == colId).ToList();
 

@@ -49,6 +49,9 @@
 		<!-- Custom Fonts -->
 		<MauiFont Include="Resources\Fonts\*" />
 
+		<!--08.07.2026 Alexander Stojek: Eigene Bilder einbinden (Logo, später Tab-Icons). -->
+		<MauiImage Include="Resources\Images\*" />
+
 	</ItemGroup>
 
 	<ItemGroup>

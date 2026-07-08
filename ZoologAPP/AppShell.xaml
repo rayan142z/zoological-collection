@@ -6,9 +6,13 @@
     xmlns:local="clr-namespace:ZoologAPP"
     Title="ZoologAPP">
 
-    <ShellContent
-        Title="Home"
-        ContentTemplate="{DataTemplate local:MainPage}"
-        Route="MainPage" />
+    <!--08.07.2026 Alexander Stojek (Icons): 5-Tab-Struktur mit Icons (Symbol über der Beschriftung). -->
+    <TabBar>
+        <ShellContent Title="Start"      Icon="tab_start.png"       ContentTemplate="{DataTemplate local:HomePage}"        Route="start" />
+        <ShellContent Title="Sammlungen" Icon="tab_collections.png" ContentTemplate="{DataTemplate local:CollectionsPage}" Route="collections" />
+        <ShellContent Title="Suche"      Icon="tab_search.png"      ContentTemplate="{DataTemplate local:SearchPage}"      Route="search" />
+        <ShellContent Title="Fundorte"   Icon="tab_fundorte.png"    ContentTemplate="{DataTemplate local:LocationsPage}"   Route="locations" />
+        <ShellContent Title="Mehr"       Icon="tab_more.png"        ContentTemplate="{DataTemplate local:MorePage}"        Route="more" />
+    </TabBar>
 
 </Shell>
