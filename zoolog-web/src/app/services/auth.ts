@@ -94,8 +94,11 @@ export class Auth {
 
   private loadUserFromStorage(): User | null {
     const storedUser = localStorage.getItem(this.userStorageKey);
+    const token = localStorage.getItem(this.tokenStorageKey);
 
-    if (!storedUser) {
+    if (!storedUser || !token || !this.isTokenValid(token)) {
+      localStorage.removeItem(this.tokenStorageKey);
+      localStorage.removeItem(this.userStorageKey);
       return null;
     }
 
@@ -103,8 +106,21 @@ export class Auth {
       return JSON.parse(storedUser) as User;
     } catch {
       // Falls die gespeicherten Daten beschädigt oder ungültig sind, werden sie gelöscht
+      localStorage.removeItem(this.tokenStorageKey);
       localStorage.removeItem(this.userStorageKey);
       return null;
+    }
+  }
+
+  private isTokenValid(token: string): boolean {
+    try {
+      const payloadSegment = token.split('.')[1];
+      const base64 = payloadSegment.replace(/-/g, '+').replace(/_/g, '/');
+      const payload = JSON.parse(atob(base64)) as { exp?: number };
+
+      return typeof payload.exp === 'number' && payload.exp * 1000 > Date.now();
+    } catch {
+      return false;
     }
   }
 }

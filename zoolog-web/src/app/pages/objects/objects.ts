@@ -4,6 +4,7 @@ import { DatePipe } from '@angular/common';
 import { RouterLink, ActivatedRoute } from '@angular/router';
 import { forkJoin } from 'rxjs';
 import { ApiService } from '../../services/api.service';
+import { Auth } from '../../services/auth';
 import { STATUS_EN_TO_DE } from '../../utils/status-map';
 
 interface Specimen {
@@ -48,6 +49,7 @@ interface CollectionApiResponse {
 export class Objects implements OnInit {
   private readonly api = inject(ApiService);
   private readonly cdr = inject(ChangeDetectorRef);
+  readonly auth = inject(Auth);
 
   searchTerm = '';
   selectedStatus = '';

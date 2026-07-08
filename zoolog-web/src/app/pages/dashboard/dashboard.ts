@@ -39,7 +39,7 @@ interface SpecimenApiResponse {
 })
 export class Dashboard {
   private readonly api = inject(ApiService);
-  private readonly auth = inject(Auth);
+  readonly auth = inject(Auth);
   private readonly cdr = inject(ChangeDetectorRef);
 
   showNewCollection = false;

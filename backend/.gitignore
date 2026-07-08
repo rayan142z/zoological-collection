@@ -76,4 +76,3 @@ nunit-*.xml
 /dataSources.local.xml
 /.idea/dataSources
 
-appsettings.Development.json
