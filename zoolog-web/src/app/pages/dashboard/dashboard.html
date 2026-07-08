@@ -70,16 +70,18 @@
       }
 
       <!-- Add new collection card -->
-      <a routerLink="/collections/new" class="collection-card collection-card-new" style="text-decoration: none; color: inherit;">
-        <div class="new-col-inner">
-          <div class="new-col-icon">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-              <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
-            </svg>
+      @if (auth.currentUser()) {
+        <a routerLink="/collections/new" class="collection-card collection-card-new" style="text-decoration: none; color: inherit;">
+          <div class="new-col-inner">
+            <div class="new-col-icon">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+              </svg>
+            </div>
+            <span class="new-col-label">Neue Sammlung erstellen</span>
           </div>
-          <span class="new-col-label">Neue Sammlung erstellen</span>
-        </div>
-      </a>
+        </a>
+      }
     </div>
   </section>
 
