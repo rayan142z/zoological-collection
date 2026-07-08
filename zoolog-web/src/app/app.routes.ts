@@ -26,10 +26,10 @@ export const routes: Routes = [
     { path: 'edit-object/:id', component: EditObject },
     { path: 'about-us',   component: AboutUs },
     { path: 'borrowed_objects', component: BorrowedObjects },
-    { path: 'collections/new', component: NewCollection },
+    { path: 'collections/new', component: NewCollection, canActivate: [authGuard] },
     // new-object is nested inside a collection
-    { path: 'objects/:id/new', component: NewObject },
-    { path: 'new-object', component: NewObject },  // fallback direct link
+    { path: 'objects/:id/new', component: NewObject, canActivate: [authGuard] },
+    { path: 'new-object', component: NewObject, canActivate: [authGuard] },  // fallback direct link
 
     { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
 ];
