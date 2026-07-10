@@ -1,6 +1,13 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
-	<application android:allowBackup="true" android:icon="@mipmap/appicon" android:roundIcon="@mipmap/appicon_round" android:supportsRtl="true"></application>
+	<!--08.07.2026 Alexander Stojek: usesCleartextTraffic erlaubt einfaches HTTP zum lokalen Backend (http://10.0.2.2:5227) im Emulator. Für den Demo-Betrieb ausreichend. -->
+	<application android:allowBackup="true" android:icon="@mipmap/appicon" android:roundIcon="@mipmap/appicon_round" android:supportsRtl="true" android:usesCleartextTraffic="true">
+		<!--08.07.2026 Alexander Stojek: Google-Maps-API-Key für die Kartenansicht der Fundorte. OHNE gültigen Key bleibt die Karte grau/leer (Pins funktionieren trotzdem nicht, da die Karte selbst nicht lädt). Kostenlos erstellen unter https://console.cloud.google.com/google/maps-apis -> "Maps SDK for Android" aktivieren -> API-Key kopieren -> hier statt DEIN_API_KEY_HIER einsetzen. -->
+		<meta-data android:name="com.google.android.geo.API_KEY" android:value="AIzaSyAoz-SmGoHR9vZxKFhwXyJvHUMLBMH6apk" />
+	</application>
 	<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 	<uses-permission android:name="android.permission.INTERNET" />
+	<!--08.07.2026 Alexander Stojek: Ab Android 13 muss die App explizit um Erlaubnis für Benachrichtigungen bitten. -->
+	<uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+	<uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
 </manifest>

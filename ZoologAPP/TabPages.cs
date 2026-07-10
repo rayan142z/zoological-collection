@@ -37,7 +37,8 @@ public class LocationsPage : BasePage
 public class MorePage : BasePage
 {
 	public MorePage() { Title = "Mehr"; }
-	protected override void OnAppearing() { view = auth.IsLoggedIn ? "more" : "auth"; base.OnAppearing(); }
+	//08.07.2026 Alexander Stojek (Backend): Anmeldung jetzt über den Server (api) statt lokal (auth).
+	protected override void OnAppearing() { view = api.IsLoggedIn ? "more" : "auth"; base.OnAppearing(); }
 }
 
 //08.07.2026 Alexander Stojek (Struktur-Umbau): Diese drei Tab-Seiten werden nicht mehr als eigene Tabs verwendet

@@ -6,6 +6,13 @@
 using ZoologAPP.Models;
 using ZoologAPP.Services;
 using Microsoft.Maui.Controls.Shapes;
+//08.07.2026 Alexander Stojek: Für echte lokale Benachrichtigungen (Testbenachrichtigung in den Einstellungen).
+using Plugin.LocalNotification;
+using Plugin.LocalNotification.Core.Models;
+//08.07.2026 Alexander Stojek (Karte): Für MapSpan/Distance in der Fundorte-Kartenansicht.
+using Microsoft.Maui.Maps;
+//08.07.2026 Alexander Stojek (Karte): Für Map/Pin (das Karten-Steuerelement selbst).
+using Microsoft.Maui.Controls.Maps;
 
 namespace ZoologAPP;
 
@@ -14,6 +21,22 @@ public abstract class BasePage : ContentPage
 	//08.07.2026 Alexander Stojek: Dienste sind static, damit ALLE Tabs denselben Login-Zustand teilen.
 	protected static readonly AuthService auth = new();
 	protected static readonly DataService data = new();
+
+	//08.07.2026 Alexander Stojek (Backend): Verbindung zum Server (Login + Daten holen).
+	protected static readonly ApiService api = new();
+
+	//08.07.2026 Alexander Stojek (Backend): Zwischenspeicher für die vom Server geladenen Daten + Ladezustand.
+	protected static List<ApiCollection> apiCollections = new();
+	protected static List<ApiSpecimen> apiSpecimens = new();
+	protected static List<ApiTaxonomy> apiTaxonomies = new();
+	protected static List<ApiLocation> apiLocations = new();
+	protected static bool backendLoaded = false;
+	protected static bool backendLoading = false;
+	protected static string? backendError = null;
+
+	//08.07.2026 Alexander Stojek (Backend): Merkt sich die aktuell geöffnete Sammlung / das Exponat (Backend-IDs sind Zahlen).
+	protected int selectedApiCollectionId = 0;
+	protected int selectedApiSpecimenId = 0;
 
 	//08.07.2026 Alexander Stojek: Scroll-Bereich + Inhalts-Stapel werden hier im Code aufgebaut
 	// (früher standen sie in MainPage.xaml).
@@ -58,30 +81,26 @@ public abstract class BasePage : ContentPage
 		RootStack.Clear();
 		RootStack.Add(Header());
 
-		if (view != "auth" && !auth.IsLoggedIn)
+		//08.07.2026 Alexander Stojek (Backend): Login-Prüfung jetzt gegen den Server (api) statt lokal (auth).
+		if (view != "auth" && !api.IsLoggedIn)
 		{
-			//08.07.2026 Alexander Stojek (Struktur-Umbau): Login liegt jetzt im Tab „Mehr“ – Hinweis entsprechend angepasst.
-			//08.07.2026 Alexander Stojek (Feinschliff): Hinweis verweist jetzt auf den Login oben rechts. Alt:
-			//RootStack.Add(Panel("Anmeldung nötig", "Bitte melde dich im Tab „Mehr“ an, um Zoolog zu nutzen."));
 			RootStack.Add(Panel("Anmeldung nötig", "Bitte melde dich an – oben rechts auf „Login“ tippen."));
 			return;
 		}
 
+		//08.07.2026 Alexander Stojek (Backend): Ansichten zeigen jetzt die Server-Daten (…Online-Methoden). Die alten lokalen Render-Methoden bleiben erhalten, werden aber nicht mehr aufgerufen.
 		switch (view)
 		{
-			case "auth": RenderAuth(); break;
-			case "collections": RenderCollections(); break;
-			//08.07.2026 Alexander Stojek (Struktur-Umbau): drei neue Ansichten (Sammlungs-Detail, Suche, Mehr-Menü).
-			case "collectionDetail": RenderCollectionDetail(); break;
-			case "search": RenderSearch(); break;
-			case "more": RenderMore(); break;
-			//08.07.2026 Alexander Stojek (Feature B): Einstellungen + Exponat-Detail/Bearbeiten.
+			case "auth": RenderAuthOnline(); break;
+			case "collections": RenderCollectionsOnline(); break;
+			case "collectionDetail": RenderCollectionDetailOnline(); break;
+			case "search": RenderSearchOnline(); break;
+			case "more": RenderMoreOnline(); break;
 			case "settings": RenderSettings(); break;
-			case "objectDetail": RenderObjectDetail(); break;
-			case "objects": RenderObjects(); break;
-			case "loans": RenderLoans(); break;
-			case "locations": RenderLocations(); break;
-			default: RenderHome(); break;
+			case "objectDetail": RenderObjectDetailOnline(); break;
+			case "locations": RenderLocationsOnline(); break;
+			case "onlineTest": RenderOnlineTest(); break;
+			default: RenderHomeOnline(); break;
 		}
 	}
 
@@ -103,11 +122,12 @@ public abstract class BasePage : ContentPage
 		var left = new HorizontalStackLayout { Spacing = 8, Children = { logo, brand } };
 
 		View right;
-		if (auth.IsLoggedIn)
+		//08.07.2026 Alexander Stojek (Backend): Anmeldestatus/Name kommt jetzt vom Server (api).
+		if (api.IsLoggedIn)
 		{
 			var user = new Label
 			{
-				Text = auth.CurrentUser!.Username,
+				Text = api.CurrentUser!.Username,
 				FontAttributes = FontAttributes.Bold,
 				TextColor = Color.FromArgb("#1B4332"),
 				VerticalOptions = LayoutOptions.Center,
@@ -487,7 +507,540 @@ public abstract class BasePage : ContentPage
 		RootStack.Add(Panel("Leihgaben", "Ausleihen anlegen und zurücknehmen.", Button("Öffnen", () => Show("loans"))));
 		//08.07.2026 Alexander Stojek (Feature B): Einstellungen (Benachrichtigungs-Schalter).
 		RootStack.Add(Panel("Einstellungen", "Benachrichtigungen an/aus.", Button("Öffnen", () => Show("settings"))));
+		//08.07.2026 Alexander Stojek (Backend): Verbindungstest zur Uni-Datenbank.
+		RootStack.Add(Panel("Online-Daten (Test)", "Zeigt die echten Sammlungen aus der Datenbank.", Button("Öffnen", () => Show("onlineTest"))));
 	}
+
+	//08.07.2026 Alexander Stojek (Backend): Verbindungstest – meldet sich beim Backend an und zeigt die echten Sammlungen aus der Uni-Datenbank.
+	// Das beweist, dass App und Website dieselben Daten sehen. Voraussetzung: VPN an + Backend läuft (dotnet run).
+	void RenderOnlineTest()
+	{
+		RootStack.Add(BackLink("← zurück", () => Show("more")));
+		RootStack.Add(new Label { Text = "Online-Daten (Backend)", FontSize = 20, FontAttributes = FontAttributes.Bold });
+
+		var status = new Label { Text = "Verbinde mit dem Server…", TextColor = Color.FromArgb("#6B7280") };
+		RootStack.Add(status);
+
+		var results = new VerticalStackLayout { Spacing = 10 };
+		RootStack.Add(results);
+
+		// Daten asynchron laden und Anzeige danach aktualisieren.
+		_ = LoadOnlineAsync(status, results);
+	}
+
+	async Task LoadOnlineAsync(Label status, VerticalStackLayout results)
+	{
+		try
+		{
+			if (!api.IsLoggedIn)
+			{
+				//08.07.2026 Alexander Stojek (Backend): LoginAsync liefert jetzt auch den genauen Fehlertext.
+				var (ok, error) = await api.LoginAsync("demo_user", "Demo123!");
+				if (!ok)
+				{
+					status.Text = "Login beim Server fehlgeschlagen: " + error;
+					return;
+				}
+			}
+
+			var collections = await api.GetAsync<List<ApiCollection>>("collections");
+			var specimens = await api.GetAsync<List<ApiSpecimen>>("specimen");
+
+			status.Text = $"Verbunden ✔  ({collections.Count} Sammlungen, {specimens.Count} Exponate aus der Datenbank)";
+
+			results.Clear();
+			foreach (var c in collections)
+			{
+				var count = specimens.Count(s => s.CollectionId == c.Id);
+				results.Add(Row(c.Name ?? "(ohne Name)", $"{c.Description}\n{count} Exponate · {(c.IsPublic ? "öffentlich" : "privat")}"));
+			}
+		}
+		catch (Exception ex)
+		{
+			status.Text = "Fehler bei der Verbindung: " + ex.Message;
+		}
+	}
+
+	// ==========================================================================
+	// 08.07.2026 Alexander Stojek (Backend): Ab hier die "Online"-Ansichten – sie zeigen die Daten aus der Uni-Datenbank (nur ansehen).
+	// ==========================================================================
+
+	// Sorgt dafür, dass die Server-Daten geladen sind. Ist noch nichts da, wird geladen und "Lädt…" angezeigt.
+	bool EnsureBackendLoaded()
+	{
+		if (backendLoaded)
+			return true;
+
+		if (backendError is not null)
+		{
+			RootStack.Add(Muted("Konnte Daten nicht laden: " + backendError));
+			RootStack.Add(Button("Erneut versuchen", () => { backendError = null; Show(view); }));
+			return false;
+		}
+
+		RootStack.Add(Muted("Lädt Daten vom Server…"));
+		if (!backendLoading)
+			_ = LoadBackendDataAsync();
+		return false;
+	}
+
+	async Task LoadBackendDataAsync()
+	{
+		backendLoading = true;
+		backendError = null;
+		try
+		{
+			apiCollections = await api.GetAsync<List<ApiCollection>>("collections");
+			apiSpecimens = await api.GetAsync<List<ApiSpecimen>>("specimen");
+			apiTaxonomies = await api.GetAsync<List<ApiTaxonomy>>("taxonomy");
+			apiLocations = await api.GetAsync<List<ApiLocation>>("location");
+			backendLoaded = true;
+		}
+		catch (Exception ex)
+		{
+			backendError = ex.Message;
+		}
+		finally
+		{
+			backendLoading = false;
+		}
+		Render();
+	}
+
+	// --- Login / Registrierung über den Server ---
+	void RenderAuthOnline()
+	{
+		if (api.IsLoggedIn)
+		{
+			RootStack.Add(Panel("Angemeldet", $"{api.CurrentUser!.Username}\n{api.CurrentUser.Email}\nRolle: {api.CurrentUser.Role}", Button("Abmelden", () =>
+			{
+				api.Logout();
+				backendLoaded = false;
+				Show("auth");
+			})));
+			RootStack.Add(Button("← Zurück zu Mehr", () => Show("more")));
+			return;
+		}
+
+		var loginUser = Entry("Benutzername oder E-Mail", "demo_user");
+		var loginPass = Entry("Passwort", "Demo123!");
+		loginPass.IsPassword = true;
+		RootStack.Add(Form("Login", [loginUser, loginPass], Button("Einloggen", () => _ = DoLoginAsync(loginUser.Text, loginPass.Text))));
+
+		var regUser = Entry("Benutzername");
+		var regEmail = Entry("E-Mail");
+		var regPass = Entry("Passwort");
+		regPass.IsPassword = true;
+		RootStack.Add(Form("Registrieren", [regUser, regEmail, regPass], Button("Konto erstellen", () => _ = DoRegisterAsync(regUser.Text, regEmail.Text, regPass.Text))));
+	}
+
+	async Task DoLoginAsync(string? usernameOrEmail, string? password)
+	{
+		if (string.IsNullOrWhiteSpace(usernameOrEmail) || string.IsNullOrWhiteSpace(password))
+		{
+			Alert("Bitte Benutzername und Passwort eingeben.");
+			return;
+		}
+
+		//08.07.2026 Alexander Stojek (Backend): LoginAsync liefert jetzt auch den genauen Fehlertext, damit man sieht was schiefging.
+		var (ok, error) = await api.LoginAsync(usernameOrEmail.Trim(), password);
+		if (!ok)
+		{
+			Alert(error ?? "Login fehlgeschlagen.");
+			return;
+		}
+
+		backendLoaded = false;
+		Show("more");
+	}
+
+	async Task DoRegisterAsync(string? username, string? email, string? password)
+	{
+		if (string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(password))
+		{
+			Alert("Bitte alle Felder ausfüllen.");
+			return;
+		}
+
+		var (ok, error) = await api.RegisterAsync(username.Trim(), email.Trim(), password);
+		Alert(ok ? "Konto erstellt. Du kannst dich jetzt einloggen." : (error ?? "Registrierung fehlgeschlagen."));
+		if (ok) Show("auth");
+	}
+
+	// --- Startseite (Server-Daten) ---
+	void RenderHomeOnline()
+	{
+		if (!EnsureBackendLoaded()) return;
+
+		var userId = api.CurrentUser!.Id;
+		var mine = apiCollections.Where(c => c.CreatedBy == userId).ToList();
+		var mineIds = mine.Select(c => c.Id).ToHashSet();
+		var myObjects = apiSpecimens.Where(s => mineIds.Contains(s.CollectionId)).ToList();
+		var onLoan = myObjects.Count(s => s.Status == "on loan");
+
+		RootStack.Add(new Label { Text = $"Hallo, {api.CurrentUser.Username} 👋", FontSize = 24, FontAttributes = FontAttributes.Bold, TextColor = Color.FromArgb("#1B4332") });
+		RootStack.Add(Muted("Willkommen in deiner zoologischen Sammlung."));
+
+		var stats = new Grid { ColumnSpacing = 12, RowSpacing = 12 };
+		stats.ColumnDefinitions.Add(new ColumnDefinition(GridLength.Star));
+		stats.ColumnDefinitions.Add(new ColumnDefinition(GridLength.Star));
+		stats.RowDefinitions.Add(new RowDefinition(GridLength.Auto));
+		stats.RowDefinitions.Add(new RowDefinition(GridLength.Auto));
+		stats.Add(StatCard("🗂️", mine.Count.ToString(), "Sammlungen"), 0, 0);
+		stats.Add(StatCard("🔬", myObjects.Count.ToString(), "Exponate"), 1, 0);
+		stats.Add(StatCard("📤", onLoan.ToString(), "Ausgeliehen"), 0, 1);
+		stats.Add(StatCard("⭐", "—", "Favoriten"), 1, 1);
+		RootStack.Add(stats);
+
+		RootStack.Add(new Label { Text = "Meine Sammlungen", FontSize = 18, FontAttributes = FontAttributes.Bold });
+		if (mine.Count == 0)
+			RootStack.Add(Muted("Du hast noch keine eigenen Sammlungen."));
+		foreach (var c in mine.Take(3))
+			RootStack.Add(Row(c.Name ?? "", $"{CountObjects(c.Id)} Exponate · {(c.IsPublic ? "öffentlich" : "privat")}", [
+				Button("Öffnen", () => { selectedApiCollectionId = c.Id; Show("collectionDetail"); })
+			]));
+	}
+
+	// --- Sammlungen (Server-Daten, alle sichtbaren) ---
+	void RenderCollectionsOnline()
+	{
+		if (!EnsureBackendLoaded()) return;
+
+		RootStack.Add(new Label { Text = "Sammlungen", FontSize = 20, FontAttributes = FontAttributes.Bold });
+		RootStack.Add(BackLink("↻ Neu laden", () => { backendLoaded = false; Show("collections"); }));
+
+		if (apiCollections.Count == 0)
+			RootStack.Add(Muted("Keine Sammlungen gefunden."));
+		foreach (var c in apiCollections)
+			RootStack.Add(Row(c.Name ?? "", $"{c.Description}\n{CountObjects(c.Id)} Exponate · {(c.IsPublic ? "öffentlich" : "privat")}", [
+				Button("Öffnen", () => { selectedApiCollectionId = c.Id; Show("collectionDetail"); })
+			]));
+	}
+
+	// --- Eine Sammlung mit ihren Exponaten (Server-Daten) ---
+	void RenderCollectionDetailOnline()
+	{
+		if (!EnsureBackendLoaded()) return;
+
+		var collection = apiCollections.FirstOrDefault(c => c.Id == selectedApiCollectionId);
+		if (collection is null) { Show("collections"); return; }
+
+		RootStack.Add(BackLink("← zurück", () => Show("collections")));
+		RootStack.Add(new Label { Text = collection.Name ?? "", FontSize = 22, FontAttributes = FontAttributes.Bold, TextColor = Color.FromArgb("#1B4332") });
+		if (!string.IsNullOrWhiteSpace(collection.Description))
+			RootStack.Add(Muted(collection.Description));
+
+		RootStack.Add(new Label { Text = "Exponate", FontSize = 18, FontAttributes = FontAttributes.Bold });
+		var objs = apiSpecimens.Where(s => s.CollectionId == collection.Id).ToList();
+		if (objs.Count == 0)
+			RootStack.Add(Muted("Keine Exponate in dieser Sammlung."));
+		foreach (var o in objs)
+			RootStack.Add(Row(o.Name ?? "", $"{StatusDe(o.Status)} · {TaxonomyName(o.TaxonomyId)}", [
+				Button("Öffnen", () => { selectedApiSpecimenId = o.Id; Show("objectDetail"); })
+			]));
+	}
+
+	// --- Ein Exponat im Detail (Server-Daten, nur ansehen) ---
+	//08.07.2026 Alexander Stojek (Feinschliff): Alte Detailseite – Felder standen ohne Trennung untereinander in einem Textblock, Datum roh (yyyy-MM-dd), kein Status-Banner. Alt:
+	/*
+	void RenderObjectDetailOnline()
+	{
+		if (!EnsureBackendLoaded()) return;
+
+		var o = apiSpecimens.FirstOrDefault(s => s.Id == selectedApiSpecimenId);
+		if (o is null) { Show("collectionDetail"); return; }
+
+		RootStack.Add(BackLink("← zurück", () => Show("collectionDetail")));
+		RootStack.Add(new Label { Text = o.Name ?? "", FontSize = 22, FontAttributes = FontAttributes.Bold, TextColor = Color.FromArgb("#1B4332") });
+
+		var location = apiLocations.FirstOrDefault(l => l.Id == o.LocationId);
+		var body =
+			$"Status: {StatusDe(o.Status)}\n" +
+			$"Wissenschaftl. Name: {TaxonomyName(o.TaxonomyId)}\n" +
+			$"Größe: {(string.IsNullOrWhiteSpace(o.Size) ? "—" : o.Size)}\n" +
+			$"Fundort: {(location?.Name ?? "—")}\n" +
+			$"Funddatum: {(string.IsNullOrWhiteSpace(o.DateCollected) ? "—" : o.DateCollected)}";
+		RootStack.Add(Panel("Details", body));
+
+		if (!string.IsNullOrWhiteSpace(o.Description))
+			RootStack.Add(Panel("Beschreibung", o.Description));
+	}
+	*/
+
+	//08.07.2026 Alexander Stojek (Feinschliff): Neue Detailseite – Name, darunter ein farbiges Status-Banner (verfügbar/ausgeliehen/...),
+	// danach die Angaben als „Spezifikationen“-Karte mit Trennlinien zwischen den Zeilen (Vorbild: Detailseite der Web-App). Datum lesbar formatiert.
+	void RenderObjectDetailOnline()
+	{
+		if (!EnsureBackendLoaded()) return;
+
+		var o = apiSpecimens.FirstOrDefault(s => s.Id == selectedApiSpecimenId);
+		if (o is null) { Show("collectionDetail"); return; }
+
+		RootStack.Add(BackLink("← zurück", () => Show("collectionDetail")));
+		RootStack.Add(new Label { Text = o.Name ?? "", FontSize = 22, FontAttributes = FontAttributes.Bold, TextColor = Color.FromArgb("#1B4332") });
+		RootStack.Add(StatusBanner(o.Status));
+
+		var location = apiLocations.FirstOrDefault(l => l.Id == o.LocationId);
+
+		var specCard = Card();
+		specCard.Add(new Label { Text = "Spezifikationen", FontSize = 18, FontAttributes = FontAttributes.Bold });
+		specCard.Add(SpecRow("Wissenschaftlicher Name", TaxonomyName(o.TaxonomyId), italic: true));
+		specCard.Add(SpecDivider());
+		specCard.Add(SpecRow("Größe", string.IsNullOrWhiteSpace(o.Size) ? "—" : o.Size));
+		specCard.Add(SpecDivider());
+		specCard.Add(SpecRow("Fundort", location?.Name ?? "—"));
+		specCard.Add(SpecDivider());
+		specCard.Add(SpecRow("Funddatum", FormatDate(o.DateCollected)));
+		RootStack.Add(Wrap(specCard));
+
+		if (!string.IsNullOrWhiteSpace(o.Description))
+			RootStack.Add(Panel("Beschreibung", o.Description));
+	}
+
+	//08.07.2026 Alexander Stojek (Feinschliff): Farbiges Banner mit dem Status (grün = verfügbar, gelb = ausgeliehen, rot = verloren/zerstört).
+	View StatusBanner(string? status)
+	{
+		var color = status switch
+		{
+			"available" => Color.FromArgb("#2D6A4F"),
+			"on loan" => Color.FromArgb("#B45309"),
+			_ => Color.FromArgb("#C2413D")
+		};
+		return new Border
+		{
+			BackgroundColor = color,
+			StrokeThickness = 0,
+			StrokeShape = new RoundRectangle { CornerRadius = 8 },
+			Padding = new Thickness(12, 8),
+			Content = new Label { Text = StatusDe(status), TextColor = Colors.White, FontAttributes = FontAttributes.Bold }
+		};
+	}
+
+	//08.07.2026 Alexander Stojek (Feinschliff): Eine Zeile "Beschriftung ↔ Wert" wie in der Spezifikationen-Tabelle der Web-App.
+	View SpecRow(string label, string value, bool italic = false)
+	{
+		var row = new Grid { ColumnDefinitions = { new ColumnDefinition(GridLength.Auto), new ColumnDefinition(GridLength.Star) } };
+		row.Add(new Label { Text = label, TextColor = Color.FromArgb("#6B7280") }, 0, 0);
+		row.Add(new Label { Text = value, TextColor = Color.FromArgb("#0F172A"), FontAttributes = italic ? FontAttributes.Italic : FontAttributes.None, HorizontalOptions = LayoutOptions.End, HorizontalTextAlignment = TextAlignment.End }, 1, 0);
+		return row;
+	}
+
+	//08.07.2026 Alexander Stojek (Feinschliff): Dünne Trennlinie zwischen den Spezifikations-Zeilen.
+	View SpecDivider() => new BoxView { HeightRequest = 1, Color = Color.FromArgb("#E5E7EB") };
+
+	//08.07.2026 Alexander Stojek (Feinschliff): Wandelt das Server-Datum (yyyy-MM-dd) in ein lesbares deutsches Format (dd.MM.yyyy) um.
+	string FormatDate(string? raw)
+	{
+		if (string.IsNullOrWhiteSpace(raw))
+			return "—";
+		return DateTime.TryParse(raw, out var date) ? date.ToString("dd.MM.yyyy") : raw;
+	}
+
+	// --- Suche (Server-Daten) ---
+	void RenderSearchOnline()
+	{
+		if (!EnsureBackendLoaded()) return;
+
+		var box = new SearchBar { Placeholder = "Exponate, Sammlungen, Fundorte suchen…", BackgroundColor = Colors.White };
+		RootStack.Add(box);
+		var results = new VerticalStackLayout { Spacing = 12 };
+		RootStack.Add(results);
+		box.TextChanged += (_, e) => RenderSearchOnlineResults(results, e.NewTextValue);
+		RenderSearchOnlineResults(results, "");
+	}
+
+	void RenderSearchOnlineResults(VerticalStackLayout container, string? query)
+	{
+		container.Clear();
+		var q = (query ?? "").Trim().ToLower();
+		if (q.Length == 0) { container.Add(Muted("Tippe oben, um zu suchen.")); return; }
+
+		var cols = apiCollections.Where(c => (c.Name ?? "").ToLower().Contains(q)).ToList();
+		var objs = apiSpecimens.Where(s => (s.Name ?? "").ToLower().Contains(q) || TaxonomyName(s.TaxonomyId).ToLower().Contains(q)).ToList();
+		var locs = apiLocations.Where(l => (l.Name ?? "").ToLower().Contains(q)).ToList();
+
+		if (cols.Count + objs.Count + locs.Count == 0) { container.Add(Muted("Keine Treffer.")); return; }
+
+		if (cols.Count > 0) container.Add(new Label { Text = "Sammlungen", FontAttributes = FontAttributes.Bold });
+		foreach (var c in cols) container.Add(Row(c.Name ?? "", c.Description ?? ""));
+
+		if (objs.Count > 0) container.Add(new Label { Text = "Exponate", FontAttributes = FontAttributes.Bold });
+		foreach (var o in objs) container.Add(Row(o.Name ?? "", $"{TaxonomyName(o.TaxonomyId)} · {StatusDe(o.Status)}"));
+
+		if (locs.Count > 0) container.Add(new Label { Text = "Fundorte", FontAttributes = FontAttributes.Bold });
+		foreach (var l in locs) container.Add(Row(l.Name ?? "", $"{l.Region} · {l.Country}"));
+	}
+
+	// --- Fundorte (Server-Daten) ---
+	//08.07.2026 Alexander Stojek (Karte): Alte Fundorte-Ansicht (nur Textliste). Alt:
+	/*
+	void RenderLocationsOnline()
+	{
+		if (!EnsureBackendLoaded()) return;
+
+		RootStack.Add(new Label { Text = "Fundorte", FontSize = 20, FontAttributes = FontAttributes.Bold });
+		if (apiLocations.Count == 0)
+			RootStack.Add(Muted("Keine Fundorte gefunden."));
+		foreach (var l in apiLocations)
+		{
+			var coords = l.Latitude.HasValue && l.Longitude.HasValue ? $"\n{l.Latitude}, {l.Longitude}" : "";
+			RootStack.Add(Row(l.Name ?? "", $"{l.Region} · {l.Country}{coords}"));
+		}
+	}
+	*/
+
+	//08.07.2026 Alexander Stojek (Karte): Fundorte-Ansicht mit echter Kartenansicht. Alt (ohne Klick-zum-Zoomen):
+	/*
+	void RenderLocationsOnline()
+	{
+		if (!EnsureBackendLoaded()) return;
+
+		RootStack.Add(new Label { Text = "Fundorte", FontSize = 20, FontAttributes = FontAttributes.Bold });
+
+		var withCoords = apiLocations.Where(l => l.Latitude.HasValue && l.Longitude.HasValue).ToList();
+		if (withCoords.Count > 0)
+		{
+			var map = new Microsoft.Maui.Controls.Maps.Map
+			{
+				HeightRequest = 260,
+				IsScrollEnabled = true,
+				IsZoomEnabled = true
+			};
+
+			foreach (var l in withCoords)
+			{
+				map.Pins.Add(new Pin
+				{
+					Label = l.Name ?? "Fundort",
+					Address = $"{l.Region} · {l.Country}",
+					Location = new Microsoft.Maui.Devices.Sensors.Location(l.Latitude!.Value, l.Longitude!.Value)
+				});
+			}
+
+			var first = withCoords[0];
+			map.MoveToRegion(MapSpan.FromCenterAndRadius(
+				new Microsoft.Maui.Devices.Sensors.Location(first.Latitude!.Value, first.Longitude!.Value),
+				Distance.FromKilometers(2000)));
+
+			RootStack.Add(Wrap(map));
+		}
+		else
+		{
+			RootStack.Add(Muted("Keine Fundorte mit Koordinaten vorhanden."));
+		}
+
+		RootStack.Add(new Label { Text = "Alle Fundorte", FontSize = 18, FontAttributes = FontAttributes.Bold });
+		if (apiLocations.Count == 0)
+			RootStack.Add(Muted("Keine Fundorte gefunden."));
+		foreach (var l in apiLocations)
+		{
+			var coords = l.Latitude.HasValue && l.Longitude.HasValue ? $"\n{l.Latitude}, {l.Longitude}" : "\n(keine Koordinaten)";
+			RootStack.Add(Row(l.Name ?? "", $"{l.Region} · {l.Country}{coords}"));
+		}
+	}
+	*/
+
+	//08.07.2026 Alexander Stojek (Karte): Neu – Klick auf einen Fundort in der Liste zoomt die Karte zu dessen Position.
+	// Die Karte selbst bleibt frei verschieb- und zoombar (IsScrollEnabled/IsZoomEnabled), das übernimmt die native Kartenansicht.
+	// Hinweis: Auf Android braucht die Karte selbst einen Google-Maps-API-Key (siehe AndroidManifest.xml), sonst bleiben die Kartenkacheln grau.
+	void RenderLocationsOnline()
+	{
+		if (!EnsureBackendLoaded()) return;
+
+		RootStack.Add(new Label { Text = "Fundorte", FontSize = 20, FontAttributes = FontAttributes.Bold });
+
+		var withCoords = apiLocations.Where(l => l.Latitude.HasValue && l.Longitude.HasValue).ToList();
+		Microsoft.Maui.Controls.Maps.Map? map = null;
+
+		if (withCoords.Count > 0)
+		{
+			//08.07.2026 Alexander Stojek (Karte): "Map" ist mehrdeutig (es gibt auch Microsoft.Maui.ApplicationModel.Map) -> voll qualifiziert.
+			map = new Microsoft.Maui.Controls.Maps.Map
+			{
+				HeightRequest = 260,
+				IsScrollEnabled = true,
+				IsZoomEnabled = true
+			};
+
+			foreach (var l in withCoords)
+			{
+				map.Pins.Add(new Pin
+				{
+					Label = l.Name ?? "Fundort",
+					Address = $"{l.Region} · {l.Country}",
+					Location = new Microsoft.Maui.Devices.Sensors.Location(l.Latitude!.Value, l.Longitude!.Value)
+				});
+			}
+
+			// Karte so zoomen, dass alle Pins sichtbar sind (Mittelpunkt = erster Fundort, großzügiger Radius).
+			var first = withCoords[0];
+			map.MoveToRegion(MapSpan.FromCenterAndRadius(
+				new Microsoft.Maui.Devices.Sensors.Location(first.Latitude!.Value, first.Longitude!.Value),
+				Distance.FromKilometers(2000)));
+
+			RootStack.Add(Wrap(map));
+		}
+		else
+		{
+			RootStack.Add(Muted("Keine Fundorte mit Koordinaten vorhanden."));
+		}
+
+		RootStack.Add(new Label { Text = "Alle Fundorte", FontSize = 18, FontAttributes = FontAttributes.Bold });
+		if (apiLocations.Count == 0)
+			RootStack.Add(Muted("Keine Fundorte gefunden."));
+		foreach (var l in apiLocations)
+		{
+			var coords = l.Latitude.HasValue && l.Longitude.HasValue ? $"\n{l.Latitude}, {l.Longitude}" : "\n(keine Koordinaten)";
+
+			//08.07.2026 Alexander Stojek (Karte): Bei Fundorten mit Koordinaten gibt es einen Knopf, der die Karte dorthin zoomt.
+			if (l.Latitude.HasValue && l.Longitude.HasValue && map is not null)
+			{
+				var lat = l.Latitude.Value;
+				var lon = l.Longitude.Value;
+				RootStack.Add(Row(l.Name ?? "", $"{l.Region} · {l.Country}{coords}", [
+					Button("Auf Karte zeigen", () =>
+					{
+						map.MoveToRegion(MapSpan.FromCenterAndRadius(
+							new Microsoft.Maui.Devices.Sensors.Location(lat, lon),
+							Distance.FromKilometers(50)));
+						_ = RootScroll.ScrollToAsync(0, 0, true);
+					})
+				]));
+			}
+			else
+			{
+				RootStack.Add(Row(l.Name ?? "", $"{l.Region} · {l.Country}{coords}"));
+			}
+		}
+	}
+
+	// --- Mehr-Menü (Server) ---
+	void RenderMoreOnline()
+	{
+		RootStack.Add(new Label { Text = "Mehr", FontSize = 20, FontAttributes = FontAttributes.Bold });
+		RootStack.Add(Panel("Konto",
+			api.IsLoggedIn ? $"Angemeldet als {api.CurrentUser!.Username} (Rolle: {api.CurrentUser.Role})" : "Nicht angemeldet",
+			Button("Öffnen", () => Show("auth"))));
+		RootStack.Add(Panel("Einstellungen", "Benachrichtigungen an/aus.", Button("Öffnen", () => Show("settings"))));
+	}
+
+	// --- kleine Helfer für die Server-Daten ---
+	int CountObjects(int collectionId) => apiSpecimens.Count(s => s.CollectionId == collectionId);
+
+	string TaxonomyName(int taxonomyId)
+	{
+		var t = apiTaxonomies.FirstOrDefault(x => x.Id == taxonomyId);
+		return t is null ? "" : $"{t.Genus} {t.Species}".Trim();
+	}
+
+	string StatusDe(string? status) => status switch
+	{
+		"available" => "verfügbar",
+		"on loan" => "ausgeliehen",
+		"lost" => "verloren",
+		"destroyed" => "zerstört",
+		_ => status ?? ""
+	};
 
 	//08.07.2026 Alexander Stojek (Feature B): Einstellungen – Schalter für Benachrichtigungen (wird in Preferences gespeichert).
 	// Die eigentlichen Erinnerungen bei ablaufenden Leihfristen kommen in einem späteren Schritt; dieser Schalter steuert später, ob sie geplant werden.
@@ -500,9 +1053,47 @@ public abstract class BasePage : ContentPage
 
 		var stack = Card();
 		stack.Add(new Label { Text = "Einstellungen", FontSize = 18, FontAttributes = FontAttributes.Bold });
-		stack.Add(new Label { Text = "Benachrichtigungen bei bald ablaufenden Leihfristen.", TextColor = Color.FromArgb("#4B5563") });
+		stack.Add(new Label { Text = "Benachrichtigungen bei bald ablaufenden Leihfristen. (Die automatische Erinnerung folgt, sobald Leihgaben über das Backend verfügbar sind.)", TextColor = Color.FromArgb("#4B5563") });
 		stack.Add(LabeledSwitch("Benachrichtigungen aktiviert", toggle));
+
+		//08.07.2026 Alexander Stojek (Benachrichtigungen): Test-Knopf – löst eine ECHTE Handy-Benachrichtigung aus (nach 5 Sekunden), sofern der Schalter an ist.
+		//08.07.2026 Alexander Stojek (Benachrichtigungen): Button-Text realistisch benannt (nicht mehr "Test-Benachrichtigung senden").
+		var notifyStatus = new Label { TextColor = Color.FromArgb("#6B7280"), FontSize = 13 };
+		stack.Add(Button("Leihfrist läuft ab – Testbenachrichtigung", () => _ = SendTestNotificationAsync(notifyStatus)));
+		stack.Add(notifyStatus);
+
 		RootStack.Add(Wrap(stack));
+	}
+
+	//08.07.2026 Alexander Stojek (Benachrichtigungen): Fordert bei Bedarf die Berechtigung an und plant eine echte lokale Benachrichtigung in 5 Sekunden.
+	async Task SendTestNotificationAsync(Label status)
+	{
+		if (!Preferences.Get("notifications_enabled", true))
+		{
+			status.Text = "Benachrichtigungen sind ausgeschaltet – zuerst den Schalter aktivieren.";
+			return;
+		}
+
+		var allowed = await LocalNotificationCenter.Current.AreNotificationsEnabled();
+		if (!allowed)
+			allowed = await LocalNotificationCenter.Current.RequestNotificationPermission();
+
+		if (!allowed)
+		{
+			status.Text = "Keine Berechtigung für Benachrichtigungen erteilt (Android-Einstellungen prüfen).";
+			return;
+		}
+
+		//08.07.2026 Alexander Stojek (Benachrichtigungen): Echter, realistischer Text (kein "so würde es aussehen" mehr).
+		var notification = new NotificationRequest
+		{
+			NotificationId = 1001,
+			Title = "Leihfrist läuft ab",
+			Description = "Eine Leihgabe muss bald zurückgegeben werden.",
+			Schedule = new NotificationRequestSchedule { NotifyTime = DateTime.Now.AddSeconds(5) }
+		};
+		await LocalNotificationCenter.Current.Show(notification);
+		status.Text = "Wird in 5 Sekunden angezeigt …";
 	}
 
 	//08.07.2026 Alexander Stojek (Feature B): Detail- und Bearbeiten-Ansicht eines Exponats (nur der Eigentümer kann bearbeiten).
