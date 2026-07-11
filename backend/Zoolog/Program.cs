@@ -8,7 +8,12 @@ using Scalar.AspNetCore;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddControllersWithViews();
+builder.Services.AddControllersWithViews()
+    .AddJsonOptions(options =>
+        {
+            // Verhindert den Absturz bei zyklischen Tabellen-Beziehungen
+            options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
+        });
 builder.Services.AddOpenApi();
 
 var allowedOriginsConfig = builder.Configuration.GetValue<string>("allowedOrigins") ?? "http://localhost:4200";

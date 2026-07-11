@@ -31,17 +31,21 @@
         
         <div style="display: flex; flex-direction: column; gap: 0.5rem;">
           <label style="font-weight: 600; color: #1e293b;">Daten-Import (Optional)</label>
-          <button 
-            type="button" 
-            (click)="onImport()" 
-            class="primary-button" 
-            style="display: flex; align-items: center; justify-content: center; gap: 0.5rem; width: 100%; height: 45px;"
-          >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
-            </svg>
-            Bestehende Daten importieren
-          </button>
+          <div class="import-container">
+  <!-- Unsichtbarer Datei-Auswähler -->
+            <input 
+              type="file" 
+              #csvInput 
+              style="display: none;" 
+              accept=".csv" 
+              (change)="onCsvSelected($event)" 
+            />
+            
+            <!-- Dein sichtbarer Button -->
+            <button type="button" class="secondary-button" (click)="csvInput.click()">
+              📂 CSV Exemplare importieren
+            </button>
+          </div>
         </div>
 
         <div style="display: flex; flex-direction: column; gap: 0.5rem;">

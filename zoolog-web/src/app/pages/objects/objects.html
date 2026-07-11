@@ -26,6 +26,13 @@
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
         </button>
       </div>
+
+      @if (activeCollectionId !== null) {
+        <button type="button" class="primary-button" (click)="exportCollection()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          <i class="fa fa-download"></i> Sammlung als CSV exportieren
+        </button>
+      }
       <!-- PRIMARY ACTION: Neues Objekt lives here now -->
       @if (auth.currentUser()) {
         <a routerLink="/new-object" class="primary-button new-obj-btn">

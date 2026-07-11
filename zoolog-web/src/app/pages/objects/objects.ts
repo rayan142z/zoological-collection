@@ -137,4 +137,40 @@ export class Objects implements OnInit {
     };
     return map[status] || '';
   }
+
+  exportCollection(): void {
+    
+    if (this.activeCollectionId === null) {
+      alert('Es ist keine Sammlung zum Exportieren ausgewählt.');
+      return;
+    }
+
+    const id = this.activeCollectionId;
+
+    
+    this.api.getBlob(`specimen/export-csv/${id}`).subscribe({
+      next: (blob: Blob) => {
+        // Temporären Download-Link im Browser generieren
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        
+      
+        const nameSanitized = this.activeCollectionName ? this.activeCollectionName.replace(/[^a-zA-Z0-9]/g, '_') : id;
+        a.download = `sammlung_${nameSanitized}_export.csv`;
+        
+     
+        document.body.appendChild(a);
+        a.click();
+        
+      
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+      },
+      error: (err) => {
+        console.error('CSV-Export fehlgeschlagen:', err);
+        alert('Die CSV-Datei konnte nicht exportiert werden.');
+      }
+    });
+  }
 }

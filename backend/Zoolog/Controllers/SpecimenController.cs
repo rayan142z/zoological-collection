@@ -229,6 +229,198 @@ public class SpecimenController : ControllerBase
         return NoContent();
     }
 
+    [Authorize]
+    [HttpPost("import-csv/{collectionId}")]
+    public async Task<IActionResult> ImportCsv(int collectionId,[FromForm] IFormFile file)
+    {
+        if (file == null || file.Length == 0)
+            return BadRequest(new { message = "Keine Datei hochgeladen." });
+
+        if (!TryGetCurrentUserId(out var userId))
+            return Unauthorized();
+
+        var collection = await _db.Collections.FindAsync(collectionId);
+        if (collection == null)
+            return NotFound(new { message = "Sammlung nicht gefunden." });
+
+        var specimensToCreate = new List<Specimen>();
+
+        try
+        {
+            Console.WriteLine($"[CSV-DEBUG] Starte Import für CollectionId: {collectionId}");
+            Console.WriteLine($"[CSV-DEBUG] Dateiname: {file.FileName}, Größe: {file.Length} Bytes");
+
+            using (var stream = file.OpenReadStream())
+            using (var reader = new StreamReader(stream))
+            {
+                // Header-Zeile lesen und loggen
+                var headerLine = await reader.ReadLineAsync();
+                Console.WriteLine($"[CSV-DEBUG] Header gelesen: '{headerLine}'");
+
+                int zeilenZaehler = 1;
+                string? line;
+
+                while ((line = await reader.ReadLineAsync()) != null)
+                {
+                    zeilenZaehler++;
+                    Console.WriteLine($"[CSV-DEBUG] Verarbeite Zeile {zeilenZaehler}: '{line}'");
+
+                    if (string.IsNullOrWhiteSpace(line))
+                    {
+                        Console.WriteLine($"[CSV-DEBUG] Zeile {zeilenZaehler} ist leer oder besteht nur aus Whitespaces. Überspringe.");
+                        continue;
+                    }
+
+                    var parts = line.Split(';');
+                    Console.WriteLine($"[CSV-DEBUG] Zeile {zeilenZaehler} in {parts.Length} Spalten gesplittet.");
+                    
+                    if (parts.Length < 9)
+                    {
+                        var msg = $"Fehler in Zeile {zeilenZaehler}: Die Zeile enthält nur {parts.Length} statt der 9 erforderlichen Spalten. Gefundenes Trennzeichen vielleicht kein Semikolon?";
+                        Console.WriteLine($"[CSV-DEBUG] [VALIDIERUNGSFEHLER] {msg}");
+                        return BadRequest(new { message = msg });
+                    }
+
+                    
+                    var name = parts[0].Trim();
+                    var speciesName = parts[1].Trim();
+                    var locationName = parts[2].Trim();
+
+                 
+                    var kingdom = parts[3].Trim();
+                    var phylum = parts[4].Trim();
+                    var @class = parts[5].Trim(); 
+                    var orders = parts[6].Trim();
+                    var family = parts[7].Trim();
+                    var genus = parts[8].Trim();
+
+                    Console.WriteLine($"[CSV-DEBUG] Zeile {zeilenZaehler} extrahiert -> Name: {name}, Species: {speciesName}, Location: {locationName}");
+
+                    
+                    if (string.IsNullOrEmpty(name) || string.IsNullOrEmpty(speciesName) || string.IsNullOrEmpty(locationName) ||
+                        string.IsNullOrEmpty(kingdom) || string.IsNullOrEmpty(phylum) || string.IsNullOrEmpty(@class) ||
+                        string.IsNullOrEmpty(orders) || string.IsNullOrEmpty(family) || string.IsNullOrEmpty(genus))
+                    {
+                        var msg = $"Fehler in Zeile {zeilenZaehler}: Es wurden leere Werte nach dem Trimmen gefunden.";
+                        Console.WriteLine($"[CSV-DEBUG] [VALIDIERUNGSFEHLER] {msg}");
+                        return BadRequest(new { message = msg });
+                    }
+
+                    Console.WriteLine($"[CSV-DEBUG] Suche Location in DB: '{locationName}'");
+                    var location = await _db.Locations.FirstOrDefaultAsync(l => l.Name.ToLower() == locationName.ToLower());
+                    if (location == null)
+                    {
+                        Console.WriteLine($"[CSV-DEBUG] Location '{locationName}' nicht gefunden. Erstelle neu...");
+                        location = new Location { Name = locationName };
+                        _db.Locations.Add(location);
+                        await _db.SaveChangesAsync(); 
+                        Console.WriteLine($"[CSV-DEBUG] Neue Location mit ID {location.Id} gespeichert.");
+                    }
+
+                   
+                    Console.WriteLine($"[CSV-DEBUG] Suche Taxonomy in DB (Species): '{speciesName}'");
+                    var taxonomy = await _db.Taxonomies.FirstOrDefaultAsync(t => t.Species.ToLower() == speciesName.ToLower());
+                    if (taxonomy == null)
+                    {
+                        Console.WriteLine($"[CSV-DEBUG] Taxonomy für '{speciesName}' nicht gefunden. Erstelle neu...");
+                        taxonomy = new Taxonomy 
+                        { 
+                            Species = speciesName, 
+                            Genus = genus,
+                            Kingdom = kingdom,
+                            Phylum = phylum,
+                            Class = @class,
+                            Orders = orders,
+                            Family = family
+                        };
+                        _db.Taxonomies.Add(taxonomy);
+                        await _db.SaveChangesAsync(); 
+                        Console.WriteLine($"[CSV-DEBUG] Neue Taxonomy mit ID {taxonomy.Id} gespeichert.");
+                    }
+
+                    // 3. Exemplar vorbereiten
+                    var specimen = new Specimen
+                    {
+                        Name = name,
+                        CollectionId = collectionId,
+                        LocationId = location.Id,
+                        TaxonomyId = taxonomy.Id,
+                        Status = "available",
+                        DateCollected = DateOnly.FromDateTime(DateTime.Now),
+                        AddedBy = userId,
+                        CreatedAt = DateTime.Now
+                    };
+
+                    specimensToCreate.Add(specimen);
+                    Console.WriteLine($"[CSV-DEBUG] Exemplar '{name}' erfolgreich für den Batch-Eintrag vorbereitet.");
+                }
+            }
+
+            Console.WriteLine($"[CSV-DEBUG] Schleife beendet. Anzahl zu speichernder Exemplare: {specimensToCreate.Count}");
+
+            if (specimensToCreate.Count > 0)
+            {
+                Console.WriteLine("[CSV-DEBUG] Führe AddRange und SaveChangesAsync für Exemplare aus...");
+                _db.Specimens.AddRange(specimensToCreate);
+                await _db.SaveChangesAsync();
+                Console.WriteLine("[CSV-DEBUG] Alle Exemplare erfolgreich in die Datenbank geschrieben!");
+            }
+
+            return Ok(new { message = $"{specimensToCreate.Count} Exemplare erfolgreich importiert." });
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[CSV-DEBUG] [KRITISCHER FEHLER] Exception geworfen: {ex.Message}");
+            Console.WriteLine($"[CSV-DEBUG] StackTrace: {ex.StackTrace}");
+            
+           
+            return BadRequest(new { 
+                message = "Fehler beim Verarbeiten der CSV auf Serverebene.", 
+                error = ex.Message,
+                detail = ex.InnerException?.Message,
+                stackTrace = ex.StackTrace
+            });
+        }
+    }
+
+    [HttpGet("export-csv/{collectionId}")]
+    public async Task<IActionResult> ExportCsv(int collectionId)
+    {
+       
+        var specimens = await _db.Specimens
+            .Include(s => s.Location)
+            .Include(s => s.Taxonomy)
+            .Where(s => s.CollectionId == collectionId)
+            .ToListAsync();
+
+        var sb = new System.Text.StringBuilder();
+
+        
+        sb.AppendLine("Name;Species;Location;Kingdom;Phylum;Class;Orders;Family;Genus");
+
+        foreach (var s in specimens)
+        {
+           
+            var locationName = s.Location?.Name ?? "";
+            var species = s.Taxonomy?.Species ?? "";
+            var kingdom = s.Taxonomy?.Kingdom ?? "";
+            var phylum = s.Taxonomy?.Phylum ?? "";
+            var @class = s.Taxonomy?.Class ?? "";
+            var orders = s.Taxonomy?.Orders ?? "";
+            var family = s.Taxonomy?.Family ?? "";
+            var genus = s.Taxonomy?.Genus ?? "";
+
+            
+            sb.AppendLine($"{s.Name};{species};{locationName};{kingdom};{phylum};{@class};{orders};{family};{genus}");
+        }
+
+       
+        var csvBytes = System.Text.Encoding.UTF8.GetBytes(sb.ToString());
+        var fileName = $"sammlung_{collectionId}_export_{DateTime.Now:yyyyMMdd}.csv";
+
+        return File(csvBytes, "text/csv", fileName);
+    }
+
     private bool TryGetCurrentUserId(out int userId)
     {
         var userIdText = User.FindFirstValue(ClaimTypes.NameIdentifier);
