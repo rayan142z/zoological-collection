@@ -28,6 +28,8 @@ export class NewCollection {
   description = '';
   selectedCsvFile: File | null = null;
 
+  
+
   onSubmit(): void {
     if (!this.collectionName || this.collectionName.trim().length < 2) {
       alert('Der Name muss mindestens 2 Zeichen lang sein.');
@@ -44,7 +46,7 @@ export class NewCollection {
       next: (newCollection) => {
         console.log('Sammlung erfolgreich erstellt:', newCollection);
         
-        // Falls eine CSV-Datei ausgewählt wurde, jagen wir sie jetzt hinterher
+        
         if (this.selectedCsvFile) {
           const formData = new FormData();
           formData.append('file', this.selectedCsvFile);
@@ -58,12 +60,12 @@ export class NewCollection {
             error: (err) => {
               console.error('CSV-Import fehlgeschlagen:', err);
               alert('Sammlung wurde erstellt, aber der CSV-Import der Exemplare ist fehlgeschlagen.');
-              // Trotzdem weiterleiten, da die Sammlung ja existiert
+              
               this.router.navigate(['/objects', newCollection.id]);
             }
           });
         } else {
-          // Keine CSV ausgewählt? Dann direkt zur Detailansicht springen
+         
           this.router.navigate(['/objects', newCollection.id]);
         }
       },

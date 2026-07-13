@@ -28,10 +28,10 @@
       </div>
 
       @if (activeCollectionId !== null) {
-        <button type="button" class="primary-button" (click)="exportCollection()">
+        <a type="button" class="primary-button" (click)="exportCollection()">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
           <i class="fa fa-download"></i> Sammlung als CSV exportieren
-        </button>
+        </a>
       }
       <!-- PRIMARY ACTION: Neues Objekt lives here now -->
       @if (auth.currentUser()) {
@@ -40,6 +40,23 @@
           Neues Objekt
         </a>
       }
+
+    
+        <!-- Zeigt den Bearbeiten-Button nur an, wenn du der Ersteller bist -->
+      @if (collection.createdBy === currentUserId) {
+        <a [routerLink]="['/collection-edit', collection.id]" class="primary-button btn-edit-icon">
+           ⚙️ Sammlung bearbeiten
+        </a>
+      }
+      
+      @if (activeCollectionId !== null && auth.isLoggedIn()) {
+      <a (click)="toggleFavorite()" class="btn-favorite" [class.is-active]="isFavorited">
+        <span class="star-icon">
+          {{ isFavorited ? '★' : '☆' }}
+        </span>
+        
+      </a>
+    }
     </div>
   </div>
 

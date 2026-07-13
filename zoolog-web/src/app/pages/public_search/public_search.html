@@ -1,0 +1,61 @@
+
+<div class="search-container">
+  <h2>Öffentliche Sammlungen</h2>
+  <p class="search-subtitle">Entdecke zoologische Sammlungen von anderen Forschern</p>
+  
+  <!-- Moderne Suchleiste -->
+  <div class="search-bar-wrapper">
+    <input 
+      type="text" 
+      [(ngModel)]="searchTerm" 
+      (input)="search()" 
+      placeholder="Nach Namen oder Begriffen suchen..." 
+      class="search-control"
+    />
+  </div>
+
+  <!-- Lade-Zustand -->
+  @if (isLoading) {
+    <div class="loading-state">
+      <p>Sammlungen werden durchsucht...</p>
+    </div>
+  } @else {
+    <!-- Ergebnisse -->
+    <div class="results-grid">
+      @for (col of collections; track col.id) {
+        <div class="collection-card">
+          <div class="card-content">
+            <div class="card-header">
+              <h3>{{ col.name }}</h3>
+            </div>
+            <p class="card-description">
+              {{ col.description || 'Keine Beschreibung für diese Sammlung hinterlegt.' }}
+            </p>
+          </div>
+
+          <div class="card-footer-zone">
+            <div class="card-meta">
+              <div class="creator-info">
+                Erstellt von
+                <span class="creator-name">&#64;{{ col.creator?.username || 'Unbekannt' }}</span>
+              </div>
+              <div class="specimen-badge">
+                {{ col.specimenCount }} Exemplare
+              </div>
+            </div>
+
+            <!-- Weiterleitung zu deiner bestehenden Objects-Page mit der ID -->
+            <a [routerLink]="['/objects', col.id]" class="btn-view">
+              Sammlung ansehen
+            </a>
+          </div>
+        </div>
+      } @empty {
+        <!-- Leerraum-Anzeige -->
+        <div class="empty-state">
+          <p>Es wurden keine öffentlichen Sammlungen gefunden.</p>
+        </div>
+      }
+    </div>
+  }
+</div>

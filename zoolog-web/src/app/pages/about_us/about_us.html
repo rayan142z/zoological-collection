@@ -29,39 +29,6 @@
   </div>
 </section>
 
-<section class="about-mission">
-  <div class="container">
-    <div class="mission-grid">
-      <div class="mission-text">
-        <h2 class="section-title">Unsere Mission</h2>
-        <p>
-          Seit ihrer Gründung widmet sich die Zoologische Sammlung der
-          systematischen Erfassung, Konservierung und wissenschaftlichen
-          Erschließung zoologischer Präparate. Unser Bestand umfasst
-          Tausende von Objekten aus allen Tierklassen — vom Insekt bis
-          zum Großsäuger.
-        </p>
-        <p>
-          Wir verstehen uns als Brücke zwischen Vergangenheit und
-          Gegenwart: Jedes Präparat erzählt eine Geschichte über
-          Ökosysteme, Artenvielfalt und den Wandel unserer Natur.
-        </p>
-        <div class="mission-cta">
-          <a href="/dashboard" class="btn-primary">Sammlung entdecken</a>
-          
-        </div>
-      </div>
-      <div class="mission-stats">
-        @for (stat of stats(); track stat.label) {
-          <div class="stat-card">
-            <span class="stat-number">{{ stat.value }}</span>
-            <span class="stat-label">{{ stat.label }}</span>
-          </div>
-        }
-      </div>
-    </div>
-  </div>
-</section>
 
 <section class="about-values">
   <div class="container">
@@ -85,36 +52,7 @@
   </div>
 </section>
 
-<section class="about-team">
-  <div class="container">
-    <div class="team-header">
-      <h2 class="section-title">Das Team</h2>
-      <p class="section-subtitle">
-        Menschen, die für Naturwissenschaft und Vermittlung brennen.
-      </p>
-    </div>
-    <div class="team-grid">
-      @for (member of team(); track member.name) {
-        <div class="team-card">
-          <div class="team-avatar">
-            <span class="avatar-initial">{{ member.name.charAt(0) }}</span>
-            <div class="avatar-ring"></div>
-          </div>
-          <div class="team-info">
-            <h3 class="team-name">{{ member.name }}</h3>
-            <span class="team-role">{{ member.role }}</span>
-            <p class="team-bio">{{ member.bio }}</p>
-          </div>
-          <div class="team-specialty">
-            @for (tag of member.specialties; track tag) {
-              <span class="specialty-tag">{{ tag }}</span>
-            }
-          </div>
-        </div>
-      }
-    </div>
-  </div>
-</section>
+
 
 
 

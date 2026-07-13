@@ -14,6 +14,8 @@ public class Group6DbContext : DbContext
     public DbSet<Specimen> Specimens { get; set; }
     public DbSet<Loan> Loans { get; set; }
 
+    public DbSet<CollectionFavorite> CollectionFavorites { get; set; }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
@@ -128,6 +130,21 @@ public class Group6DbContext : DbContext
                 .WithMany()
                 .HasForeignKey(l => l.SpecimenId)
                 .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        modelBuilder.Entity<CollectionFavorite>(entity =>
+        {
+            entity.ToTable("collection_favorites");
+
+            // Zusammengesetzter Primärschlüssel (Composite Key)
+            entity.HasKey(cf => new { cf.UserId, cf.CollectionId });
+
+            entity.Property(cf => cf.UserId).HasColumnName("user_id");
+            entity.Property(cf => cf.CollectionId).HasColumnName("collection_id");
+            
+            entity.Property(cf => cf.FavoritedAt)
+                .HasColumnName("favorited_at")
+                .HasDefaultValueSql("GETDATE()");
         });
     }
 }
