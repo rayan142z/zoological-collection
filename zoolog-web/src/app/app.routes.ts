@@ -11,6 +11,8 @@ import { ObjectInfo } from './pages/object_info/object_info';
 import { BorrowedObjects } from './pages/borrowed_objects/borrowed_objects';
 import { NewCollection } from './pages/new_collection/new_collection';
 import { EditObject } from './pages/edit_object/edit_object';
+import { PublicSearch } from './pages/public_search/public_search';
+import { CollectionEditComponent } from './pages/collection-edit/collection-edit';
 
 export const routes: Routes = [
     { path: 'login',      component: Login },
@@ -27,6 +29,8 @@ export const routes: Routes = [
     { path: 'about-us',   component: AboutUs },
     { path: 'borrowed_objects', component: BorrowedObjects },
     { path: 'collections/new', component: NewCollection, canActivate: [authGuard] },
+    { path: 'public_search', component: PublicSearch },
+    { path: 'collection-edit/:id', component: CollectionEditComponent },
     // new-object is nested inside a collection
     { path: 'objects/:id/new', component: NewObject, canActivate: [authGuard] },
     { path: 'new-object', component: NewObject, canActivate: [authGuard] },  // fallback direct link

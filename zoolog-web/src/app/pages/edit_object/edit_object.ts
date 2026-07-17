@@ -77,6 +77,30 @@ export class EditObject implements OnInit {
     });
   }
 
+  // Die neue Lösch-Funktion
+  deleteSpecimen(): void {
+    // Sicherheitsabfrage vor dem Löschen
+    const confirmDelete = confirm(`Möchtest du das Exemplar unwiderruflich löschen?`);
+    if (!confirmDelete) return;
+
+    this.api.delete(`specimen/${this.specimenId}`).subscribe({
+      next: () => {
+        console.log('Exemplar erfolgreich gelöscht');
+        // Nach erfolgreichem Löschen zurück zur übergeordneten Sammlung navigieren
+        if (this.collectionId) {
+          this.router.navigate(['/objects', this.collectionId]);
+        } else {
+          this.router.navigate(['/dashboard']);
+        }
+      },
+      error: (err) => {
+        console.error('Fehler beim Löschen des Exemplars:', err);
+        alert('Das Exemplar konnte nicht gelöscht werden.');
+      }
+    });
+  }
+
+
   onSubmit(): void {
   this.isSaving.set(true);
   this.errorMessage.set('');

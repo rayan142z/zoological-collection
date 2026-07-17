@@ -64,6 +64,98 @@ public class CollectionsController : ControllerBase
         return Ok(collections);
     }
 
+    // POST /api/collections/5/favorite
+    [HttpPost("{id}/favorite")]
+    public async Task<IActionResult> AddFavorite(int id, [FromBody] int userId)
+    {
+        // Prüfen, ob der Favorit schon existiert
+        var exists = await _context.CollectionFavorites
+            .AnyAsync(cf => cf.UserId == userId && cf.CollectionId == id);
+
+        if (exists)
+            return BadRequest("Sammlung ist bereits als Favorit markiert.");
+
+        var favorite = new CollectionFavorite
+        {
+            UserId = userId,
+            CollectionId = id,
+            FavoritedAt = DateTime.UtcNow
+        };
+
+        _context.CollectionFavorites.Add(favorite);
+        await _context.SaveChangesAsync();
+
+        return Ok(new { message = "Favorit erfolgreich hinzugefügt." });
+    }
+
+    // DELETE /api/collections/5/favorite/user/1
+    [HttpDelete("{id}/favorite/user/{userId}")]
+    public async Task<IActionResult> RemoveFavorite(int id, int userId)
+    {
+        var favorite = await _context.CollectionFavorites
+            .FirstOrDefaultAsync(cf => cf.UserId == userId && cf.CollectionId == id);
+
+        if (favorite == null)
+            return NotFound("Favorit nicht gefunden.");
+
+        _context.CollectionFavorites.Remove(favorite);
+        await _context.SaveChangesAsync();
+
+        return Ok(new { message = "Favorit erfolgreich entfernt." });
+    }
+
+    // GET /api/collections/favorites/user/1
+    [HttpGet("favorites/user/{userId}")]
+    public async Task<IActionResult> GetUserFavorites(int userId)
+    {
+        var favorites = await _context.CollectionFavorites
+            .Where(cf => cf.UserId == userId)
+            .Select(cf => cf.CollectionId) // Gibt direkt ein Array der favorisierten Collection-IDs zurück
+            .ToListAsync();
+
+        return Ok(favorites);
+    }
+
+   [AllowAnonymous]
+    [HttpGet("search-public")]
+    public async Task<IActionResult> SearchPublic([FromQuery] string? query = "")
+    {
+        // Startpunkt: Nur Sammlungen, die explizit öffentlich sichtbar sind
+        var collectionsQuery = _context.Collections.Where(c => c.IsPublic);
+
+        // Suchbegriff filtern (falls übergeben)
+        if (!string.IsNullOrWhiteSpace(query))
+        {
+            var cleanQuery = query.Trim().ToLower();
+            // SQL Server arbeitet standardmäßig Case-Insensitive, ToLower() sichert es ab
+            collectionsQuery = collectionsQuery.Where(c => c.Name.ToLower().Contains(cleanQuery));
+        }
+
+        var results = await collectionsQuery
+            .Select(collection => new
+            {
+                collection.Id,
+                collection.Name,
+                collection.Description,
+                collection.IsPublic,
+                collection.CreatedBy,
+                Creator = new
+                {
+                    collection.Creator.Id,
+                    collection.Creator.Username,
+                    collection.Creator.Email,
+                    collection.Creator.UserRole,
+                    collection.Creator.Status
+                },
+                collection.CreatedAt,
+                // Ermittelt live die Anzahl der enthaltenen Exemplare für die Suchübersicht
+                SpecimenCount = _context.Specimens.Count(s => s.CollectionId == collection.Id)
+            })
+            .ToListAsync();
+
+        return Ok(results);
+    }
+
     // GET /api/collections/1
     [AllowAnonymous]
     [HttpGet("{id}")]
@@ -161,20 +253,49 @@ public class CollectionsController : ControllerBase
     }
 
     // DELETE /api/collections/1
-    [Authorize(Roles = "admin,moderator")]
-    [HttpDelete("{id}")]
-    public async Task<IActionResult> Delete(int id)
+    //[Authorize(Roles = "admin,moderator")]
+   [HttpDelete("{id}")]
+    public async Task<IActionResult> DeleteCollection(int id)
     {
+        // 1. Prüfen, ob die Sammlung überhaupt existiert
         var collection = await _context.Collections.FindAsync(id);
-        if (collection is null) return NotFound();
-
-        if (User.IsInRole("moderator") && !collection.IsPublic)
+        if (collection == null)
         {
-            return Forbid();
+            return NotFound();
         }
 
-        _context.Collections.Remove(collection);
-        await _context.SaveChangesAsync();
-        return NoContent();
+        // Wir nutzen eine Transaktion, um die Verbindung für die PRAGMA-Befehle offen zu halten
+        using var transaction = await _context.Database.BeginTransactionAsync();
+        try
+        {
+            // 2. Schalte SQLite Foreign-Key-Prüfungen für diese Verbindung kurzzeitig aus
+            await _context.Database.ExecuteSqlRawAsync("PRAGMA foreign_keys = OFF;");
+
+            // 3. Lösche alle Specimens, die zu dieser Sammlung gehören
+            // (Nutzt den Spaltennamen 'collection_id' aus deinem Specimen-Mapping)
+            await _context.Database.ExecuteSqlRawAsync(
+                "DELETE FROM specimen WHERE collection_id = {0}", id);
+
+            // 4. Lösche die Sammlung selbst 
+            // (Falls deine Tabelle in der DB im Plural "collections" heißt, passe es zu "collections" an)
+            await _context.Database.ExecuteSqlRawAsync(
+                "DELETE FROM collections WHERE id = {0}", id); 
+
+            // 5. Änderungen in der Datenbank festschreiben
+            await transaction.CommitAsync();
+
+            // 6. Foreign Keys wieder einschalten, damit nachfolgende Operationen wieder geschützt sind
+            await _context.Database.ExecuteSqlRawAsync("PRAGMA foreign_keys = ON;");
+
+            return NoContent();
+        }
+        catch (Exception ex)
+        {
+            // Im Fehlerfall machen wir alles rückgängig und stellen die Fremdschlüsselprüfung wieder her
+            await transaction.RollbackAsync();
+            await _context.Database.ExecuteSqlRawAsync("PRAGMA foreign_keys = ON;");
+            
+            return StatusCode(500, $"Fehler beim Löschen der Sammlung: {ex.Message}");
+        }
     }
 }

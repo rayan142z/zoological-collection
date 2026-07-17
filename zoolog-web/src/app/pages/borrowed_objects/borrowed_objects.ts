@@ -6,8 +6,8 @@ import { RouterLink } from '@angular/router';
   standalone: true,
   imports: [RouterLink],
   templateUrl: './borrowed_objects.html',
-  styleUrl: './borrowed_objects.css' // Kannst du anlegen, falls du separates CSS nutzt
+  styleUrl: './borrowed_objects.css' 
 })
 export class BorrowedObjects {
-  // Hier kommt später die Ausleih-Logik rein
+  
 }

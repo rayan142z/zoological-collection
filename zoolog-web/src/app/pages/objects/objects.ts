@@ -56,7 +56,8 @@ export class Objects implements OnInit {
   viewMode: 'grid' | 'list' = 'grid';
   activeCollectionName = '';
   activeCollectionId: number | null = null;
-
+  isFavorited: boolean = false;
+  collection: any = null;
   specimens: Specimen[] = [];
 
   constructor(private route: ActivatedRoute) {}
@@ -66,6 +67,19 @@ export class Objects implements OnInit {
       const id = params.get('id');
       this.activeCollectionId = id ? Number(id) : null;
       this.loadSpecimens();
+      this.checkIfFavorited();
+    });
+    const collectionId = Number(this.route.snapshot.paramMap.get('id'));
+    this.loadCollectionDetails(collectionId); 
+  }
+
+    private loadCollectionDetails(id: number): void {
+    this.api.get<any>(`collections/${id}`).subscribe({
+      next: (data) => {
+        this.collection = data; // <-- Zuweisung an die Klassen-Property!
+        this.cdr.detectChanges();
+      },
+      error: (err) => console.error('Fehler beim Laden der Sammlung:', err)
     });
   }
 
@@ -108,6 +122,60 @@ export class Objects implements OnInit {
     });
   }
 
+  get currentUserId(): number | undefined {
+    return this.auth.currentUser()?.id;
+  } 
+
+  private checkIfFavorited(): void {
+    // Signal aufrufen mit ()
+    const userId = this.auth.currentUser()?.id; 
+    
+    if (!userId || this.activeCollectionId === null) {
+      this.isFavorited = false;
+      return;
+    }
+
+    this.api.get<number[]>(`collections/favorites/user/${userId}`).subscribe({
+      next: (favoriteIds) => {
+        this.isFavorited = favoriteIds.includes(this.activeCollectionId!);
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        console.error('Fehler beim Laden der Favoriten:', err);
+      }
+    });
+  }
+
+  toggleFavorite(): void {
+    // Signal aufrufen mit ()
+    const userId = this.auth.currentUser()?.id;
+    
+    if (!userId) {
+      alert('Du musst eingeloggt sein, um Sammlungen zu favorisieren.');
+      return;
+    }
+
+    if (this.activeCollectionId === null) return;
+
+    if (this.isFavorited) {
+      this.api.delete(`collections/${this.activeCollectionId}/favorite/user/${userId}`).subscribe({
+        next: () => {
+          this.isFavorited = false;
+          this.cdr.detectChanges();
+        },
+        error: (err) => console.error('Fehler beim Entfernen des Favoriten:', err)
+      });
+    } else {
+      this.api.post(`collections/${this.activeCollectionId}/favorite`, userId).subscribe({
+        next: () => {
+          this.isFavorited = true;
+          this.cdr.detectChanges();
+        },
+        error: (err) => console.error('Fehler beim Hinzufügen des Favoriten:', err)
+      });
+    }
+  }
+
   private get scopedToCollection(): Specimen[] {
     return this.activeCollectionId === null
       ? this.specimens
@@ -136,5 +204,35 @@ export class Objects implements OnInit {
       'zerstört':    'status-destroyed',
     };
     return map[status] || '';
+  }
+
+  exportCollection(): void {
+    if (this.activeCollectionId === null) {
+      alert('Es ist keine Sammlung zum Exportieren ausgewählt.');
+      return;
+    }
+
+    const id = this.activeCollectionId;
+
+    this.api.getBlob(`specimen/export-csv/${id}`).subscribe({
+      next: (blob: Blob) => {
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        
+        const nameSanitized = this.activeCollectionName ? this.activeCollectionName.replace(/[^a-zA-Z0-9]/g, '_') : id;
+        a.download = `sammlung_${nameSanitized}_export.csv`;
+        
+        document.body.appendChild(a);
+        a.click();
+        
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+      },
+      error: (err) => {
+        console.error('CSV-Export fehlgeschlagen:', err);
+        alert('Die CSV-Datei konnte nicht exportiert werden.');
+      }
+    });
   }
 }

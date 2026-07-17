@@ -44,32 +44,21 @@ export class Dashboard {
 
   showNewCollection = false;
   activeTab = 'mine';
+  favCollections: any[] = [];
+  favoriteCount: number = 0;
 
   // "Favoriten" und "Ausgeliehen" gibt es im Backend noch nicht (kein Favorites-Konzept,
   // kein LoanController. Als "—" markiert statt einer falschen Zahl.
   quickStats = [
     { icon: '🗂️', value: '0',  label: 'Meine Sammlungen' },
     { icon: '🔬', value: '0',  label: 'Objekte gesamt' },
-    { icon: '⭐', value: '—',  label: 'Favoriten' },
-    { icon: '📤', value: '—',  label: 'Ausgeliehen' },
+    { icon: '⭐', value: '0',  label: 'Favoriten' },
+    
   ];
 
   myCollections: Collection[] = [];
 
-  favCollections: Collection[] = [
-    { id: 4,  name: 'Meeresschnecken',    description: '', emoji: '🐚', color: 'linear-gradient(135deg,#e3f2fd,#bbdefb)', objectCount: 31, tags: [], lastUpdated: '', owner: 'Prof. K. Huber' },
-    { id: 5,  name: 'Vögel Deutschlands', description: '', emoji: '🐦', color: 'linear-gradient(135deg,#f3e5f5,#e1bee7)', objectCount: 18, tags: [], lastUpdated: '', owner: 'Dr. A. Berger' },
-    { id: 6,  name: 'Pilze & Flechten',   description: '', emoji: '🍄', color: 'linear-gradient(135deg,#fce4ec,#f8bbd0)', objectCount: 9,  tags: [], lastUpdated: '', owner: 'L. Vogel' },
-    { id: 7,  name: 'Spinnen Europas',    description: '', emoji: '🕷️', color: 'linear-gradient(135deg,#efebe9,#d7ccc8)', objectCount: 22, tags: [], lastUpdated: '', owner: 'M. Schreiber' },
-    { id: 8,  name: 'Fossilien Siegen',   description: '', emoji: '🦴', color: 'linear-gradient(135deg,#e8eaf6,#c5cae9)', objectCount: 14, tags: [], lastUpdated: '', owner: 'Archiv' },
-  ];
-
-  popularCollections: Collection[] = [
-    { id: 9,  name: 'Schmetterlinge Europas', description: 'Über 40 Arten aus ganz Europa — von Tagfaltern bis Nachtfaltern', emoji: '🦋', color: 'linear-gradient(135deg,#e8f5e9,#a5d6a7)', objectCount: 43, tags: [], lastUpdated: '', views: 1240 },
-    { id: 10, name: 'Käfer der Welt',         description: 'Die artenreichste Tiergruppe — präzise erfasst und klassifiziert',  emoji: '🪲', color: 'linear-gradient(135deg,#fff3e0,#ffcc80)', objectCount: 67, tags: [], lastUpdated: '', views: 980  },
-    { id: 11, name: 'Heimische Vögel',         description: 'Singvögel, Greifvögel und Wasservögel aus Deutschland',            emoji: '🐦', color: 'linear-gradient(135deg,#e3f2fd,#90caf9)', objectCount: 29, tags: [], lastUpdated: '', views: 754  },
-    { id: 12, name: 'Meeresmuscheln',          description: 'Muschelschalen aus Nord- und Ostsee sowie dem Mittelmeer',         emoji: '🐚', color: 'linear-gradient(135deg,#fce4ec,#f48fb1)', objectCount: 18, tags: [], lastUpdated: '', views: 612  },
-  ];
+  
 
   totalObjects(cols: Collection[]): number {
     return cols.reduce((sum, c) => sum + c.objectCount, 0);
@@ -77,6 +66,7 @@ export class Dashboard {
 
   ngOnInit(): void {
     this.loadMyCollections();
+    this.loadFavorites();
   }
 
   private loadMyCollections(): void {
@@ -103,6 +93,8 @@ export class Dashboard {
         this.quickStats[1].value = String(
           this.myCollections.reduce((sum, col) => sum + col.objectCount, 0)
         );
+        
+        console.log(this.favCollections.length);
         // Erzwingt das Re-Rendern nach der asynchronen Antwort - sonst bleibt
         // die Anzeige bei "0", bis irgendein anderes Browser-Event zufällig
         // ein Re-Render auslöst (z.B. Klick auf einen Navigationslink).
@@ -111,6 +103,67 @@ export class Dashboard {
       error: (err) => {
         console.error('Fehler beim Laden der Sammlungen:', err);
       },
+    });
+  }
+
+  private loadFavorites(): void {
+    const userId = this.auth.currentUser()?.id;
+    if (!userId) return;
+
+    this.api.get<any[]>(`collections/favorites/user/${userId}`).subscribe({
+      next: (favoriteIds) => {
+        if (!favoriteIds || favoriteIds.length === 0) {
+          this.favCollections = [];
+          this.favoriteCount = 0;
+          this.cdr.detectChanges();
+          return;
+        }
+
+        // Alle IDs rigoros in Nummern umwandeln
+        const numericIds = favoriteIds.map(id => Number(id));
+        console.log('Aus Backend gelesene Favoriten-Nummern:', numericIds);
+
+        forkJoin({
+          collections: this.api.get<any[]>('collections'),
+          specimens: this.api.get<any[]>('specimen'),
+        }).subscribe({
+          next: ({ collections, specimens }) => {
+            console.log('Rohe Collections aus der Datenbank:', collections);
+
+            // Filtern mit Absicherung gegen unterschiedliche ID-Schreibweisen (id vs Id)
+            const rawFavorites = collections.filter((c) => {
+              const collectionId = c.id ?? c.Id ?? c.collectionId;
+              const isMatch = numericIds.includes(Number(collectionId));
+              return isMatch;
+            });
+
+            
+
+            // Mappen für das HTML-Template
+            this.favCollections = rawFavorites.map((c) => {
+              const cId = c.id ?? c.Id ?? c.collectionId;
+              return {
+                id: Number(cId),
+                name: c.name,
+                description: c.description ?? '',
+                emoji: '⭐',
+                color: 'linear-gradient(135deg, #fffde7, #fff9c4)',
+                objectCount: specimens.filter((s) => (s.collectionId ?? s.CollectionId) === cId).length,
+                tags: [],
+                lastUpdated: c.createdAt ? new Date(c.createdAt).toLocaleDateString('de-DE') : 'Unbekannt',
+              };
+            });
+
+            this.favoriteCount = this.favCollections.length;
+            this.quickStats[2].value = String(this.favCollections.length);
+            // Erzwinge das Zeichnen der UI
+            this.cdr.detectChanges();
+
+          },
+          error: (err) => console.error('Fehler im forkJoin der Favoriten:', err),
+        });
+      },
+      error: (err) => console.error('Fehler beim Laden der Favoriten-IDs:', err),
     });
   }
 }
