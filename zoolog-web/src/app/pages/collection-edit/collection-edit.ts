@@ -6,6 +6,7 @@ import { ApiService } from '../../services/api.service';
 import { ChangeDetectorRef } from '@angular/core';
 import { Location } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { HttpHeaders } from '@angular/common/http';
 
 @Component({
   selector: 'app-collection-edit',

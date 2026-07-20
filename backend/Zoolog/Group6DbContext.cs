@@ -31,6 +31,8 @@ public class Group6DbContext : DbContext
             entity.Property(u => u.UserRole).HasColumnName("user_role").HasMaxLength(30).HasDefaultValue("user").IsRequired();
             entity.Property(u => u.Status).HasColumnName("status").HasMaxLength(20).HasDefaultValue("active").IsRequired();
             entity.Property(u => u.CreatedAt).HasColumnName("created_at").HasDefaultValueSql("getdate()");
+            entity.Property(u => u.Description).HasColumnName("description");
+            entity.Property(u => u.Job).HasColumnName("job");
         });
 
         modelBuilder.Entity<Taxonomy>(entity =>
@@ -45,6 +47,7 @@ public class Group6DbContext : DbContext
             entity.Property(t => t.Family).HasColumnName("family").HasMaxLength(100);
             entity.Property(t => t.Genus).HasColumnName("genus").HasMaxLength(100);
             entity.Property(t => t.Species).HasColumnName("species").HasMaxLength(100).IsRequired();
+            entity.Property(t => t.Validated).HasColumnName("validated").HasDefaultValue(false);
         });
 
         modelBuilder.Entity<Location>(entity =>
@@ -86,6 +89,8 @@ public class Group6DbContext : DbContext
             entity.Property(s => s.DateCollected).HasColumnName("date_collected");
             entity.Property(s => s.Status).HasColumnName("status").HasMaxLength(30);
             entity.Property(s => s.Size).HasColumnName("size").HasMaxLength(100);
+            entity.Property(s => s.Weight).HasColumnName("weight");
+            entity.Property(s => s.BirthYear).HasColumnName("birth_year");
             entity.Property(s => s.PhotoPath).HasColumnName("photo_path").HasMaxLength(500);
             entity.Property(s => s.LocationId).HasColumnName("location_id");
             entity.Property(s => s.TaxonomyId).HasColumnName("taxonomy_id");
@@ -145,6 +150,11 @@ public class Group6DbContext : DbContext
             entity.Property(cf => cf.FavoritedAt)
                 .HasColumnName("favorited_at")
                 .HasDefaultValueSql("GETDATE()");
+
+            entity.HasOne<Collection>() 
+                .WithMany()
+                .HasForeignKey(cf => cf.CollectionId)
+                .OnDelete(DeleteBehavior.Cascade);
         });
     }
 }

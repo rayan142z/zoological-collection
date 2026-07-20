@@ -444,3 +444,286 @@
   .quick-stats { grid-template-columns: 1fr 1fr; gap: 10px; }
   .popular-grid { grid-template-columns: 1fr; }
 }
+
+/* Erweitertes Gast-Willkommensbanner */
+.dashboard-hero.welcome-guest-hero {
+  background: linear-gradient(135deg, #1b3b2b 0%, #2e5a40 100%);
+  color: #ffffff;
+  padding: 40px;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(27, 59, 43, 0.15);
+  margin-bottom: 30px;
+}
+
+.dashboard-hero.welcome-guest-hero .hero-eyebrow {
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: #8fbc8f;
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+
+.dashboard-hero.welcome-guest-hero .dashboard-title {
+  color: #ffffff;
+  font-size: 2.2rem;
+  margin-bottom: 12px;
+}
+
+.dashboard-hero.welcome-guest-hero .dashboard-subtitle {
+  color: #d0e1d4;
+  font-size: 1.05rem;
+  max-width: 700px;
+  line-height: 1.6;
+  margin-bottom: 25px;
+}
+
+/* Statistiken-Streifen im Banner */
+.guest-stats-strip {
+  display: flex;
+  gap: 30px;
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+  padding-top: 25px;
+  margin-top: 25px;
+  flex-wrap: wrap;
+}
+
+.gstat {
+  display: flex;
+  flex-direction: column;
+}
+
+.gstat-val {
+  font-size: 1.6rem;
+  font-weight: bold;
+  font-family: Georgia, serif;
+  color: #ffffff;
+  line-height: 1.2;
+}
+
+.gstat-lbl {
+  font-size: 0.85rem;
+  color: #b2c8b8;
+  margin-top: 2px;
+}
+
+/* Layout für das erweiterte Gast-Willkommensbanner */
+.dashboard-hero.welcome-guest-hero {
+  background: linear-gradient(135deg, #1b3b2b 0%, #2e5a40 100%);
+  color: #ffffff;
+  padding: 45px;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(27, 59, 43, 0.15);
+  margin-bottom: 30px;
+}
+
+.dashboard-hero.welcome-guest-hero .hero-eyebrow {
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: #8fbc8f;
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+
+.dashboard-hero.welcome-guest-hero .dashboard-title {
+  color: #ffffff;
+  font-size: 2.2rem;
+  margin-bottom: 12px;
+}
+
+.dashboard-hero.welcome-guest-hero .dashboard-subtitle {
+  color: #d0e1d4;
+  font-size: 1.05rem;
+  max-width: 800px;
+  line-height: 1.6;
+  margin-bottom: 25px;
+}
+
+/* Grid für die Feature-Stichpunkte mit Emojis */
+.hero-features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 15px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 20px;
+  border-radius: 12px;
+  margin-bottom: 30px;
+}
+
+.hero-feature-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  font-size: 0.95rem;
+  color: #e2ede5;
+  line-height: 1.4;
+}
+
+.feature-emoji {
+  font-size: 1.3rem;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.hero-feature-item strong {
+  color: #ffffff;
+}
+
+/* Statistiken-Streifen im Banner */
+.guest-stats-strip {
+  display: flex;
+  gap: 30px;
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+  padding-top: 25px;
+  margin-top: 25px;
+  flex-wrap: wrap;
+}
+
+.gstat {
+  display: flex;
+  flex-direction: column;
+}
+
+.gstat-val {
+  font-size: 1.6rem;
+  font-weight: bold;
+  font-family: Georgia, serif;
+  color: #ffffff;
+  line-height: 1.2;
+}
+
+.gstat-lbl {
+  font-size: 0.85rem;
+  color: #b2c8b8;
+  margin-top: 2px;
+}
+
+/* Layout für das erweiterte Gast-Willkommensbanner */
+.dashboard-hero.welcome-guest-hero {
+  background: linear-gradient(135deg, #1b3b2b 0%, #2e5a40 100%);
+  color: #ffffff;
+  padding: 45px;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(27, 59, 43, 0.15);
+  margin-bottom: 30px;
+}
+
+.dashboard-hero.welcome-guest-hero .hero-eyebrow {
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: #8fbc8f;
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+
+.dashboard-hero.welcome-guest-hero .dashboard-title {
+  color: #ffffff;
+  font-size: 2.2rem;
+  margin-bottom: 12px;
+}
+
+.dashboard-hero.welcome-guest-hero .dashboard-subtitle {
+  color: #d0e1d4;
+  font-size: 1.05rem;
+  max-width: 800px;
+  line-height: 1.6;
+  margin-bottom: 30px;
+}
+
+/* Container für die Feature-Stichpunkte untereinander */
+.hero-features-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 24px;
+  border-radius: 12px;
+  margin-bottom: 30px;
+}
+
+.hero-feature-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  font-size: 0.95rem;
+  color: #e2ede5;
+  line-height: 1.5;
+}
+
+.feature-emoji {
+  font-size: 1.3rem;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.hero-feature-item strong {
+  color: #ffffff;
+}
+
+/* Statistiken-Streifen im Banner */
+.guest-stats-strip {
+  display: flex;
+  gap: 30px;
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+  padding-top: 25px;
+  margin-top: 25px;
+  flex-wrap: wrap;
+}
+
+.gstat {
+  display: flex;
+  flex-direction: column;
+}
+
+.gstat-val {
+  font-size: 1.6rem;
+  font-weight: bold;
+  font-family: Georgia, serif;
+  color: #ffffff;
+  line-height: 1.2;
+}
+
+.gstat-lbl {
+  font-size: 0.85rem;
+  color: #b2c8b8;
+  margin-top: 2px;
+}
+
+/* Erzwingt, dass alle Elemente in .hero-actions nebeneinander stehen */
+.hero-actions {
+  display: flex !important;
+  flex-direction: row !important;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+/* Garantiert, dass die Links/Buttons sich wie Inline-Flex-Elemente verhalten */
+.hero-actions a, 
+.hero-actions button {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+  flex: 0 0 auto;
+}
+
+/* Das Grid für die Sammlungs-Karten */
+.collections-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); /* Erzeugt automatisch nebeneinander liegende Spalten */
+  gap: 20px; /* Abstand zwischen den Karten (horizontal und vertikal) */
+  margin-top: 20px;
+}
+
+/* Jede einzelne Karte und die "Neu erstellen"-Karte als Block */
+.collections-grid > * {
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+}

@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, computed} from '@angular/core';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { Auth } from '../../services/auth';
 
@@ -16,6 +16,15 @@ export class Navbar {
 
   // Signal mit dem aktuell eingeloggten Nutzer
   currentUser = this.auth.currentUser;
+
+  isAdminOrMod = computed(() => {
+    const user = this.currentUser();
+    if (!user) return false;
+    
+    // Beispiel: Falls deine Rolle als String im User-Objekt liegt
+    const role = (user as any).role; 
+    return role === 'admin' || role === 'moderator';
+  });
 
   logout(): void {
     this.auth.logout();

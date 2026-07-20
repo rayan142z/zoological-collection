@@ -43,33 +43,47 @@
         <div class="section-card">
           <h2 class="section-title">Grunddaten</h2>
 
-          @if (!collectionLocked) {
-            <div class="form-group autocomplete-container">
-              <label class="form-label">Sammlung suchen <span class="required">*</span></label>
-              <input class="form-input" type="text" placeholder="Sammlung eingeben…"
-                [ngModel]="collectionSearch()" (ngModelChange)="collectionSearch.set($event); collectionId.set(null)" name="collectionSearch"/>
-              
-              @if (collectionSearch() && !collectionId()) {
-                <div class="autocomplete-dropdown">
-                  @for (col of filteredCollections(); track col.id) {
-                    <div class="autocomplete-item" (click)="selectCollection(col)">
-                      {{ col.name }}
-                    </div>
-                  } @empty {
-                    <div class="autocomplete-no-results">Keine Sammlung gefunden</div>
-                  }
-                </div>
-              }
-              @if (collectionOptions().length === 0) {
-                <p class="form-hint">Du hast noch keine eigene Sammlung. Lege zuerst eine im Dashboard an.</p>
-              }
+          <div class="form-group">
+            <label class="form-label">Ziel-Sammlung</label>
+            <div class="selected-collection-badge">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 8px; vertical-align: middle;">
+                <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
+              </svg>
+              <span style="font-weight: 600;">{{ targetCollectionName() || 'Lädt Sammlung...' }}</span>
             </div>
-          }
+          </div>
 
           <div class="form-group">
             <label class="form-label">Name <span class="required">*</span></label>
             <input class="form-input" type="text" placeholder="z.B. Hirschkäfer"
               [ngModel]="name()" (ngModelChange)="name.set($event)" name="name"/>
+          </div>
+
+          <!-- Zusätzliche Felder: Größe, Gewicht und Geburtsjahr -->
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Größe</label>
+              <input class="form-input" type="number" step="0.01" placeholder="z.B. 12.5"
+                [ngModel]="size()" (ngModelChange)="size.set($event)" name="size"/>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Gewicht</label>
+              <input class="form-input" type="number" step="0.01" placeholder="z.B. 45.2"
+                [ngModel]="weight()" (ngModelChange)="weight.set($event)" name="weight"/>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Geburtsjahr</label>
+              <input class="form-input" type="number" placeholder="z.B. 2021"
+                [ngModel]="birthYear()" (ngModelChange)="birthYear.set($event)" name="birthYear"/>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Sammlungsdatum <span class="required">*</span></label>
+              <input class="form-input" type="date"
+                [ngModel]="dateCollected()" (ngModelChange)="dateCollected.set($event)" name="dateCollected"/>
+            </div>
           </div>
 
           <div class="form-group">
@@ -78,41 +92,31 @@
               [ngModel]="description()" (ngModelChange)="description.set($event)" name="description"></textarea>
           </div>
 
-          <div class="form-row">
-            <div class="form-group">
-              <label class="form-label">Sammlungsdatum <span class="required">*</span></label>
-              <input class="form-input" type="date"
-                [ngModel]="dateCollected()" (ngModelChange)="dateCollected.set($event)" name="dateCollected"/>
-            </div>
-            <div class="form-group">
-              <label class="form-label">Status <span class="required">*</span></label>
-              <select class="form-select"
-                [ngModel]="status()" (ngModelChange)="status.set($event)" name="status">
-                <option value="">Status wählen…</option>
-                <option value="verfügbar">Verfügbar</option>
-                <option value="ausgeliehen">Ausgeliehen</option>
-                <option value="verloren">Verloren</option>
-                <option value="zerstört">Zerstört</option>
-              </select>
-            </div>
-          </div>
+          <div class="form-group">
+            <div class="location-picker-container">
+              <label class="form-label">Fundort auf Karte wählen</label>
+              
+              <!-- Das Karten-Element -->
+              <div id="map" style="height: 350px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #ccc;"></div>
 
-          <div class="form-group autocomplete-container">
-            <label class="form-label">Fundort suchen <span class="required">*</span></label>
-            <input class="form-input" type="text" placeholder="Ort, Region oder Land eingeben…"
-              [ngModel]="locationSearch()" (ngModelChange)="locationSearch.set($event); locationId.set(null)" name="locationSearch"/>
+              @if (latitude() && longitude()) {
+                <div class="coords-badge" style="padding: 8px; background: #e9ecef; border-radius: 4px; display: inline-block; margin-bottom: 15px;">
+                  📍 Gewählte Koordinaten: <strong>{{ latitude() }}</strong>, <strong>{{ longitude() }}</strong>
+                </div>
+              }
+            </div>
             
-            @if (locationSearch() && !locationId()) {
-              <div class="autocomplete-dropdown">
-                @for (loc of filteredLocations(); track loc.id) {
-                  <div class="autocomplete-item" (click)="selectLocation(loc)">
-                    {{ loc.name }} <span style="color: #64748b; font-size: 0.85rem;">({{ loc.region }}, {{ loc.country }})</span>
-                  </div>
-                } @empty {
-                  <div class="autocomplete-no-results">Kein Fundort gefunden</div>
-                }
+            <!-- Koordinaten-Anzeige -->
+            <div class="coordinates-row">
+              <div class="coord-box">
+                <span class="coord-label">Breitengrad (Latitude)</span>
+                <input class="form-input read-only-input" type="text" [value]="latitude() ?? ''" readonly />
               </div>
-            }
+              <div class="coord-box">
+                <span class="coord-label">Längengrad (Longitude)</span>
+                <input class="form-input read-only-input" type="text" [value]="longitude() ?? ''" readonly />
+              </div>
+            </div>
           </div>
           
           <div class="step-nav">
@@ -128,29 +132,43 @@
       @if (currentStep() === 2) {
         <div class="section-card">
           <h2 class="section-title">Taxonomie</h2>
-          
+
           <div class="form-group autocomplete-container">
-            <label class="form-label">Art / Gattung suchen <span class="required">*</span></label>
-            <input class="form-input" type="text" placeholder="z.B. Lucanus cervus…"
-              [ngModel]="taxonomySearch()" (ngModelChange)="taxonomySearch.set($event); taxonomyId.set(null)" name="taxonomySearch"/>
-            
-            @if (taxonomySearch() && !taxonomyId()) {
-              <div class="autocomplete-dropdown">
-                @for (tax of filteredTaxonomies(); track tax.id) {
-                  <div class="autocomplete-item" (click)="selectTaxonomy(tax)">
-                    <strong>{{ tax.genus }}</strong> <em>{{ tax.species }}</em>
-                  </div>
-                } @empty {
-                  <div class="autocomplete-no-results">Keine passende Art gefunden</div>
-                }
+            <div style="display: flex; justify-content: space-between; align-items: baseline;">
+              <label class="form-label">Art / Gattung <span class="required">*</span></label>
+              <button type="button" (click)="toggleTaxMode()" class="btn-toggle" style="font-size: 0.8rem; cursor: pointer; color: #3b82f6; border: none; background: none;">
+                {{ taxMode() === 'search' ? 'Neue Art Beantragen' : 'Zur Suche zurückkehren' }}
+              </button>
+            </div>
+
+            @if (taxMode() === 'search') {
+              <input class="form-input" type="text" placeholder="z.B. Lucanus cervus…"
+                    [ngModel]="taxonomySearch()" (ngModelChange)="taxonomySearch.set($event); taxonomyId.set(null)" name="taxonomySearch"/>
+              
+              @if (taxonomySearch() && !taxonomyId()) {
+                <div class="autocomplete-dropdown">
+                  @for (tax of filteredTaxonomies(); track tax.id) {
+                    <div class="autocomplete-item" (click)="selectTaxonomy(tax)">
+                      <strong>{{ tax.genus }}</strong> <em>{{ tax.species }}</em>
+                    </div>
+                  } @empty {
+                    <div class="autocomplete-no-results">Keine passende Art gefunden</div>
+                  }
+                </div>
+              }
+            } @else {
+              <div class="manual-tax-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                <input class="form-input" [(ngModel)]="newTaxonomy.genus" name="genus" placeholder="Gattung">
+                <input class="form-input" [(ngModel)]="newTaxonomy.species" name="species" placeholder="Art">
+                <input class="form-input" [(ngModel)]="newTaxonomy.kingdom" name="kingdom" placeholder="Reich" style="grid-column: span 2;">
+                <input class="form-input" [(ngModel)]="newTaxonomy.phylum" name="phylum" placeholder="Stamm">
+                <input class="form-input" [(ngModel)]="newTaxonomy.class" name="class" placeholder="Klasse">
+                <input class="form-input" [(ngModel)]="newTaxonomy.family" name="family" placeholder="Familie" style="grid-column: span 2;">
               </div>
             }
-            <p class="form-hint">
-              Fehlt die gesuchte Art? Neue Arten werden über einen Artenantrag registriert.
-            </p>
           </div>
 
-          @if (selectedTaxonomy()) {
+          @if (taxMode() === 'search' && selectedTaxonomy()) {
             <div class="form-row">
               <div class="form-group">
                 <label class="form-label">Reich</label>

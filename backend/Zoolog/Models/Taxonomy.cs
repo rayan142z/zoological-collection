@@ -11,4 +11,6 @@ public class Taxonomy
     public string Genus { get; set; }
     public string Species { get; set; }
 
+    public bool Validated { get; set; } = false;
+
 }

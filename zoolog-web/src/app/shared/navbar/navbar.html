@@ -13,6 +13,9 @@
     <a class="nav-link" routerLink="/dashboard" routerLinkActive="active">Übersicht</a>
     <a class="nav-link" routerLink="/public_search" routerLinkActive="active">Suche</a>
     <a class="nav-link" routerLink="/borrowed_objects"   routerLinkActive="active">Leih Informationen</a>
+    @if (isAdminOrMod()) {
+      <a class="nav-link" routerLink="/taxonomy-validation" routerLinkActive="active">Anträge</a>
+    }
     <a class="nav-link" routerLink="/about-us"  routerLinkActive="active">Über uns</a>
   </div>
 

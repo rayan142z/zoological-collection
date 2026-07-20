@@ -8,8 +8,13 @@ export interface User {
   id: number;
   email: string;
   username: string;
+  name: string; // Alias für HTML-Template (user.name)
   role: 'user' | 'moderator' | 'admin';
   status: string;
+  
+  // Neue nullable Felder:
+  job?: string;
+  description?: string;
 }
 
 interface LoginResponse {
@@ -22,6 +27,10 @@ interface LoginResponse {
     email: string;
     role: string;
     status: string;
+    
+    // Auch in der API-Antwort erwarten wir diese Felder optional:
+    job?: string;
+    description?: string;
   };
 }
 
@@ -81,8 +90,13 @@ export class Auth {
       id: rawUser.id,
       email: rawUser.email,
       username: rawUser.username,
+      name: rawUser.username, // username auf name mappen, damit das HTML-Template direkt funktioniert
       role: rawUser.role as User['role'],
       status: rawUser.status,
+      
+      // Die neuen Felder in die Session persistieren:
+      job: rawUser.job,
+      description: rawUser.description
     };
 
     localStorage.setItem(this.tokenStorageKey, token);
@@ -122,5 +136,21 @@ export class Auth {
     } catch {
       return false;
     }
+  }
+
+  getCurrentUserRole(): 'user' | 'moderator' | 'admin' | null {
+    const user = this.currentUser();
+    return user ? user.role : null;
+  }
+
+  // Gibt die ID des aktuellen Nutzers zurück (oder null)
+  getCurrentUserId(): number | null {
+    const user = this.currentUser();
+    return user ? user.id : null;
+  }
+
+  // Hilfsmethode, um direkt zu prüfen, ob der aktuelle Nutzer Admin ist
+  isUserAdmin(): boolean {
+    return this.getCurrentUserRole() === 'admin';
   }
 }

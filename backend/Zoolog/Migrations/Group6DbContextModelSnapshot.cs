@@ -78,7 +78,7 @@ namespace Zoolog.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
                         .HasColumnName("favorited_at")
-                        .HasDefaultValueSql("getdate()");
+                        .HasDefaultValueSql("GETDATE()");
 
                     b.HasKey("UserId", "CollectionId");
 
@@ -96,14 +96,19 @@ namespace Zoolog.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<int?>("FromCollection")
+                        .HasColumnType("int");
+
                     b.Property<DateOnly>("LoanDate")
                         .HasColumnType("date")
                         .HasColumnName("loan_date");
 
-                    b.Property<string>("LoanedTo")
-                        .IsRequired()
+                    b.Property<int?>("LoanedFrom")
+                        .HasColumnType("int");
+
+                    b.Property<int>("LoanedTo")
                         .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)")
+                        .HasColumnType("int")
                         .HasColumnName("loaned_to");
 
                     b.Property<string>("Notes")
@@ -145,11 +150,11 @@ namespace Zoolog.Migrations
                         .HasColumnName("country");
 
                     b.Property<decimal>("Latitude")
-                        .HasColumnType("decimal(18,2)")
+                        .HasColumnType("decimal(18, 9)")
                         .HasColumnName("latitude");
 
                     b.Property<decimal>("Longitude")
-                        .HasColumnType("decimal(18,2)")
+                        .HasColumnType("decimal(18, 9)")
                         .HasColumnName("longitude");
 
                     b.Property<string>("Name")
@@ -179,6 +184,10 @@ namespace Zoolog.Migrations
                     b.Property<int>("AddedBy")
                         .HasColumnType("int")
                         .HasColumnName("added_by");
+
+                    b.Property<int?>("BirthYear")
+                        .HasColumnType("int")
+                        .HasColumnName("birth_year");
 
                     b.Property<int>("CollectionId")
                         .HasColumnType("int")
@@ -226,6 +235,10 @@ namespace Zoolog.Migrations
                     b.Property<int>("TaxonomyId")
                         .HasColumnType("int")
                         .HasColumnName("taxonomy_id");
+
+                    b.Property<decimal?>("Weight")
+                        .HasColumnType("decimal(18,2)")
+                        .HasColumnName("weight");
 
                     b.HasKey("Id");
 
@@ -291,6 +304,12 @@ namespace Zoolog.Migrations
                         .HasColumnType("nvarchar(100)")
                         .HasColumnName("species");
 
+                    b.Property<bool>("Validated")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false)
+                        .HasColumnName("validated");
+
                     b.HasKey("Id");
 
                     b.ToTable("taxonomy", (string)null);
@@ -311,11 +330,19 @@ namespace Zoolog.Migrations
                         .HasColumnName("created_at")
                         .HasDefaultValueSql("getdate()");
 
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("description");
+
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)")
                         .HasColumnName("email");
+
+                    b.Property<string>("Job")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("job");
 
                     b.Property<string>("Pass")
                         .IsRequired()
@@ -362,21 +389,11 @@ namespace Zoolog.Migrations
 
             modelBuilder.Entity("Zoolog.Models.CollectionFavorite", b =>
                 {
-                    b.HasOne("Zoolog.Models.Collection", "Collection")
+                    b.HasOne("Zoolog.Models.Collection", null)
                         .WithMany()
                         .HasForeignKey("CollectionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.HasOne("Zoolog.Models.User", "Creator")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Collection");
-
-                    b.Navigation("Creator");
                 });
 
             modelBuilder.Entity("Zoolog.Models.Loan", b =>

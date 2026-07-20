@@ -10,6 +10,7 @@ namespace Zoolog.Models
 
         public int CollectionId { get; set; }
         // public Collection Collection { get; set; } = null!;
+        
 
         public DateTime FavoritedAt { get; set; }
     }

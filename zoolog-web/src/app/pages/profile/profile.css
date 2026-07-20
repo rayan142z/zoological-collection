@@ -1,81 +1,287 @@
-.profile-page {
-  min-height: calc(100vh - 76px);
+/* Container, der die Karte zentriert */
+.profile-container {
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 32px;
-  background: var(--color-background, #f5f7f4);
+  min-height: calc(100vh - 120px); /* Zieht Header/Footer-Höhe ab */
+  padding: 24px;
+  background-color: #f8f9fa;
 }
 
+/* Die Profilkarte selbst */
 .profile-card {
+  background: #ffffff;
+  border: 1px solid #e9ecef;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
   width: 100%;
-  max-width: 520px;
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: 14px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
-  padding: 32px;
+  max-width: 480px;
+  padding: 40px;
+  box-sizing: border-box;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-.profile-card h1 {
-  margin: 0 0 8px;
-  color: var(--color-primary);
-  font-size: 28px;
+.profile-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.06);
 }
 
-.profile-info {
+/* Header: Avatar, Name & Rolle */
+.profile-header {
   display: flex;
   flex-direction: column;
-  gap: 14px;
-  margin-bottom: 24px;
+  align-items: center;
+  text-align: center;
+  margin-bottom: 28px;
 }
 
-.info-row {
+/* Moderner, runder Initialen-Avatar */
+.avatar-placeholder {
+  width: 88px;
+  height: 88px;
+  background: linear-gradient(135deg, #085a08, #04a635);
+  color: #ffffff;
+  font-size: 36px;
+  font-weight: 700;
   display: flex;
-  justify-content: space-between;
-  gap: 16px;
-  padding: 14px 0;
-  border-bottom: 1px solid var(--color-border);
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  margin-bottom: 16px;
+  box-shadow: 0 4px 14px rgba(59, 130, 246, 0.3);
 }
 
-.info-row span {
-  color: var(--color-text);
-  font-size: 14px;
-}
-
-.info-row strong {
-  color: var(--color-primary);
-  font-size: 14px;
-  text-align: right;
-}
-
-.secondary-button {
-  height: 42px;
-  padding: 0 18px;
-  border: 1px solid var(--color-primary);
-  border-radius: 8px;
-  background: transparent;
-  color: var(--color-primary);
+.profile-header h2 {
+  font-size: 24px;
   font-weight: 700;
-  cursor: pointer;
+  color: #1e293b;
+  margin: 0 0 10px 0;
+  letter-spacing: -0.5px;
 }
 
-.secondary-button:hover {
-  background: var(--color-primary);
-  color: white;
+/* Moderne, dezente Rollen-Badges */
+.role-badge {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  padding: 6px 14px;
+  border-radius: 9999px;
+  letter-spacing: 0.8px;
+  display: inline-block;
 }
 
-.error-message {
-  color: #b3261e;
+.role-badge.admin {
+  background-color: #fee2e2;
+  color: #ef4444;
+}
+
+.role-badge.moderator {
+  background-color: #f0fdf4;
+  color: #16a34a;
+}
+
+.role-badge.user {
+  background-color: #f1f5f9;
+  color: #475569;
+}
+
+/* Trennlinie */
+.divider {
+  border: 0;
+  height: 1px;
+  background: #e2e8f0;
+  margin: 0 0 28px 0;
+}
+
+/* Info-Details */
+.profile-details {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  margin-bottom: 36px;
+}
+
+.detail-item {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.detail-item label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #94a3b8;
+  letter-spacing: 0.5px;
+}
+
+.detail-item p {
+  margin: 0;
+  font-size: 15px;
+  color: #334155;
+  line-height: 1.5;
+}
+
+/* Platzhalter-Texte für noch nicht ausgefüllte Felder (job, description) */
+.placeholder-text {
+  color: #94a3b8;
+  font-style: italic;
+  font-size: 14px;
+}
+
+/* Abmelde-Button */
+.profile-actions {
+  display: flex;
+  justify-content: center;
+}
+
+.btn-logout {
+  background-color: #ffffff;
+  color: #ef4444;
+  border: 1px solid #fee2e2;
+  padding: 12px 24px;
+  font-size: 14px;
   font-weight: 600;
+  border-radius: 10px;
+  cursor: pointer;
+  width: 100%;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
 }
 
-.profile-link {
-  color: var(--color-primary);
-  font-weight: 700;
-  text-decoration: none;
+.btn-logout:hover {
+  background-color: #ef4444;
+  color: #ffffff;
+  border-color: #ef4444;
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.15);
 }
 
-.profile-link:hover {
-  text-decoration: underline;
+.btn-logout:active {
+  transform: scale(0.98);
+}
+
+/* Lade-Anzeige */
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 50vh;
+  color: #64748b;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+/* Styling für die Eingabefelder im Bearbeitungsmodus */
+.edit-input {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #334155;
+  background-color: #f8fafc;
+  box-sizing: border-box;
+  transition: all 0.2s ease;
+}
+
+.edit-input:focus {
+  outline: none;
+  border-color: #3b82f6;
+  background-color: #ffffff;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+}
+
+.edit-textarea {
+  width: 100%;
+  min-height: 90px;
+  padding: 10px 14px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #334155;
+  background-color: #f8fafc;
+  box-sizing: border-box;
+  font-family: inherit;
+  resize: vertical;
+  transition: all 0.2s ease;
+}
+
+.edit-textarea:focus {
+  outline: none;
+  border-color: #3b82f6;
+  background-color: #ffffff;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+}
+
+/* Button-Gruppen */
+.profile-actions {
+  width: 100%;
+}
+
+.default-actions-group,
+.edit-actions-group {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+}
+
+/* Der neue Bearbeitungs-Button */
+.btn-edit {
+  background-color: #3b82f6;
+  color: #ffffff;
+  border: none;
+  padding: 12px 24px;
+  font-size: 14px;
+  font-weight: 600;
+  border-radius: 10px;
+  cursor: pointer;
+  width: 100%;
+  transition: all 0.2s ease;
+}
+
+.btn-edit:hover {
+  background-color: #2563eb;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+}
+
+/* Speichern-Button */
+.btn-save {
+  background-color: #10b981;
+  color: #ffffff;
+  border: none;
+  padding: 12px 24px;
+  font-size: 14px;
+  font-weight: 600;
+  border-radius: 10px;
+  cursor: pointer;
+  width: 100%;
+  transition: all 0.2s ease;
+}
+
+.btn-save:hover {
+  background-color: #059669;
+  box-shadow: 0 4px 12px rgba(5, 150, 105, 0.2);
+}
+
+/* Abbrechen-Button */
+.btn-cancel {
+  background-color: #f1f5f9;
+  color: #475569;
+  border: 1px solid #e2e8f0;
+  padding: 12px 24px;
+  font-size: 14px;
+  font-weight: 600;
+  border-radius: 10px;
+  cursor: pointer;
+  width: 100%;
+  transition: all 0.2s ease;
+}
+
+.btn-cancel:hover {
+  background-color: #e2e8f0;
+  color: #1e293b;
 }

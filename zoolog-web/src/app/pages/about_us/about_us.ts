@@ -20,7 +20,7 @@ export class AboutUs {
   // Core values
   readonly values = signal([
     {
-      icon: '️',
+      icon: '️🪺',
       title: 'Bewahrung',
       description: 'Wir schützen das Naturerbe durch modernste Konservierungsmethoden.'
     },

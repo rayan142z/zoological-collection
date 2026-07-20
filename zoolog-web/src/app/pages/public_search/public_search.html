@@ -1,61 +1,195 @@
-
 <div class="search-container">
-  <h2>Öffentliche Sammlungen</h2>
-  <p class="search-subtitle">Entdecke zoologische Sammlungen von anderen Forschern</p>
+  <h2>Öffentliche Entdeckung</h2>
+  <p class="search-subtitle">Finde Sammlungen von anderen Forschern oder stöbere gezielt in Spezies und Biotop-Daten</p>
   
-  <!-- Moderne Suchleiste -->
-  <div class="search-bar-wrapper">
-    <input 
-      type="text" 
-      [(ngModel)]="searchTerm" 
-      (input)="search()" 
-      placeholder="Nach Namen oder Begriffen suchen..." 
-      class="search-control"
-    />
+  <!-- Umschalter für den Suchmodus -->
+  <div class="search-mode-toggle">
+    <button 
+      class="btn-toggle" [class.active]="searchMode === 'collections'" (click)="setMode('collections')">
+      Sammlungen durchsuchen
+    </button>
+    <button 
+      class="btn-toggle" [class.active]="searchMode === 'specimens'" (click)="setMode('specimens')">
+      Spezies & Filter-Suche
+    </button>
   </div>
 
-  <!-- Lade-Zustand -->
-  @if (isLoading) {
-    <div class="loading-state">
-      <p>Sammlungen werden durchsucht...</p>
+  <!-- ANSICHT 1: SAMMLUNGEN -->
+  @if (searchMode === 'collections') {
+    <div class="search-bar-wrapper">
+      <input 
+        type="text" 
+        [(ngModel)]="searchTerm" 
+        (input)="executeSearch()" 
+        placeholder="Nach Namen oder Begriffen suchen..." 
+        class="search-control"
+      />
     </div>
-  } @else {
-    <!-- Ergebnisse -->
-    <div class="results-grid">
-      @for (col of collections; track col.id) {
-        <div class="collection-card">
-          <div class="card-content">
-            <div class="card-header">
-              <h3>{{ col.name }}</h3>
-            </div>
-            <p class="card-description">
-              {{ col.description || 'Keine Beschreibung für diese Sammlung hinterlegt.' }}
-            </p>
-          </div>
 
-          <div class="card-footer-zone">
-            <div class="card-meta">
-              <div class="creator-info">
-                Erstellt von
-                <span class="creator-name">&#64;{{ col.creator?.username || 'Unbekannt' }}</span>
-              </div>
-              <div class="specimen-badge">
-                {{ col.specimenCount }} Exemplare
-              </div>
+    @if (isLoading) {
+      <div class="loading-state"><p>Sammlungen werden durchsucht...</p></div>
+    } @else {
+      <div class="results-grid">
+        @for (col of collections; track col.id) {
+          <div class="collection-card">
+            <div class="card-content">
+              <div class="card-header"><h3>{{ col.name }}</h3></div>
+              <p class="card-description">{{ col.description || 'Keine Beschreibung hinterlegt.' }}</p>
             </div>
-
-            <!-- Weiterleitung zu deiner bestehenden Objects-Page mit der ID -->
-            <a [routerLink]="['/objects', col.id]" class="btn-view">
-              Sammlung ansehen
-            </a>
+            <div class="card-footer-zone">
+              <div class="card-meta">
+                <div class="creator-info">Erstellt von <span class="creator-name">&#64;{{ col.creator?.username || 'Unbekannt' }}</span></div>
+                <div class="specimen-badge">{{ col.specimenCount }} Exemplare</div>
+              </div>
+              <a [routerLink]="['/objects', col.id]" class="btn-view">Sammlung ansehen</a>
+            </div>
           </div>
-        </div>
-      } @empty {
-        <!-- Leerraum-Anzeige -->
-        <div class="empty-state">
-          <p>Es wurden keine öffentlichen Sammlungen gefunden.</p>
-        </div>
-      }
-    </div>
+        } @empty {
+          <div class="empty-state"><p>Es wurden keine öffentlichen Sammlungen gefunden.</p></div>
+        }
+      </div>
+    }
   }
+
+  <!-- ANSICHT 2: SPEZIES & ERWEITERTE FILTER -->
+  <!-- ANSICHT 2: SPEZIES & ERWEITERTE FILTER -->
+  @else {
+    <div class="advanced-filter-panel">
+      <!-- 1. Reihe: Generelle Freitext-Suche -->
+      <div class="filter-group">
+        <label>Generelle Suche</label>
+        <input 
+          type="text" 
+          [(ngModel)]="specimenQuery" 
+          (input)="executeSearch()" 
+          placeholder="Nach Name, Beschreibung etc. suchen..." 
+          class="search-control"
+        />
+      </div>
+
+      <!-- 2. Alle Taxonomie-Felder nebeneinander -->
+      <div class="taxonomy-grid-row">
+        <div class="filter-group">
+          <label>Klasse</label>
+          <input type="text" [(ngModel)]="selectedClass" (input)="executeSearch()" placeholder="z.B. Insecta" class="search-control" />
+        </div>
+        <div class="filter-group">
+          <label>Ordnung</label>
+          <input type="text" [(ngModel)]="selectedOrder" (input)="executeSearch()" placeholder="z.B. Araneae" class="search-control" />
+        </div>
+        <div class="filter-group">
+          <label>Familie</label>
+          <input type="text" [(ngModel)]="selectedFamily" (input)="executeSearch()" placeholder="z.B. Salticidae" class="search-control" />
+        </div>
+        <div class="filter-group">
+          <label>Gattung</label>
+          <input type="text" [(ngModel)]="selectedGenus" (input)="executeSearch()" placeholder="z.B. Salticus" class="search-control" />
+        </div>
+        <div class="filter-group">
+          <label>Spezies</label>
+          <input type="text" [(ngModel)]="selectedSpecies" (input)="executeSearch()" placeholder="z.B. scenicus" class="search-control" />
+        </div>
+      </div>
+
+      <!-- 3. Intervall-Reihe (Gewicht & Größe) -->
+      <div class="intervals-row">
+        <div class="filter-group">
+          <label>Min. Gewicht</label>
+          <input type="number" [(ngModel)]="minWeight" (input)="executeSearch()" placeholder="min" class="search-control" />
+        </div>
+        <div class="filter-group">
+          <label>Max. Gewicht</label>
+          <input type="number" [(ngModel)]="maxWeight" (input)="executeSearch()" placeholder="max" class="search-control" />
+        </div>
+        <div class="filter-group">
+          <label>Min. Größe</label>
+          <input type="number" [(ngModel)]="minSize" (input)="executeSearch()" placeholder="min" class="search-control" />
+        </div>
+        <div class="filter-group">
+          <label>Max. Größe</label>
+          <input type="number" [(ngModel)]="maxSize" (input)="executeSearch()" placeholder="max" class="search-control" />
+        </div>
+      </div>
+
+      <!-- 4. Geodaten-Auswahl über Karten-Button -->
+      <div class="geo-filter-row">
+        <button type="button" class="btn-geo-toggle" (click)="openMapModal()">
+          📍 @if (centerLat && centerLng) {
+            Koordinaten gewählt ({{ centerLat | number:'1.2-2' }}, {{ centerLng | number:'1.2-2' }} | Radius: {{ radiusKm || 10 }} km)
+          } @else {
+            Standort & Radius auf Karte wählen...
+          }
+        </button>
+        @if (centerLat !== null || centerLng !== null) {
+          <button type="button" class="btn-clear-geo" (click)="clearGeoFilter()">Auswahl aufheben</button>
+        }
+      </div>
+    </div>
+
+    <!-- LEAFLET KARTEN MODAL / POPUP -->
+    @if (isMapModalOpen) {
+      <div class="map-modal-backdrop">
+        <div class="map-modal-content">
+          <div class="map-modal-header">
+            <h3>Standort und Suchradius wählen</h3>
+            <button type="button" class="btn-close" (click)="closeMapModal()">×</button>
+          </div>
+          
+          <div class="map-container-wrapper">
+            <!-- Das Div für die Leaflet-Karte -->
+            <div id="leafletMap" class="leaflet-map"></div>
+          </div>
+
+          <div class="map-radius-control">
+            <label>Radius: <strong>{{ tempRadiusKm }} km</strong></label>
+            <input 
+              type="range" 
+              min="1" 
+              max="200" 
+              [(ngModel)]="tempRadiusKm" 
+              (input)="updateMapCircle()" 
+              class="radius-slider"
+            />
+          </div>
+
+          <div class="map-modal-footer">
+            <button type="button" class="btn-secondary" (click)="clearGeoFilter(); closeMapModal()">Zurücksetzen</button>
+            <button type="button" class="btn-primary" (click)="applyGeoSelection()">Übernehmen</button>
+          </div>
+        </div>
+      </div>
+    }
+    
+
+    <!-- Ergebnisse für Spezies -->
+    @if (isLoading) {
+      <div class="loading-state"><p>Spezies werden gefiltert...</p></div>
+    } @else {
+      <div class="results-grid">
+        @for (specimen of specimens; track specimen.id) {
+          <div class="collection-card">
+            <div class="card-content">
+              <div class="card-header">
+                <h3>{{ specimen.name }}</h3>
+                <span class="species-tag">{{ specimen.species || 'Unbekannt' }}</span>
+              </div>
+              <p class="card-description">{{ specimen.description || 'Keine Beschreibung hinterlegt.' }}</p>
+              
+              <div class="specimen-details-meta">
+                <span><strong>Klasse:</strong> {{ specimen.class || 'k.A.' }}</span>
+                <span><strong>Größe:</strong> {{ specimen.size ? specimen.size : 'k.A.' }}</span>
+                <span><strong>Gewicht:</strong> {{ specimen.weight ? specimen.weight : 'k.A.' }}</span>
+              </div>
+            </div>
+            
+            <div class="card-footer-zone">
+              <a [routerLink]="['/objects', specimen.collectionId]" class="btn-view">Zur Sammlung</a>
+            </div>
+          </div>
+        } @empty {
+          <div class="empty-state"><p>Keine Spezies gefunden, die diesen Filterkriterien entsprechen.</p></div>
+        }
+      </div>
+    }
+  }  
 </div>

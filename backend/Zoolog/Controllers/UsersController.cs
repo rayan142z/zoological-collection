@@ -43,7 +43,13 @@ public class UserUpdateRequest
     [RegularExpression("^(active|blocked)$", ErrorMessage = "Status muss active oder blocked sein.")]
     public string Status { get; set; } = "active";
 
-    // Optional: leave empty/omit to keep the current password.
+    // --- NEU: Optionale Beschreibung für das Benutzerprofil ---
+    [StringLength(500, ErrorMessage = "Die Beschreibung darf maximal 500 Zeichen lang sein.")]
+    public string? Description { get; set; }
+
+    [StringLength(50, ErrorMessage = "Job darf maximal 50 Zeichen lang sein.")]
+    public string? Job { get; set; }
+
     [StringLength(100, MinimumLength = 6, ErrorMessage = "Passwort muss mindestens 6 Zeichen lang sein.")]
     public string? Pass { get; set; }
 }
@@ -60,7 +66,7 @@ public class UsersController : ControllerBase
     }
 
     // GET /api/users
-    [Authorize(Roles = "admin")]
+    [Authorize]
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
@@ -72,7 +78,9 @@ public class UsersController : ControllerBase
                 user.Email,
                 user.UserRole,
                 user.Status,
-                user.CreatedAt
+                user.CreatedAt,
+                user.Description, 
+                user.Job
             })
             .ToListAsync();
         return Ok(users);
@@ -92,6 +100,11 @@ public class UsersController : ControllerBase
                 user.Email,
                 user.UserRole,
                 user.Status,
+                
+                // --- NEU: Hier mitsenden ---
+                user.Description, 
+                user.Job, 
+                
                 user.CreatedAt
             })
             .FirstOrDefaultAsync();
@@ -135,8 +148,8 @@ public class UsersController : ControllerBase
     }
 
     // PUT /api/users/1
-    [Authorize(Roles="admin")]
     [HttpPut("{id}")]
+    [Authorize]
     public async Task<IActionResult> Update(int id, UserUpdateRequest request)
     {
         var user = await _context.Users.FindAsync(id);
@@ -154,6 +167,10 @@ public class UsersController : ControllerBase
         user.Email = request.Email;
         user.UserRole = request.UserRole;
         user.Status = request.Status;
+        
+        // --- NEU: Wert in der DB-Entität aktualisieren ---
+        user.Description = request.Description; 
+        user.Job = request.Job; 
 
         if (!string.IsNullOrWhiteSpace(request.Pass))
         {
@@ -163,17 +180,54 @@ public class UsersController : ControllerBase
         await _context.SaveChangesAsync();
         return NoContent();
     }
-
     // DELETE /api/users/1
-    [Authorize(Roles="admin")]
+    [Authorize(Roles = "admin")]
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(int id)
     {
+        // 1. User suchen
         var user = await _context.Users.FindAsync(id);
         if (user is null) return NotFound();
 
-        _context.Users.Remove(user);
-        await _context.SaveChangesAsync();
-        return NoContent();
+        // 2. Transaktion starten für maximale Datensicherheit
+        using var transaction = await _context.Database.BeginTransactionAsync();
+
+        try
+        {
+            // 3. Alle Sammlungen laden, die diesem User gehören
+            var userCollections = await _context.Collections
+                .Where(c => c.CreatedBy == id)
+                .ToListAsync();
+
+            // 4. Erst die Sammlungen manuell aus dem Context entfernen
+            if (userCollections.Any())
+            {
+                _context.Collections.RemoveRange(userCollections);
+                // HINWEIS: Hier könntest du jetzt auch Schleifen einbauen,
+                // um z.B. physische Bilder der Sammlungen von der Festplatte zu löschen!
+            }
+
+            // 5. Erst wenn die Sammlungen weg sind, den User selbst löschen
+            _context.Users.Remove(user);
+
+            // 6. Alle Änderungen in einem Rutsch in die DB schreiben
+            await _context.SaveChangesAsync();
+
+            // 7. Transaktion erfolgreich abschließen (Commit)
+            await transaction.CommitAsync();
+
+            return NoContent(); // 204
+        }
+        catch (Exception ex)
+        {
+            // Falls irgendetwas schiefgeht (z.B. DB-Verbindung bricht ab),
+            // macht diese Zeile alle bisherigen Löschungen dieses Durchgangs rückgängig!
+            await transaction.RollbackAsync();
+            
+            // Logge den Fehler für dich im Server-Terminal
+            Console.WriteLine($"Fehler beim manuellen Löschen von User {id}: {ex.Message}");
+            
+            return StatusCode(500, "Fehler beim Löschen des Benutzers und seiner Daten.");
+        }
     }
 }

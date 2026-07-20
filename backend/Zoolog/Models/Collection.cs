@@ -15,5 +15,5 @@ public class Collection
     public User Creator { get; set; } = null!;
     public DateTime CreatedAt { get; set; }
 
-    public virtual ICollection<Specimen> Specimens { get; set; } = new List<Specimen>();
+    
 }

@@ -20,24 +20,89 @@
 
 .breadcrumb-current { color: var(--text-muted); }
 
-/* ── Header ──────────────────────────────────────────────── */
+/* Header-Layout anpassen */
 .objects-header {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  grid-template-rows: auto auto;
+  row-gap: 20px; /* Großzügiger Abstand nach unten zu den Buttons */
+  margin-bottom: 24px;
+}
+
+/* Titel links oben */
+.header-main-info {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+/* Besitzer oben rechts */
+.collection-owner-badge {
+  grid-column: 2;
+  grid-row: 1;
+  justify-self: end;
+  align-self: center;
+  
   display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  margin-bottom: 20px;
-  gap: 16px;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
+  padding: 6px 12px;
+  border-radius: 8px;
+  transition: background-color 0.2s ease;
 }
 
-.objects-title {
-  font-size: 36px;
-  font-weight: 700;
-  color: var(--text);
-  letter-spacing: -0.5px;
-  line-height: 1.1;
+/* Hover-Effekt für den Klickbereich */
+.collection-owner-badge:hover {
+  background-color: rgba(0, 0, 0, 0.05); /* Dezentes Highlight beim Hovern */
 }
 
-.objects-subtitle { color: var(--text-muted); font-size: 14px; margin-top: 6px; }
+.owner-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #666;
+}
+
+.owner-profile {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Runder Avatar-Platzhalter mit dem Anfangsbuchstaben */
+.owner-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background-color: var(--green-dark, #2e5a44);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.owner-name {
+  font-weight: 600;
+  font-size: 15px;
+  color: #333;
+}
+
+/* Die Button-Leiste darunter zieht sich über die ganze Breite */
+.header-actions {
+  grid-column: 1 / span 2;
+  grid-row: 2;
+  
+  display: flex;
+  align-items: center;
+  column-gap: 16px; /* Mehr horizontaler Abstand zwischen den Buttons */
+  row-gap: 12px;    /* Abstand nach unten bei Umbruch auf Smartphones */
+  flex-wrap: wrap;
+}
 
 /* ── View toggle ─────────────────────────────────────────── */
 .header-actions { display: flex; align-items: center; gap: 12px; padding-top: 6px; }
@@ -126,120 +191,138 @@
 .pill-active { background: var(--green-dark); color: #F0EAD6; border-color: var(--green-dark); }
 
 /* ── Card grid ───────────────────────────────────────────── */
+
+/* Grundstruktur der Karte */
 .specimen-card {
-  position: relative;
-  cursor: pointer;
-  background: var(--surface);
-  border: 1px solid var(--cream-border);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-sm);
-  transition: box-shadow 0.2s, transform 0.2s;
-  height: 340px;
   display: flex;
   flex-direction: column;
+  background: white;
+  border-radius: 12px;
   overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  border: 1px solid #e5e7eb; /* Sehr dezenter Rahmen */
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
 
-.specimen-card:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); }
+.specimen-card-2 {
+  display: flex;
+  flex-direction: column;
+  background: gray;
+  border-radius: 12px;
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  border: 1px solid #e5e7eb; /* Sehr dezenter Rahmen */
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
 
+.specimen-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.15);
+}
+
+/* Bildbereich optimieren */
 .card-image-area {
-  height: 200px;
-  flex-shrink: 0;
-  background: var(--cream);
+  position: relative;
+  height: 200px; /* Feste Höhe für Einheitlichkeit */
+  width: 100%;
+  overflow: hidden;
+  background-color: #f3f4f6; /* Platzhalter-Hintergrund */
+}
+
+.card-image-area-2 {
+  position: relative;
+  height: 200px; /* Feste Höhe für Einheitlichkeit */
+  width: 100%;
+  overflow: hidden;
+  background-color: #f3f4f6; /* Platzhalter-Hintergrund */
+}
+
+.specimen-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+.img-placeholder {
   display: flex;
   align-items: center;
   justify-content: center;
-  position: relative;
-  overflow: hidden;
+  height: 100%;
+  font-size: 3rem;
 }
 
-.card-image-area .badge { position: absolute; top: 12px; left: 12px; z-index: 2; }
-
-.specimen-img {
-  max-height: 160px;
-  max-width: 85%;
-  object-fit: contain;
-  transition: transform 0.3s ease;
-  position: relative;
-  z-index: 1;
+/* Badge Styling */
+.badge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 2;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  background: rgba(255, 255, 255, 0.9);
 }
-.specimen-card:hover .specimen-img { transform: scale(1.04); }
 
-.img-placeholder { font-size: 48px; }
-
+/* Body Styling */
 .card-body-area {
-  flex: 1;
-  padding: 14px 18px 16px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
+  padding: 16px;
 }
 
-.specimen-name  { font-size: 17px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
-.specimen-latin { font-size: 13px; color: var(--brown); font-style: italic; }
+.specimen-name {
+  margin: 0 0 4px 0;
+  font-size: 1.25rem;
+  color: #111827;
+}
+
+.specimen-latin {
+  margin: 0 0 12px 0;
+  color: #6b7280;
+  font-size: 0.9rem;
+}
 
 .specimen-footer {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  padding-top: 10px;
-  border-top: 1px solid var(--cream-dark);
-  margin-top: auto;
+  font-size: 0.8rem;
+  color: #9ca3af;
+  border-top: 1px solid #f3f4f6;
+  padding-top: 12px;
 }
 
-.specimen-year { font-size: 12px; color: var(--text-hint); font-weight: 600; }
-.specimen-id   { font-size: 12px; color: var(--text-hint); }
 
-/* ── Hover overlay ───────────────────────────────────────── */
-.hover-overlay {
-  position: absolute;
-  left: 0; right: 0;
-  top: 140px;
-  bottom: 0;
-  background: var(--green-dark);
-  color: #F0EAD6;
-  padding: 16px 18px;
-  opacity: 0;
-  transform: translateY(6px);
-  transition: opacity 0.22s ease, transform 0.22s ease;
-  display: flex;
-  flex-direction: column;
-  gap: 7px;
-  z-index: 3;
-  overflow: hidden;
-}
-
-.specimen-card:hover .hover-overlay { opacity: 1; transform: translateY(0); }
-
-.overlay-title {
-  font-size: 15px;
-  font-weight: 700;
-  color: #F0EAD6;
-  margin-bottom: 2px;
-  padding-bottom: 8px;
-  border-bottom: 1px solid rgba(240,234,214,0.2);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.overlay-row { display: flex; justify-content: space-between; font-size: 12px; color: rgba(240,234,214,0.65); }
-.overlay-val { color: #F0EAD6; font-weight: 600; }
 
 /* ── Add object card ─────────────────────────────────────── */
 .add-object-card {
   border: 2px dashed var(--cream-border);
   background: transparent;
   text-decoration: none;
+  display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
   cursor: pointer;
+  min-height: 220px; /* Gleicht die Höhe an deine normalen Objektkarten an */
+  height: 100%;
+  box-sizing: border-box;
+  padding: 20px;
+  border-radius: 12px; /* Falls deine Karten abgerundete Ecken haben */
 }
 
 .add-object-card:hover {
   border-color: var(--green-mid);
   background: var(--green-light);
   transform: translateY(-2px);
+}
+
+.add-object-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  text-align: center;
 }
 
 .add-object-inner {
@@ -371,4 +454,192 @@
 
 .btn-favorite:active .star-icon {
   transform: scale(3);
+}
+
+/* Container-Klasse als Anker für die absolute Positionierung des Tooltips */
+.collection-owner-badge {
+  position: relative;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-end;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 8px;
+  transition: background-color 0.2s ease;
+}
+
+.collection-owner-badge:hover {
+  background-color: rgba(0, 0, 0, 0.04); /* Leichte Schattierung beim Hovern */
+}
+
+/* Der versteckte Tooltip */
+.owner-tooltip {
+  position: absolute;
+  top: 100%; /* Direkt unter dem Badge */
+  right: 0;
+  margin-top: 8px;
+  width: 250px;
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  padding: 12px;
+  z-index: 100;
+  text-align: left;
+  
+  /* Standardmäßig unsichtbar & leicht nach unten verschoben für einen schönen Einblend-Effekt */
+  visibility: hidden;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s;
+}
+
+/* Einblenden, wenn über das gesamte Badge gehovert wird */
+.collection-owner-badge:hover .owner-tooltip {
+  visibility: visible;
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Tooltip Styling */
+.tooltip-header {
+  display: flex;
+  justify-content: space-between; /* Schiebt Namen nach links und Meta nach rechts */
+  align-items: flex-start;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 8px;
+  margin-bottom: 8px;
+}
+
+.tooltip-username {
+  font-size: 1.1rem;
+  color: #333;
+  word-break: break-word;
+  padding-right: 12px; /* Verhindert, dass der Name in die rechte Seite reinragt */
+}
+
+.tooltip-meta-right {
+  display: flex;
+  flex-direction: column; /* Stapelt Job und Rolle untereinander */
+  align-items: flex-end;   /* Richtet beide bündig am rechten Rand aus */
+  text-align: right;
+  flex-shrink: 0;          /* Verhindert, dass die rechte Seite zusammengedrückt wird */
+}
+
+.tooltip-job {
+  font-size: 0.8rem;
+  color: #666;
+  font-style: italic;
+  line-height: 1.2;
+}
+
+.tooltip-role {
+  font-size: 0.75rem;
+  color: #888;
+  text-transform: lowercase; /* Erzwingt Kleinschreibung */
+  line-height: 1.2;
+  margin-top: 2px;
+}
+
+.tooltip-role {
+  font-size: 0.75rem;
+  background-color: #f1f5f9;
+  color: #64748b;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.tooltip-desc {
+  font-size: 0.8rem;
+  color: #475569;
+  margin: 0 0 10px 0;
+  line-height: 1.4;
+}
+
+.tooltip-contact {
+  font-size: 0.8rem;
+  border-top: 1px solid #f1f5f9;
+  padding-top: 8px;
+}
+
+.contact-label {
+  display: block;
+  font-size: 0.7rem;
+  color: #94a3b8;
+  text-transform: uppercase;
+  margin-bottom: 2px;
+}
+
+.contact-email {
+  color: #2563eb;
+  text-decoration: none;
+  word-break: break-all;
+}
+
+.contact-email:hover {
+  text-decoration: underline;
+}
+
+/* Der gesamte Admin-Bereich im Tooltip-Footer */
+.tooltip-admin-actions {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(255, 77, 79, 0.15); /* Sehr dezente rote Trennlinie */
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Kleiner, dezenter Warnhinweis für den Admin */
+.admin-warning-text {
+  font-size: 0.7rem;
+  color: #ff7875;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* Der schicke rote Lösch-Button */
+.btn-ban-user {
+  background-color: #fff1f0;
+  color: #ff4d4f;
+  border: 1px solid #ffccc7;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: 0 2px 4px rgba(255, 77, 79, 0.05);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Animierter Hover-Effekt */
+.btn-ban-user:hover {
+  background-color: #ff4d4f;
+  color: #ffffff;
+  border-color: #ff4d4f;
+  box-shadow: 0 4px 8px rgba(255, 77, 79, 0.3);
+  transform: translateY(-1px); /* Minimaler Lift-Effekt */
+}
+
+/* Klick-Effekt (Active State) */
+.btn-ban-user:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(255, 77, 79, 0.2);
+}
+
+.ban-icon {
+  font-size: 0.9rem;
+}
+
+.specimen-img {
+  width: 120%;       /* Nimmt die volle Breite des Containers */
+  height: 120%;      /* Nimmt die volle Höhe des Containers */
+  object-fit: cover; /* DAS ist der Trick: Bild wird zugeschnitten, behält Ratio */
+  object-position: center; /* Zentriert das Bild, damit das Wichtigste sichtbar bleibt */
 }

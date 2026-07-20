@@ -1,14 +1,80 @@
-<div class="page-container">
-  
+<div class="loans-container">
+  <h2>Leih-Übersicht</h2>
 
-  <div class="objects-header">
-    <div>
-      <h1 class="objects-title serif">Objekt ausleihen</h1>
-      <p class="objects-subtitle">Hier entsteht die Ausleih-Maske.</p>
-    </div>
-  </div>
+  @if (isLoading) {
+    <p>Lade Leih-Informationen...</p>
+  } @else if (errorMessage) {
+    <p class="error">{{ errorMessage }}</p>
+  } @else {
 
-  <div class="card" style="padding: 2rem; margin-top: 1.5rem; text-align: center; color: #64748b;">
-    <p>Diese Seite ist aktuell noch leer und bereit für den Ausleih-Prozess.</p>
-  </div>
+    <!-- Sektion 1: Von mir verliehene Exemplare -->
+    <section class="loan-section">
+      <h3>Von mir verliehene Tiere</h3>
+      @if (loanedOut.length === 0) {
+        <p class="empty-text">Du hast aktuell keine Tiere verliehen.</p>
+      } @else {
+        <table class="loans-table">
+          <thead>
+            <tr>
+              <th>Exemplar</th>
+              <th>Verliehen an</th>
+              <th>Leihdatum</th>
+              <th>Rückgabe bis</th>
+              <th>Notiz</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (item of loanedOut; track item.id) {
+              <tr>
+                <td><a [routerLink]="['/object', item.specimenId]">{{ item.specimenName }}</a></td>
+                <td>{{ item.partnerName }}</td>
+                <td>{{ item.loanDate | date:'mediumDate' }}</td>
+                <td>{{ item.returnDate ? (item.returnDate | date:'mediumDate') : 'Unbefristet' }}</td>
+                <td>{{ item.notes || '-' }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      }
+    </section>
+
+    <!-- Sektion 2: Von anderen an mich geliehene Exemplare -->
+    <section class="loan-section" style="margin-top: 40px;">
+      <h3>Von anderen an mich geliehene Tiere</h3>
+      @if (borrowedIn.length === 0) {
+        <p class="empty-text">Du hast aktuell keine Fremd-Exemplare ausgeliehen.</p>
+      } @else {
+        <table class="loans-table">
+          <thead>
+            <tr>
+              <th>Exemplar</th>
+              <th>Verliehen von</th>
+              <th>Leihdatum</th>
+              <th>Rückgabe bis</th>
+              <th>Notiz</th>
+              <th>Aktion</th> <!-- Neue Spalte -->
+            </tr>
+          </thead>
+          <tbody>
+            @for (item of borrowedIn; track item.id) {
+              <tr>
+                <td><a [routerLink]="['/object', item.specimenId]">{{ item.specimenName }}</a></td>
+                <td>{{ item.partnerName }}</td>
+                <td>{{ item.loanDate | date:'mediumDate' }}</td>
+                <td>{{ item.returnDate ? (item.returnDate | date:'mediumDate') : 'Unbefristet' }}</td>
+                <td>{{ item.notes || '-' }}</td>
+                <td>
+                  <!-- Der Zurückgeben-Button -->
+                  <button class="btn-return" (click)="returnLoan(item.id, item.specimenId)">
+                    Zurückgeben
+                  </button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      }
+    </section>
+
+  }
 </div>

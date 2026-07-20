@@ -423,3 +423,19 @@
 .autocomplete-dropdown::-webkit-scrollbar-thumb:hover {
   background: #94a3b8;
 }
+
+.btn-text-link {
+  background: none;
+  border: none;
+  color: #0f680b;
+  font-size: 0.85rem;
+  cursor: pointer;
+  margin-bottom: 8px;
+  padding: 0;
+}
+
+.manual-tax-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}

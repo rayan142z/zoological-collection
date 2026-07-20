@@ -56,7 +56,10 @@ public class CollectionsController : ControllerBase
                     collection.Creator.Username,
                     collection.Creator.Email,
                     collection.Creator.UserRole,
-                    collection.Creator.Status
+                    collection.Creator.Status,
+                    
+                    collection.Creator.Description,
+                    collection.Creator.Job
                 },
                 collection.CreatedAt
             })
@@ -145,7 +148,9 @@ public class CollectionsController : ControllerBase
                     collection.Creator.Username,
                     collection.Creator.Email,
                     collection.Creator.UserRole,
-                    collection.Creator.Status
+                    collection.Creator.Status,
+                    collection.Creator.Description,
+                    collection.Creator.Job
                 },
                 collection.CreatedAt,
                 // Ermittelt live die Anzahl der enthaltenen Exemplare für die Suchübersicht
@@ -181,7 +186,9 @@ public class CollectionsController : ControllerBase
                     collection.Creator.Username,
                     collection.Creator.Email,
                     collection.Creator.UserRole,
-                    collection.Creator.Status
+                    collection.Creator.Status,
+                    collection.Creator.Description,
+                    collection.Creator.Job
                 },
                 collection.CreatedAt
             })
@@ -246,7 +253,7 @@ public class CollectionsController : ControllerBase
 
         collection.Name = request.Name;
         collection.Description = request.Description;
-        collection.IsPublic = request.IsPublic;
+        //collection.IsPublic = request.IsPublic;
 
         await _context.SaveChangesAsync();
         return NoContent();
@@ -259,43 +266,59 @@ public class CollectionsController : ControllerBase
     {
         // 1. Prüfen, ob die Sammlung überhaupt existiert
         var collection = await _context.Collections.FindAsync(id);
-        if (collection == null)
+        
+        if (collection == null) 
         {
-            return NotFound();
+            return NotFound(new { message = "Sammlung mit dieser ID nicht gefunden" });
         }
 
-        // Wir nutzen eine Transaktion, um die Verbindung für die PRAGMA-Befehle offen zu halten
-        using var transaction = await _context.Database.BeginTransactionAsync();
+        // 2. Prüfen, ob sich in dieser Sammlung Exemplare befinden, die aktuell verliehen sind (Status != 'returned')
+        bool hasActiveLoans = await _context.Loans
+            .Join(_context.Specimens,
+                loan => loan.SpecimenId,
+                specimen => specimen.Id,
+                (loan, specimen) => new { loan, specimen })
+            .AnyAsync(x => x.specimen.CollectionId == id && x.loan.Status != "returned");
+
+        if (hasActiveLoans)
+        {
+            return BadRequest(new { message = "Die Sammlung kann nicht gelöscht werden, da sich darin Exemplare befinden, die aktuell verliehen sind." });
+        }
+
         try
         {
-            // 2. Schalte SQLite Foreign-Key-Prüfungen für diese Verbindung kurzzeitig aus
-            await _context.Database.ExecuteSqlRawAsync("PRAGMA foreign_keys = OFF;");
-
-            // 3. Lösche alle Specimens, die zu dieser Sammlung gehören
-            // (Nutzt den Spaltennamen 'collection_id' aus deinem Specimen-Mapping)
+            // 3. Erst alle alten Leihvorgänge löschen, die zu den Exemplaren dieser Sammlung gehören
             await _context.Database.ExecuteSqlRawAsync(
-                "DELETE FROM specimen WHERE collection_id = {0}", id);
+                @"DELETE FROM loan WHERE specimen_id IN (SELECT id FROM specimen WHERE collection_id = {0})", id);
 
-            // 4. Lösche die Sammlung selbst 
-            // (Falls deine Tabelle in der DB im Plural "collections" heißt, passe es zu "collections" an)
-            await _context.Database.ExecuteSqlRawAsync(
-                "DELETE FROM collections WHERE id = {0}", id); 
+            // 4. Danach die Exemplare und die Sammlung löschen
+            await _context.Database.ExecuteSqlRawAsync("DELETE FROM specimen WHERE collection_id = {0}", id);
+            _context.Collections.Remove(collection);
 
-            // 5. Änderungen in der Datenbank festschreiben
-            await transaction.CommitAsync();
-
-            // 6. Foreign Keys wieder einschalten, damit nachfolgende Operationen wieder geschützt sind
-            await _context.Database.ExecuteSqlRawAsync("PRAGMA foreign_keys = ON;");
-
+            // 5. Änderungen in der Datenbank speichern
+            await _context.SaveChangesAsync();
             return NoContent();
         }
         catch (Exception ex)
         {
-            // Im Fehlerfall machen wir alles rückgängig und stellen die Fremdschlüsselprüfung wieder her
-            await transaction.RollbackAsync();
-            await _context.Database.ExecuteSqlRawAsync("PRAGMA foreign_keys = ON;");
-            
-            return StatusCode(500, $"Fehler beim Löschen der Sammlung: {ex.Message}");
+            Console.WriteLine($"Fehler beim Löschen: {ex.Message}");
+            return StatusCode(500, new { message = "Löschen fehlgeschlagen", detail = ex.Message });
         }
+    }
+
+    [HttpGet("public-stats")]
+    [AllowAnonymous]
+    public async Task<IActionResult> GetPublicStats()
+    {
+        var totalCollections = await _context.Collections.CountAsync(c => c.IsPublic);
+        var totalObjects = await _context.Specimens.CountAsync();
+        var totalUsers = await _context.Users.CountAsync();
+
+        return Ok(new
+        {
+            totalCollections,
+            totalObjects,
+            totalUsers
+        });
     }
 }

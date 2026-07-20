@@ -1,26 +1,103 @@
-<div class="profile-page">
-    <section class="profile-card">
-        <h1>Profil</h1>
+@if (currentUser(); as user) {
+  <div class="profile-container">
+    <div class="profile-card">
+      
+      <!-- Header-Bereich -->
+      <div class="profile-header">
+        <div class="avatar-placeholder">
+          {{ user.name.charAt(0).toUpperCase() }}
+        </div>
+        <h2>{{ user.name }}</h2>
+        <span class="role-badge" [ngClass]="user.role?.toLowerCase()">
+          {{ user.role || 'User' }}
+        </span>
+      </div>
 
-        @if (currentUser(); as user) {
-            <div class="profile-info">
-                <div class="info-row">
-                    <p><strong>Benutzername:</strong> {{ user.username || 'Kein Benutzername vorhanden' }}</p>
-                </div>
+      <hr class="divider" />
 
-                <div class="info-row">
-                    <p><strong>E-Mail:</strong> {{ user.email }}</p>
-                </div>
+      <!-- Info-Bereich -->
+      <div class="profile-details">
+        
+        <!-- NAME -->
+        <div class="detail-item">
+          <label>Name</label>
+          @if (isEditing()) {
+            <input type="text" class="edit-input" [(ngModel)]="editForm.username" />
+          } @else {
+            <p>{{ user.name }}</p>
+          }
+        </div>
 
-                <div class="info-row">
-                    <p><strong>Rolle:</strong> {{ user.role }}</p>
-                </div>
+        <!-- EMAIL -->
+        <div class="detail-item">
+          <label>E-Mail-Adresse</label>
+          @if (isEditing()) {
+            <input type="email" class="edit-input" [(ngModel)]="editForm.email" />
+          } @else {
+            <p>{{ user.email }}</p>
+          }
+        </div>
 
-                <button class="secondary-button" type="button" (click)="logout()">Abmelden</button>
-            </div>
+        <!-- JOB -->
+        <div class="detail-item">
+          <label>Tätigkeit / Bereich</label>
+          @if (isEditing()) {
+            <input type="text" class="edit-input" placeholder="z. B. Forscher, Museum" [(ngModel)]="editForm.job" />
+          } @else {
+            <p class="job-text">
+              @if (user.job) {
+                {{ user.job }}
+              } @else {
+                <span class="placeholder-text">Keine Angabe</span>
+              }
+            </p>
+          }
+        </div>
+
+        <!-- DESCRIPTION -->
+        <div class="detail-item">
+          <label>Über mich</label>
+          @if (isEditing()) {
+            <textarea class="edit-textarea" placeholder="Beschreibe dich kurz..." [(ngModel)]="editForm.description"></textarea>
+          } @else {
+            <p class="description-text">
+              @if (user.description) {
+                {{ user.description }}
+              } @else {
+                <span class="placeholder-text">Noch keine Beschreibung hinzugefügt.</span>
+              }
+            </p>
+          }
+        </div>
+      </div>
+
+      <!-- Action-Buttons -->
+      <div class="profile-actions">
+        @if (isEditing()) {
+          <div class="edit-actions-group">
+            <button class="btn-save" (click)="saveChanges()">
+              Speichern
+            </button>
+            <button class="btn-cancel" (click)="cancelEditing()">
+              Abbrechen
+            </button>
+          </div>
         } @else {
-            <p class="error-message">Du bist aktuell nicht eingeloggt.</p>
-            <a class="profile-link" routerLink="/login">Zum Login</a>
+          <div class="default-actions-group">
+            <button class="btn-edit" (click)="startEditing()">
+              Profil bearbeiten
+            </button>
+            <button class="btn-logout" (click)="logout()">
+              Abmelden
+            </button>
+          </div>
         }
-    </section>
-</div>
+      </div>
+
+    </div>
+  </div>
+} @else {
+  <div class="loading-container">
+    <p>Profil wird geladen...</p>
+  </div>
+}

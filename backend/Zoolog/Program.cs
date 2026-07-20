@@ -68,6 +68,20 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<Group6DbContext>();
+    var connection = dbContext.Database.GetDbConnection();
+    
+    Console.WriteLine("==================================================");
+    Console.WriteLine("[DB-DIAGNOSE] Backend ist gestartet!");
+    Console.WriteLine($"[DB-DIAGNOSE] Provider: {dbContext.Database.ProviderName}");
+    Console.WriteLine($"[DB-DIAGNOSE] Datenbank: {connection.Database}");
+    Console.WriteLine($"[DB-DIAGNOSE] DataSource/Server: {connection.DataSource}");
+    Console.WriteLine($"[DB-DIAGNOSE] ConnectionString: {connection.ConnectionString}");
+    Console.WriteLine("==================================================");
+}
+
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
@@ -89,7 +103,7 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseCors("AllowAngular");
-
+app.UseStaticFiles();
 //app.UseRouting();
 
 app.UseAuthentication();

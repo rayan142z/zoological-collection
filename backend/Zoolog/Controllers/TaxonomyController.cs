@@ -31,10 +31,55 @@ public class TaxonomyController : ControllerBase
                 taxonomy.Orders,
                 taxonomy.Family,
                 taxonomy.Genus,
-                taxonomy.Species
+                taxonomy.Species,
+                taxonomy.Validated
             })
             .ToListAsync();
         return Ok(taxonomies);
+    }
+
+    [AllowAnonymous]
+    [HttpGet("validated")]
+    public async Task<IActionResult> GetValidated()
+    {
+        var taxonomy = await _db.Taxonomies
+            .Where(taxonomy => taxonomy.Validated)
+            .Select(taxonomy => new
+            {
+                taxonomy.Id,
+                taxonomy.Kingdom,
+                taxonomy.Phylum,
+                taxonomy.Class,
+                taxonomy.Orders,
+                taxonomy.Family,
+                taxonomy.Genus,
+                taxonomy.Species,
+                taxonomy.Validated
+            })
+            .FirstOrDefaultAsync();
+        return taxonomy is null ? NotFound() : Ok(taxonomy);
+    }
+
+    [Authorize(Roles = "admin,moderator")]
+    [HttpGet("unvalidated")]
+    public async Task<IActionResult> GetUnvalidated()
+    {
+        var list = await _db.Taxonomies
+            .Where(t => !t.Validated)
+            .Select(taxonomy => new // Empfehlung: Direkt die gleiche Projektion wie bei den anderen nutzen
+            {
+                taxonomy.Id,
+                taxonomy.Kingdom,
+                taxonomy.Phylum,
+                taxonomy.Class,
+                taxonomy.Orders,
+                taxonomy.Family,
+                taxonomy.Genus,
+                taxonomy.Species,
+                taxonomy.Validated
+            })
+            .ToListAsync();
+        return Ok(list);
     }
 
     // GET /api/taxonomy/1
@@ -53,9 +98,23 @@ public class TaxonomyController : ControllerBase
                 taxonomy.Orders,
                 taxonomy.Family,
                 taxonomy.Genus,
-                taxonomy.Species
+                taxonomy.Species,
+                taxonomy.Validated
             })
             .FirstOrDefaultAsync();
         return taxonomy is null ? NotFound() : Ok(taxonomy);
+    }
+
+    [Authorize(Roles = "admin,moderator")]
+    [HttpPut("{id}/validate")]
+    public async Task<IActionResult> ValidateTaxonomy(int id)
+    {
+        var taxonomy = await _db.Taxonomies.FindAsync(id);
+        if (taxonomy is null) return NotFound(new { message = "Taxonomie nicht gefunden." });
+
+        taxonomy.Validated = true;
+        await _db.SaveChangesAsync();
+
+        return Ok(new { message = "Taxonomie erfolgreich validiert." });
     }
 }

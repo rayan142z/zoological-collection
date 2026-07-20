@@ -13,6 +13,7 @@ import { NewCollection } from './pages/new_collection/new_collection';
 import { EditObject } from './pages/edit_object/edit_object';
 import { PublicSearch } from './pages/public_search/public_search';
 import { CollectionEditComponent } from './pages/collection-edit/collection-edit';
+import { TaxonomyValidationComponent } from './pages/taxonomy-validation/taxonomy-validation';
 
 export const routes: Routes = [
     { path: 'login',      component: Login },
@@ -31,9 +32,10 @@ export const routes: Routes = [
     { path: 'collections/new', component: NewCollection, canActivate: [authGuard] },
     { path: 'public_search', component: PublicSearch },
     { path: 'collection-edit/:id', component: CollectionEditComponent },
+    { path: 'taxonomy-validation', component: TaxonomyValidationComponent },
     // new-object is nested inside a collection
     { path: 'objects/:id/new', component: NewObject, canActivate: [authGuard] },
-    { path: 'new-object', component: NewObject, canActivate: [authGuard] },  // fallback direct link
+    { path: 'new-object/:id', component: NewObject, canActivate: [authGuard] },  // fallback direct link
 
     { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
 ];

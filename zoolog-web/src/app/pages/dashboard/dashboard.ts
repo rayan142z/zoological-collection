@@ -4,6 +4,7 @@ import { RouterLink } from '@angular/router';
 import { forkJoin } from 'rxjs';
 import { ApiService } from '../../services/api.service';
 import { Auth } from '../../services/auth';
+import { HttpClient } from '@angular/common/http';
 
 interface Collection {
   id: number;
@@ -47,6 +48,12 @@ export class Dashboard {
   favCollections: any[] = [];
   favoriteCount: number = 0;
 
+  portalStats = {
+    totalCollections: 124,
+    totalObjects: 3.450,
+    totalUsers: 48
+  };
+
   // "Favoriten" und "Ausgeliehen" gibt es im Backend noch nicht (kein Favorites-Konzept,
   // kein LoanController. Als "—" markiert statt einer falschen Zahl.
   quickStats = [
@@ -67,7 +74,24 @@ export class Dashboard {
   ngOnInit(): void {
     this.loadMyCollections();
     this.loadFavorites();
+    this.loadPortalStats();
   }
+
+  private loadPortalStats(): void {
+  this.api.get<any>('collections/public-stats').subscribe({
+    next: (stats) => {
+      this.portalStats = {
+        totalCollections: stats.totalCollections,
+        totalObjects: stats.totalObjects,
+        totalUsers: stats.totalUsers,
+      };
+      this.cdr.detectChanges();
+    },
+    error: (err) => {
+      console.error('Fehler beim Laden der Portal-Statistiken:', err);
+    },
+  });
+}
 
   private loadMyCollections(): void {
     const userId = this.auth.currentUser()?.id;

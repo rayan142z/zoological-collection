@@ -1,88 +1,143 @@
 <div class="page-container">
 
-  <!-- Hero greeting -->
-  <div class="dashboard-hero">
-    <div class="hero-text">
-      <p class="hero-eyebrow">Willkommen zurück</p>
-      <h1 class="dashboard-title serif">Übersicht</h1>
-      <p class="dashboard-subtitle">Deine zoologischen Sammlungen auf einen Blick</p>
+  @if (auth.currentUser()) {
+    <!-- Dein bestehender Code für angemeldete Nutzer ... -->
+    <div class="dashboard-hero">
+  <div class="hero-text">
+    <p class="hero-eyebrow">Willkommen zurück</p>
+    <h1 class="dashboard-title serif">Übersicht</h1>
+    <p class="dashboard-subtitle">Deine zoologischen Sammlungen auf einen Blick</p>
+  </div>
+</div>
+
+<!-- Sektion liegt nun außerhalb des Hero-Containers -->
+<section class="dash-section">
+  <div class="section-header">
+    <div class="section-header-left">
+      <span class="section-icon">🗂️</span>
+      <div>
+        <h2 class="section-heading serif">Meine Sammlungen</h2>
+        <p class="section-meta">{{ myCollections.length }} Sammlungen · {{ totalObjects(myCollections) }} Objekte</p>
+      </div>
     </div>
-    <div class="hero-actions">
-      <a routerLink="/public_search" class="primary-button">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
-        Alle Sammlungen
+  </div>
+
+  <div class="collections-grid">
+    @for (col of myCollections; track col.id) {
+      <a class="collection-card" [routerLink]="['/objects', col.id]">
+        <div class="col-card-top" [style.background]="col.color">
+          <span class="col-emoji">{{ col.emoji }}</span>
+          <div class="col-card-badge">{{ col.objectCount }} Obj.</div>
+        </div>
+        <div class="col-card-body">
+          <h3 class="col-name serif">{{ col.name }}</h3>
+          <p class="col-desc">{{ col.description }}</p>
+          <div class="col-meta-row">
+            <span class="col-tag" *ngFor="let tag of col.tags">{{ tag }}</span>
+          </div>
+        </div>
+        <div class="col-card-footer">
+          <span class="col-updated">Zuletzt: {{ col.lastUpdated }}</span>
+          <span class="col-arrow">→</span>
+        </div>
       </a>
-      @if (auth.currentUser()) {
-        <button routerLink="/collections/new" class="secondary-button">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+    }
+
+    <!-- Add new collection card -->
+    <a routerLink="/collections/new" class="collection-card collection-card-new" style="text-decoration: none; color: inherit;">
+      <div class="new-col-inner">
+        <div class="new-col-icon">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
             <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
           </svg>
-          Neue Sammlung
-        </button>
-      }
-    </div>
-  </div>
-
-  <!-- Quick stats strip -->
-  <div class="quick-stats">
-    <div class="qstat" *ngFor="let s of quickStats">
-      <span class="qstat-icon">{{ s.icon }}</span>
-      <div class="qstat-body">
-        <span class="qstat-val">{{ s.value }}</span>
-        <span class="qstat-lbl">{{ s.label }}</span>
+        </div>
+        <span class="new-col-label">Neue Sammlung erstellen</span>
       </div>
-    </div>
+    </a>
   </div>
+</section>
+  } @else {
+  <!-- Ausführliches Willkommensbanner für Gäste -->
+  <div class="dashboard-hero welcome-guest-hero">
+    <div class="hero-text">
+      <p class="hero-eyebrow">🎓 Ursprünglich gestartet als Informatik-Studienprojekt</p>
+      <h1 class="dashboard-title serif">Zoologisches Archiv & Forschungsportal</h1>
+      <p class="dashboard-subtitle">
+        Willkommen auf unserer zentralen Plattform für naturkundliche Bestände! Was als universitäres Projekt im Rahmen des Informatikstudiums an der Universität begann, hat sich zu einem umfassenden, professionellen Tool für den wissenschaftlichen Austausch, die Artenbestimmung und die digitale Inventarisierung entwickelt.
+      </p>
+    </div>
 
-  <!-- ── EIGENE SAMMLUNGEN ── -->
-  <section class="dash-section">
-    <div class="section-header">
-      <div class="section-header-left">
-        <span class="section-icon">🗂️</span>
+    <!-- Stark erweiterte und gestreckte Feature-Stichpunkte -->
+    <div class="hero-features-grid">
+      <div class="hero-feature-item">
+        <span class="feature-emoji">🗂️</span>
         <div>
-          <h2 class="section-heading serif">Meine Sammlungen</h2>
-          <p class="section-meta">{{ myCollections.length }} Sammlungen · {{ totalObjects(myCollections) }} Objekte</p>
+          <strong>Sammlungen digital verwalten:</strong> Erstelle, strukturiere und pflege eigene zoologische Sammlungen, ordne sie übersichtlich Kategorien zu und behalte den gesamten Bestand von der Erfassung bis zur Archivierung stets im Blick.
         </div>
       </div>
-      
+      <div class="hero-feature-item">
+        <span class="feature-emoji">🤝</span>
+        <div>
+          <strong>Objekte verwalten & verleihen:</strong> Koordiniere Ausleihen, Leihfristen und den geregelten wissenschaftlichen Austausch von Exemplaren unkompliziert, sicher und nachvollziehbar mit anderen Forschenden und Institutionen.
+        </div>
+      </div>
+      <div class="hero-feature-item">
+        <span class="feature-emoji">🔍</span>
+        <div>
+          <strong>Detaillierte Filter- & Suchfunktion:</strong> Durchsuche alle freigegebenen Bestände gezielt nach spezifischen Kriterien wie Arten, Gattungen, Familien, geografischen Fundorten oder individuellen Merkmalen.
+        </div>
+      </div>
+      <div class="hero-feature-item">
+        <span class="feature-emoji">🔬</span>
+        <div>
+          <strong>Wissenschaftlich forschen:</strong> Nutze fundierte taxonomische Verknüpfungen, präzise Geo-Koordinaten und historische Fundortdaten für tiefergehende naturkundliche Studien und ökologische Analysen.
+        </div>
+      </div>
+      <div class="hero-feature-item">
+        <span class="feature-emoji">🌐</span>
+        <div>
+          <strong>Akademisches Networking:</strong> Vernetze dich mit Gleichgesinnten, teile spannende Entdeckungen, profitiere von einer aktiven Forscher-Community und erweitere kontinuierlich dein zoologisches Netzwerk.
+        </div>
+      </div>
+      <div class="hero-feature-item">
+        <span class="feature-emoji">📊</span>
+        <div>
+          <strong>Statistiken & Einblicke:</strong> Erhalte live auf einen Blick aussagekräftige Kennzahlen über die Gesamtzahl aller öffentlichen Sammlungen, registrierten Exemplare und aktiven Portal-Nutzer.
+        </div>
+      </div>
+    </div>
+    
+    <!-- Separate Buttons für Suche, Anmelden und Registrieren -->
+    <div class="hero-actions">
+      <a routerLink="/public_search" class="secondary-button">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+        Zur Suchfunktion
+      </a>
+      <a routerLink="/login" class="secondary-button" style="text-decoration: none; display: inline-flex; align-items: center; justify-content: center;">
+        Anmelden
+      </a>
+      <a routerLink="/register" class="secondary-button" style="text-decoration: none; display: inline-flex; align-items: center; justify-content: center;">
+        Registrieren
+      </a>
     </div>
 
-    <div class="collections-grid">
-      @for (col of myCollections; track col.id) {
-        <a class="collection-card" [routerLink]="['/objects', col.id]">
-          <div class="col-card-top" [style.background]="col.color">
-            <span class="col-emoji">{{ col.emoji }}</span>
-            <div class="col-card-badge">{{ col.objectCount }} Obj.</div>
-          </div>
-          <div class="col-card-body">
-            <h3 class="col-name serif">{{ col.name }}</h3>
-            <p class="col-desc">{{ col.description }}</p>
-            <div class="col-meta-row">
-              <span class="col-tag" *ngFor="let tag of col.tags">{{ tag }}</span>
-            </div>
-          </div>
-          <div class="col-card-footer">
-            <span class="col-updated">Zuletzt: {{ col.lastUpdated }}</span>
-            <span class="col-arrow">→</span>
-          </div>
-        </a>
-      }
-
-      <!-- Add new collection card -->
-      @if (auth.currentUser()) {
-        <a routerLink="/collections/new" class="collection-card collection-card-new" style="text-decoration: none; color: inherit;">
-          <div class="new-col-inner">
-            <div class="new-col-icon">
-              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
-              </svg>
-            </div>
-            <span class="new-col-label">Neue Sammlung erstellen</span>
-          </div>
-        </a>
-      }
+    <!-- Live-Statistiken für Gäste -->
+    <div class="guest-stats-strip">
+      <div class="gstat">
+        <span class="gstat-val">{{ portalStats.totalCollections }}</span>
+        <span class="gstat-lbl">Sammlungen</span>
+      </div>
+      <div class="gstat">
+        <span class="gstat-val">{{ portalStats.totalObjects }}</span>
+        <span class="gstat-lbl">Objekte & Exemplare</span>
+      </div>
+      <div class="gstat">
+        <span class="gstat-val">{{ portalStats.totalUsers }}</span>
+        <span class="gstat-lbl">Aktive Nutzer</span>
+      </div>
     </div>
-  </section>
+  </div>
+}
 
   <!-- ── FAVORISIERTE SAMMLUNGEN ── -->
   @if (favCollections.length > 0) {

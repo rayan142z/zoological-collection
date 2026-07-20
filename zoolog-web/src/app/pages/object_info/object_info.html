@@ -31,14 +31,80 @@
           Zurück
         </button>
         
-        <a [routerLink]="['/edit-object', specimen.id]" class="primary-button" 
-          style="flex: 1; display: inline-flex; align-items: center; justify-content: center; text-align: center; text-decoration: none;">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 0.5rem;">
-            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
-            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4Z"/>
-          </svg>
-          Bearbeiten
-        </a>
+        @if (specimen.status != "on loan" && (specimen?.collectionCreatedBy === currentUserId || isAdmin)) {
+          <a [routerLink]="['/edit-object', specimen.id]" class="primary-button" 
+            style="flex: 1; display: inline-flex; align-items: center; justify-content: center; text-align: center; text-decoration: none;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 0.5rem;">
+              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4Z"/>
+            </svg>
+            Bearbeiten
+          </a>
+        }
+        @if (specimen.status != "on loan" && (specimen?.collectionCreatedBy === currentUserId || isAdmin)) {
+          
+            <button (click)="openLoanModal()" class="primary-button" style="flex: 1; display: inline-flex; align-items: center; justify-content: center; text-align: center; text-decoration: none;">
+              📦 Exemplar verleihen
+            </button>
+          
+        }
+        @if (showLoanModal) {
+          <div class="modal-backdrop">
+            <div class="modal-content">
+              
+              <h3>Exemplar verleihen</h3>
+
+              <form [formGroup]="loanForm" (ngSubmit)="submitLoan()">
+                
+                <!-- Person / Ausleiher zum Tippen mit Vorschlagsliste -->
+                <div class="form-group" style="position: relative;">
+                  <label for="loanedTo">Verliehen an:</label>
+                  <input type="text" 
+                        formControlName="loanedTo" 
+                        (input)="onSearchChange($event)"
+                        (blur)="onBlurWithDelay()"
+                        class="form-input" 
+                        placeholder="Namen eingeben..." 
+                        autocomplete="off" />
+
+                  <!-- Vorschlags-Dropdown -->
+                  @if (showSuggestions && filteredPersons.length > 0) {
+                    <ul class="suggestions-list" style="position: absolute; background: white; border: 1px solid #ccc; width: 100%; list-style: none; padding: 0; margin: 0; z-index: 1000;">
+                      @for (person of filteredPersons; track person) {
+                        <li (click)="selectPerson(person)" style="padding: 8px; cursor: pointer; border-bottom: 1px solid #eee;">
+                          {{ person }}
+                        </li>
+                      }
+                    </ul>
+                  }
+                </div>
+
+                <!-- Geplantes Rückgabedatum -->
+                <div class="form-group">
+                  <label>Geplantes Rückgabedatum:</label>
+                  <input type="date" 
+                        formControlName="returnDate" 
+                        class="form-input" />
+                </div>
+
+                <!-- Notiz -->
+                <div class="form-group">
+                  <label>Notiz:</label>
+                  <textarea formControlName="notes" 
+                            class="form-textarea"
+                            placeholder="Optionale Anmerkungen..."></textarea>
+                </div>
+
+                <!-- Aktionen -->
+                <div class="modal-actions">
+                  <button type="button" (click)="closeLoanModal()" class="btn-cancel">Abbrechen</button>
+                  <button type="submit" class="btn-submit">Speichern</button>
+                </div>
+              </form>
+
+            </div>
+          </div>
+        }
 
       </div>
     </div>
@@ -47,15 +113,30 @@
 
     <div class="detail-layout" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem;">
       
-      <div class="detail-image-area card" style="display: flex; align-items: center; justify-content: center; background: #f8fafc; overflow: hidden; min-height: 350px; position: relative;">
-        <span class="badge {{ getStatusClass(specimen.status) }}" style="position: absolute; top: 1rem; left: 1rem; z-index: 10;">
-          {{ specimen.status }}
-        </span>
-        
-        @if (specimen.image) {
-          <img [src]="specimen.image" [alt]="specimen.name" style="width: 100%; height: 100%; object-fit: cover; max-height: 500px;"/>
-        } @else {
-          <div class="img-placeholder" style="font-size: 5rem;">🦎</div>
+      <div class="detail-visuals-area" style="display: flex; flex-direction: column; gap: 1rem;">
+
+        <!-- Bild-Bereich -->
+        <div class="detail-image-area card" style="display: flex; align-items: center; justify-content: center; background: #f8fafc; overflow: hidden; min-height: 350px; position: relative;">
+          <span class="badge {{ getStatusClass(specimen.status) }}" style="position: absolute; top: 1rem; left: 1rem; z-index: 10;">
+            {{ specimen.status }}
+          </span>
+          
+          @if (specimen.image) {
+            <img [src]="'http://localhost:5227' + specimen.image" [alt]="specimen.name" style="width: 100%; height: 100%; object-fit: cover; max-height: 500px;"/>
+          } @else {
+            <div class="img-placeholder" style="font-size: 5rem;">🦎</div>
+          }
+        </div>
+
+        <!-- Karten-Bereich (wird nur angezeigt, wenn Koordinaten da sind) -->
+        @if (specimen?.latitude && specimen?.longitude) {
+          <div class="card" style="height: 350px; overflow: hidden; border-radius: 8px; width: 100%;">
+            <div leaflet style="height: 100%; width: 100%;"
+                [leafletOptions]="mapOptions" 
+                [leafletLayers]="mapLayers"
+                (leafletMapReady)="onMapReady($event)">
+            </div>
+          </div>
         }
       </div>
 
@@ -83,6 +164,30 @@
             <span style="color: #64748b; font-weight: 500;">Funddatum / Dokumentation</span>
             <span style="color: #0f172a;">{{ specimen.dateCollected | date:'dd.MM.yyyy' }}</span>
           </div>
+
+          <!-- NEU: Größe (Size) -->
+          @if (specimen.size) {
+            <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #f1f5f9; padding-bottom: 0.5rem;">
+              <span style="color: #64748b; font-weight: 500;">Größe</span>
+              <span style="color: #0f172a;">{{ specimen.size }} </span>
+            </div>
+          }
+
+          <!-- NEU: Gewicht (Weight) -->
+          @if (specimen.weight) {
+            <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #f1f5f9; padding-bottom: 0.5rem;">
+              <span style="color: #64748b; font-weight: 500;">Gewicht</span>
+              <span style="color: #0f172a;">{{ specimen.weight }} kg</span>
+            </div>
+          }
+
+          <!-- NEU: Geburtsjahr (BirthYear) -->
+          @if (specimen.birthYear) {
+            <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #f1f5f9; padding-bottom: 0.5rem;">
+              <span style="color: #64748b; font-weight: 500;">Geburtsjahr</span>
+              <span style="color: #0f172a;">{{ specimen.birthYear }}</span>
+            </div>
+          }
 
           @if (specimen.description) {
             <div class="section-card description-card" style="margin-top: 1.5rem; padding: 1.5rem; background: #ffffff; border-radius: 8px; border: 1px solid #e2e8f0;">
