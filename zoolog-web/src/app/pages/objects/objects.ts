@@ -31,7 +31,6 @@ interface SpecimenApiResponse {
   collectionId: number;
   createdBy: number;
   taxonomyValidated: boolean;
-
 }
 
 interface TaxonomyApiResponse {
@@ -67,7 +66,6 @@ export class Objects implements OnInit {
   collection: any = null;
   specimens: Specimen[] = [];
   isAdmin: boolean = false;
-  
 
   constructor(private route: ActivatedRoute) {}
 
@@ -80,14 +78,14 @@ export class Objects implements OnInit {
     });
     this.isAdmin = this.auth.isUserAdmin();
     console.log('Admin Status:', this.isAdmin);
-  
+
     const collectionId = Number(this.route.snapshot.paramMap.get('id'));
-    this.loadCollectionDetails(collectionId); 
+    this.loadCollectionDetails(collectionId);
   }
 
   private loadCollectionDetails(id: number): void {
     if (!id) return;
-    
+
     this.api.get<any>(`collections/${id}`).subscribe({
       next: (data) => {
         this.collection = data;
@@ -95,15 +93,18 @@ export class Objects implements OnInit {
         if (data) {
           // 1. ID des Erstellers mappen
           this.collection.createdBy = data.createdBy || data.userId || data.creatorId;
-          
+
           // 2. Benutzernamen mappen (der im collections-Objekt ja bereits da ist!)
-          this.collection.createdByUsername = data.createdByUsername || data.username || data.creator?.username || 'Unbekannt';
+          this.collection.createdByUsername =
+            data.createdByUsername || data.username || data.creator?.username || 'Unbekannt';
 
           // 3. Fallbacks für den Tooltip setzen, da es keine separate User-Detail-Route gibt.
           // Falls dein collections-Endpoint diese Felder bereits mitliefert, werden sie hier übernommen:
-          this.collection.userEmail = data.creatorEmail || data.creator?.email || 'Keine E-Mail hinterlegt';
+          this.collection.userEmail =
+            data.creatorEmail || data.creator?.email || 'Keine E-Mail hinterlegt';
           this.collection.userRole = data.creatorRole || data.creator?.role || 'Mitglied';
-          this.collection.userDescription = data.creatorDescription || data.creator?.description || 'Keine Beschreibung vorhanden.';
+          this.collection.userDescription =
+            data.creatorDescription || data.creator?.description || 'Keine Beschreibung vorhanden.';
         }
         this.cdr.detectChanges();
       },
@@ -111,20 +112,22 @@ export class Objects implements OnInit {
         console.error('Fehler beim Laden der Sammlung:', err);
         this.collection = null;
         this.cdr.detectChanges();
-      }
+      },
     });
   }
 
   onBanUser(userId: number, username: string): void {
     // Passen wir den Text an das tatsächliche Löschen an
-    const confirmDelete = confirm(`Möchtest du den Benutzer "${username}" wirklich permanent löschen?`);
-    
+    const confirmDelete = confirm(
+      `Möchtest du den Benutzer "${username}" wirklich permanent löschen?`,
+    );
+
     if (confirmDelete) {
       // Hier nutzen wir jetzt .delete() statt .put() passend zu deinem [HttpDelete("{id}")]
       this.api.delete(`users/${userId}`).subscribe({
         next: () => {
           alert(`Der Benutzer ${username} wurde erfolgreich gelöscht.`);
-          
+
           // Da der User jetzt komplett aus der DB ist, updaten wir das lokale Objekt,
           // damit das Frontend Bescheid weiß und das UI sich anpasst.
           if (this.collection) {
@@ -140,7 +143,7 @@ export class Objects implements OnInit {
         error: (err) => {
           console.error('Fehler beim Löschen des Users:', err);
           alert('Der Benutzer konnte nicht gelöscht werden.');
-        }
+        },
       });
     }
   }
@@ -174,7 +177,8 @@ export class Objects implements OnInit {
 
         this.activeCollectionName =
           this.activeCollectionId !== null
-            ? collectionById.get(this.activeCollectionId)?.name ?? `Sammlung #${this.activeCollectionId}`
+            ? (collectionById.get(this.activeCollectionId)?.name ??
+              `Sammlung #${this.activeCollectionId}`)
             : '';
 
         this.cdr.detectChanges();
@@ -189,12 +193,12 @@ export class Objects implements OnInit {
 
   get currentUserId(): number | undefined {
     return this.auth.currentUser()?.id;
-  } 
+  }
 
   private checkIfFavorited(): void {
     // Signal aufrufen mit ()
-    const userId = this.auth.currentUser()?.id; 
-    
+    const userId = this.auth.currentUser()?.id;
+
     if (!userId || this.activeCollectionId === null) {
       this.isFavorited = false;
       return;
@@ -207,14 +211,14 @@ export class Objects implements OnInit {
       },
       error: (err) => {
         console.error('Fehler beim Laden der Favoriten:', err);
-      }
+      },
     });
   }
 
   toggleFavorite(): void {
     // Signal aufrufen mit ()
     const userId = this.auth.currentUser()?.id;
-    
+
     if (!userId) {
       alert('Du musst eingeloggt sein, um Sammlungen zu favorisieren.');
       return;
@@ -228,7 +232,7 @@ export class Objects implements OnInit {
           this.isFavorited = false;
           this.cdr.detectChanges();
         },
-        error: (err) => console.error('Fehler beim Entfernen des Favoriten:', err)
+        error: (err) => console.error('Fehler beim Entfernen des Favoriten:', err),
       });
     } else {
       this.api.post(`collections/${this.activeCollectionId}/favorite`, userId).subscribe({
@@ -236,7 +240,7 @@ export class Objects implements OnInit {
           this.isFavorited = true;
           this.cdr.detectChanges();
         },
-        error: (err) => console.error('Fehler beim Hinzufügen des Favoriten:', err)
+        error: (err) => console.error('Fehler beim Hinzufügen des Favoriten:', err),
       });
     }
   }
@@ -265,10 +269,10 @@ export class Objects implements OnInit {
 
   getStatusClass(status: string): string {
     const map: Record<string, string> = {
-      'verfügbar':   'status-available',
-      'ausgeliehen': 'status-loaned',
-      'verloren':    'status-lost',
-      'zerstört':    'status-destroyed',
+      verfügbar: 'status-available',
+      ausgeliehen: 'status-loaned',
+      verloren: 'status-lost',
+      zerstört: 'status-destroyed',
     };
     return map[status] || '';
   }
@@ -286,20 +290,22 @@ export class Objects implements OnInit {
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        
-        const nameSanitized = this.activeCollectionName ? this.activeCollectionName.replace(/[^a-zA-Z0-9]/g, '_') : id;
+
+        const nameSanitized = this.activeCollectionName
+          ? this.activeCollectionName.replace(/[^a-zA-Z0-9]/g, '_')
+          : id;
         a.download = `sammlung_${nameSanitized}_export.csv`;
-        
+
         document.body.appendChild(a);
         a.click();
-        
+
         document.body.removeChild(a);
         window.URL.revokeObjectURL(url);
       },
       error: (err) => {
         console.error('CSV-Export fehlgeschlagen:', err);
         alert('Die CSV-Datei konnte nicht exportiert werden.');
-      }
+      },
     });
   }
 }

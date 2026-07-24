@@ -6,17 +6,23 @@ import { forkJoin, of } from 'rxjs';
 import { catchError, timeout, first } from 'rxjs/operators';
 import { Location } from '@angular/common';
 import { Auth } from '../../services/auth';
-import { FormBuilder, FormGroup, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import {
+  FormBuilder,
+  FormGroup,
+  Validators,
+  FormsModule,
+  ReactiveFormsModule,
+} from '@angular/forms';
 
 // Importe für Leaflet
 import { LeafletModule } from '@asymmetrik/ngx-leaflet';
 import * as L from 'leaflet';
 
 const STATUS_EN_TO_DE: Record<string, string> = {
-  'available': 'verfügbar',
-  'loaned': 'ausgeliehen',
-  'lost': 'verloren',
-  'destroyed': 'zerstört'
+  available: 'verfügbar',
+  loaned: 'ausgeliehen',
+  lost: 'verloren',
+  destroyed: 'zerstört',
 };
 
 interface SpecimenApiResponse {
@@ -66,7 +72,6 @@ interface ExtendedSpecimenDetail {
   size?: string | null;
   weight?: number | null;
   birthYear?: number | null;
- 
 }
 
 interface UserDto {
@@ -79,7 +84,7 @@ interface UserDto {
   standalone: true,
   imports: [CommonModule, DatePipe, RouterLink, LeafletModule, FormsModule, ReactiveFormsModule],
   templateUrl: './object_info.html',
-  styleUrl: './object_info.css'
+  styleUrl: './object_info.css',
 })
 export class ObjectInfo implements OnInit {
   private readonly route = inject(ActivatedRoute);
@@ -109,7 +114,7 @@ export class ObjectInfo implements OnInit {
   mapOptions = {
     layers: [L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 18 })],
     zoom: 13,
-    center: L.latLng(0, 0)
+    center: L.latLng(0, 0),
   };
   mapLayers: L.Layer[] = [];
 
@@ -121,10 +126,11 @@ export class ObjectInfo implements OnInit {
     this.loanForm = this.fb.group({
       loanedTo: ['', Validators.required], // Hier tippt der Nutzer den Namen ein
       returnDate: ['', Validators.required],
-      notes: ['']
+      notes: [''],
     });
 
-    const id = this.route.snapshot.paramMap.get('id') || this.route.parent?.snapshot.paramMap.get('id');
+    const id =
+      this.route.snapshot.paramMap.get('id') || this.route.parent?.snapshot.paramMap.get('id');
     if (id) {
       this.loadSpecimenDetails(Number(id));
     } else {
@@ -137,15 +143,15 @@ export class ObjectInfo implements OnInit {
   loadSuggestions(): void {
     this.api.get<any[]>('users').subscribe({
       next: (users) => {
-        this.usersList = users.map(u => ({ id: u.id, username: u.username }));
-        
+        this.usersList = users.map((u) => ({ id: u.id, username: u.username }));
+
         this.suggestedPersons = this.usersList
-          .filter(user => user.id !== this.currentUserId)
-          .map(user => user.username);
+          .filter((user) => user.id !== this.currentUserId)
+          .map((user) => user.username);
 
         this.filteredPersons = [];
       },
-      error: (err) => console.error('Fehler beim Laden der Benutzer', err)
+      error: (err) => console.error('Fehler beim Laden der Benutzer', err),
     });
   }
 
@@ -158,8 +164,8 @@ export class ObjectInfo implements OnInit {
     }
 
     const searchTerm = input.toLowerCase();
-    this.filteredPersons = this.suggestedPersons.filter(p => 
-      p.toLowerCase().includes(searchTerm)
+    this.filteredPersons = this.suggestedPersons.filter((p) =>
+      p.toLowerCase().includes(searchTerm),
     );
     this.showSuggestions = true;
   }
@@ -178,9 +184,21 @@ export class ObjectInfo implements OnInit {
 
   private loadSpecimenDetails(id: number): void {
     forkJoin({
-      specimen: this.api.get<SpecimenApiResponse>(`specimen/${id}`).pipe(first(), timeout(5000), catchError(() => of(null))),
-      taxonomies: this.api.get<TaxonomyApiResponse[]>('taxonomy').pipe(first(), timeout(5000), catchError(() => of([]))),
-      collections: this.api.get<CollectionApiResponse[]>('collections').pipe(first(), timeout(5000), catchError(() => of([])))
+      specimen: this.api.get<SpecimenApiResponse>(`specimen/${id}`).pipe(
+        first(),
+        timeout(5000),
+        catchError(() => of(null)),
+      ),
+      taxonomies: this.api.get<TaxonomyApiResponse[]>('taxonomy').pipe(
+        first(),
+        timeout(5000),
+        catchError(() => of([])),
+      ),
+      collections: this.api.get<CollectionApiResponse[]>('collections').pipe(
+        first(),
+        timeout(5000),
+        catchError(() => of([])),
+      ),
     }).subscribe(({ specimen, taxonomies, collections }) => {
       if (!specimen) {
         this.errorMessage = 'Objekt konnte nicht geladen werden.';
@@ -188,8 +206,8 @@ export class ObjectInfo implements OnInit {
         return;
       }
 
-      const taxonomy = taxonomies.find(t => t.id === specimen.taxonomyId);
-      const matchedCollection = collections.find(c => c.id === specimen.collectionId);
+      const taxonomy = taxonomies.find((t) => t.id === specimen.taxonomyId);
+      const matchedCollection = collections.find((c) => c.id === specimen.collectionId);
 
       this.specimen = {
         id: specimen.id,
@@ -208,9 +226,9 @@ export class ObjectInfo implements OnInit {
         longitude: specimen.longitude,
         size: specimen.size,
         weight: specimen.weight,
-        birthYear: specimen.birthYear
+        birthYear: specimen.birthYear,
       };
-      
+
       this.isLoading = false;
       this.cdr.detectChanges();
     });
@@ -222,24 +240,29 @@ export class ObjectInfo implements OnInit {
       setTimeout(() => {
         map.invalidateSize();
         map.setView(point, 13);
-        
+
         const marker = L.marker(point);
         marker.addTo(map);
-        
+
         this.mapLayers = [marker];
       }, 100);
     }
   }
 
-  goBack(): void { 
-    this.location.back();  
+  goBack(): void {
+    this.location.back();
     setTimeout(() => {
       window.location.reload();
     }, 50);
   }
 
   getStatusClass(status: string): string {
-    const map: Record<string, string> = { 'verfügbar': 'status-available', 'ausgeliehen': 'status-loaned', 'verloren': 'status-lost', 'zerstört': 'status-destroyed' };
+    const map: Record<string, string> = {
+      verfügbar: 'status-available',
+      ausgeliehen: 'status-loaned',
+      verloren: 'status-lost',
+      zerstört: 'status-destroyed',
+    };
     return map[status] || '';
   }
 
@@ -254,9 +277,9 @@ export class ObjectInfo implements OnInit {
 
   submitLoan(): void {
     const typedName = this.loanForm.value.loanedTo;
-    
+
     // Finde die ID des eingetippten Benutzers anhand des Namens
-    const matchedUser = this.usersList.find(u => u.username === typedName);
+    const matchedUser = this.usersList.find((u) => u.username === typedName);
     if (!matchedUser) {
       alert('Bitte wähle einen gültigen Benutzer aus der Vorschlagsliste aus.');
       return;
@@ -282,13 +305,13 @@ export class ObjectInfo implements OnInit {
     // und übergibt die eigene ID für loanedFrom
     const payload = {
       specimenId: this.specimen?.id,
-      loanedTo: matchedUser.id,                  // ID des ausgewählten Ausleihers
-      loanedFrom: this.currentUserId,            // Eigene ID als Leihender
+      loanedTo: matchedUser.id, // ID des ausgewählten Ausleihers
+      loanedFrom: this.currentUserId, // Eigene ID als Leihender
       loanDate: new Date().toISOString().split('T')[0],
       returnDate: returnDateStr,
       notes: formValues.notes,
       fromCollection: this.specimen?.collectionId,
-      status: 'active'
+      status: 'active',
     };
 
     this.api.post('loan', payload).subscribe({
@@ -300,7 +323,7 @@ export class ObjectInfo implements OnInit {
       error: (err) => {
         console.error('Fehler beim Speichern des Verleihs:', err);
         alert('Fehler beim Speichern.');
-      }
+      },
     });
   }
 }

@@ -47,7 +47,9 @@ export class Login {
       },
       error: (err) => {
         this.isLoading.set(false);
-        this.errorMsg.set(err.error?.message ?? 'Anmeldung fehlgeschlagen. Bitte erneut versuchen.');
+        this.errorMsg.set(
+          err.error?.message ?? 'Anmeldung fehlgeschlagen. Bitte erneut versuchen.',
+        );
       },
     });
   }

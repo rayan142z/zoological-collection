@@ -6,7 +6,7 @@ import { CommonModule } from '@angular/common';
   standalone: true,
   imports: [CommonModule],
   templateUrl: './about_us.html',
-  styleUrl: './about_us.css'
+  styleUrl: './about_us.css',
 })
 export class AboutUs {
   // Stats data for the mission section
@@ -14,7 +14,7 @@ export class AboutUs {
     { label: 'Präparate', value: '5.000+' },
     { label: 'Jahre Geschichte', value: '150' },
     { label: 'Forschungsprojekte', value: '12' },
-    { label: 'Exponate', value: '800+' }
+    { label: 'Exponate', value: '800+' },
   ]);
 
   // Core values
@@ -22,18 +22,18 @@ export class AboutUs {
     {
       icon: '️🪺',
       title: 'Bewahrung',
-      description: 'Wir schützen das Naturerbe durch modernste Konservierungsmethoden.'
+      description: 'Wir schützen das Naturerbe durch modernste Konservierungsmethoden.',
     },
     {
       icon: '🔬',
       title: 'Forschung',
-      description: 'Unsere Sammlung ist Grundlage für internationale Biodiversitätsstudien.'
+      description: 'Unsere Sammlung ist Grundlage für internationale Biodiversitätsstudien.',
     },
     {
       icon: '🌱',
       title: 'Bildung',
-      description: 'Wir vermitteln Wissen über die Komplexität und Schönheit der Tierwelt.'
-    }
+      description: 'Wir vermitteln Wissen über die Komplexität und Schönheit der Tierwelt.',
+    },
   ]);
 
   // Team members
@@ -42,14 +42,14 @@ export class AboutUs {
       name: 'Dr. Elena Vogt',
       role: 'Leitung der Sammlung',
       bio: 'Elena ist Expertin für Entomologie und kuratiert seit 10 Jahren unseren Bestand.',
-      specialties: ['Insekten', 'Taxonomie']
+      specialties: ['Insekten', 'Taxonomie'],
     },
     {
       name: 'Markus Weber',
       role: 'Chef-Präparator',
       bio: 'Markus beherrscht die Kunst der Dermoplastik und sorgt für den Erhalt unserer Großsäuger.',
-      specialties: ['Präparation', 'Anatomie']
-    }
+      specialties: ['Präparation', 'Anatomie'],
+    },
   ]);
 
   // Historical timeline
@@ -57,17 +57,18 @@ export class AboutUs {
     {
       year: '1874',
       title: 'Gründung',
-      description: 'Die Sammlung wurde als Grundstock für die regionale Naturkundeausbildung ins Leben gerufen.'
+      description:
+        'Die Sammlung wurde als Grundstock für die regionale Naturkundeausbildung ins Leben gerufen.',
     },
     {
       year: '1920',
       title: 'Erweiterung',
-      description: 'Übernahme bedeutender privater Sammlungen aus Übersee.'
+      description: 'Übernahme bedeutender privater Sammlungen aus Übersee.',
     },
     {
       year: '2024',
       title: 'Digitalisierung',
-      description: 'Start des Projekts ZoologWeb zur weltweiten wissenschaftlichen Vernetzung.'
-    }
+      description: 'Start des Projekts ZoologWeb zur weltweiten wissenschaftlichen Vernetzung.',
+    },
   ]);
 }

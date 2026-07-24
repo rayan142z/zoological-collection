@@ -6,7 +6,6 @@
   } @else if (errorMessage) {
     <p class="error">{{ errorMessage }}</p>
   } @else {
-
     <!-- Sektion 1: Von mir verliehene Exemplare -->
     <section class="loan-section">
       <h3>Von mir verliehene Tiere</h3>
@@ -26,10 +25,14 @@
           <tbody>
             @for (item of loanedOut; track item.id) {
               <tr>
-                <td><a [routerLink]="['/object', item.specimenId]">{{ item.specimenName }}</a></td>
+                <td>
+                  <a [routerLink]="['/object', item.specimenId]">{{ item.specimenName }}</a>
+                </td>
                 <td>{{ item.partnerName }}</td>
-                <td>{{ item.loanDate | date:'mediumDate' }}</td>
-                <td>{{ item.returnDate ? (item.returnDate | date:'mediumDate') : 'Unbefristet' }}</td>
+                <td>{{ item.loanDate | date: 'mediumDate' }}</td>
+                <td>
+                  {{ item.returnDate ? (item.returnDate | date: 'mediumDate') : 'Unbefristet' }}
+                </td>
                 <td>{{ item.notes || '-' }}</td>
               </tr>
             }
@@ -39,7 +42,7 @@
     </section>
 
     <!-- Sektion 2: Von anderen an mich geliehene Exemplare -->
-    <section class="loan-section" style="margin-top: 40px;">
+    <section class="loan-section" style="margin-top: 40px">
       <h3>Von anderen an mich geliehene Tiere</h3>
       @if (borrowedIn.length === 0) {
         <p class="empty-text">Du hast aktuell keine Fremd-Exemplare ausgeliehen.</p>
@@ -52,16 +55,21 @@
               <th>Leihdatum</th>
               <th>Rückgabe bis</th>
               <th>Notiz</th>
-              <th>Aktion</th> <!-- Neue Spalte -->
+              <th>Aktion</th>
+              <!-- Neue Spalte -->
             </tr>
           </thead>
           <tbody>
             @for (item of borrowedIn; track item.id) {
               <tr>
-                <td><a [routerLink]="['/object', item.specimenId]">{{ item.specimenName }}</a></td>
+                <td>
+                  <a [routerLink]="['/object', item.specimenId]">{{ item.specimenName }}</a>
+                </td>
                 <td>{{ item.partnerName }}</td>
-                <td>{{ item.loanDate | date:'mediumDate' }}</td>
-                <td>{{ item.returnDate ? (item.returnDate | date:'mediumDate') : 'Unbefristet' }}</td>
+                <td>{{ item.loanDate | date: 'mediumDate' }}</td>
+                <td>
+                  {{ item.returnDate ? (item.returnDate | date: 'mediumDate') : 'Unbefristet' }}
+                </td>
                 <td>{{ item.notes || '-' }}</td>
                 <td>
                   <!-- Der Zurückgeben-Button -->
@@ -75,6 +83,5 @@
         </table>
       }
     </section>
-
   }
 </div>

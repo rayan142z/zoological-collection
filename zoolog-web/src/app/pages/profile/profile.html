@@ -1,7 +1,6 @@
 @if (currentUser(); as user) {
   <div class="profile-container">
     <div class="profile-card">
-      
       <!-- Header-Bereich -->
       <div class="profile-header">
         <div class="avatar-placeholder">
@@ -17,7 +16,6 @@
 
       <!-- Info-Bereich -->
       <div class="profile-details">
-        
         <!-- NAME -->
         <div class="detail-item">
           <label>Name</label>
@@ -42,7 +40,12 @@
         <div class="detail-item">
           <label>Tätigkeit / Bereich</label>
           @if (isEditing()) {
-            <input type="text" class="edit-input" placeholder="z. B. Forscher, Museum" [(ngModel)]="editForm.job" />
+            <input
+              type="text"
+              class="edit-input"
+              placeholder="z. B. Forscher, Museum"
+              [(ngModel)]="editForm.job"
+            />
           } @else {
             <p class="job-text">
               @if (user.job) {
@@ -58,7 +61,11 @@
         <div class="detail-item">
           <label>Über mich</label>
           @if (isEditing()) {
-            <textarea class="edit-textarea" placeholder="Beschreibe dich kurz..." [(ngModel)]="editForm.description"></textarea>
+            <textarea
+              class="edit-textarea"
+              placeholder="Beschreibe dich kurz..."
+              [(ngModel)]="editForm.description"
+            ></textarea>
           } @else {
             <p class="description-text">
               @if (user.description) {
@@ -75,25 +82,16 @@
       <div class="profile-actions">
         @if (isEditing()) {
           <div class="edit-actions-group">
-            <button class="btn-save" (click)="saveChanges()">
-              Speichern
-            </button>
-            <button class="btn-cancel" (click)="cancelEditing()">
-              Abbrechen
-            </button>
+            <button class="btn-save" (click)="saveChanges()">Speichern</button>
+            <button class="btn-cancel" (click)="cancelEditing()">Abbrechen</button>
           </div>
         } @else {
           <div class="default-actions-group">
-            <button class="btn-edit" (click)="startEditing()">
-              Profil bearbeiten
-            </button>
-            <button class="btn-logout" (click)="logout()">
-              Abmelden
-            </button>
+            <button class="btn-edit" (click)="startEditing()">Profil bearbeiten</button>
+            <button class="btn-logout" (click)="logout()">Abmelden</button>
           </div>
         }
       </div>
-
     </div>
   </div>
 } @else {

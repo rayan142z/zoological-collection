@@ -50,22 +50,19 @@ export class Dashboard {
 
   portalStats = {
     totalCollections: 124,
-    totalObjects: 3.450,
-    totalUsers: 48
+    totalObjects: 3.45,
+    totalUsers: 48,
   };
 
   // "Favoriten" und "Ausgeliehen" gibt es im Backend noch nicht (kein Favorites-Konzept,
   // kein LoanController. Als "—" markiert statt einer falschen Zahl.
   quickStats = [
-    { icon: '🗂️', value: '0',  label: 'Meine Sammlungen' },
-    { icon: '🔬', value: '0',  label: 'Objekte gesamt' },
-    { icon: '⭐', value: '0',  label: 'Favoriten' },
-    
+    { icon: '🗂️', value: '0', label: 'Meine Sammlungen' },
+    { icon: '🔬', value: '0', label: 'Objekte gesamt' },
+    { icon: '⭐', value: '0', label: 'Favoriten' },
   ];
 
   myCollections: Collection[] = [];
-
-  
 
   totalObjects(cols: Collection[]): number {
     return cols.reduce((sum, c) => sum + c.objectCount, 0);
@@ -78,20 +75,20 @@ export class Dashboard {
   }
 
   private loadPortalStats(): void {
-  this.api.get<any>('collections/public-stats').subscribe({
-    next: (stats) => {
-      this.portalStats = {
-        totalCollections: stats.totalCollections,
-        totalObjects: stats.totalObjects,
-        totalUsers: stats.totalUsers,
-      };
-      this.cdr.detectChanges();
-    },
-    error: (err) => {
-      console.error('Fehler beim Laden der Portal-Statistiken:', err);
-    },
-  });
-}
+    this.api.get<any>('collections/public-stats').subscribe({
+      next: (stats) => {
+        this.portalStats = {
+          totalCollections: stats.totalCollections,
+          totalObjects: stats.totalObjects,
+          totalUsers: stats.totalUsers,
+        };
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        console.error('Fehler beim Laden der Portal-Statistiken:', err);
+      },
+    });
+  }
 
   private loadMyCollections(): void {
     const userId = this.auth.currentUser()?.id;
@@ -115,9 +112,9 @@ export class Dashboard {
         }));
         this.quickStats[0].value = String(this.myCollections.length);
         this.quickStats[1].value = String(
-          this.myCollections.reduce((sum, col) => sum + col.objectCount, 0)
+          this.myCollections.reduce((sum, col) => sum + col.objectCount, 0),
         );
-        
+
         console.log(this.favCollections.length);
         // Erzwingt das Re-Rendern nach der asynchronen Antwort - sonst bleibt
         // die Anzeige bei "0", bis irgendein anderes Browser-Event zufällig
@@ -144,7 +141,7 @@ export class Dashboard {
         }
 
         // Alle IDs rigoros in Nummern umwandeln
-        const numericIds = favoriteIds.map(id => Number(id));
+        const numericIds = favoriteIds.map((id) => Number(id));
         console.log('Aus Backend gelesene Favoriten-Nummern:', numericIds);
 
         forkJoin({
@@ -161,8 +158,6 @@ export class Dashboard {
               return isMatch;
             });
 
-            
-
             // Mappen für das HTML-Template
             this.favCollections = rawFavorites.map((c) => {
               const cId = c.id ?? c.Id ?? c.collectionId;
@@ -172,9 +167,12 @@ export class Dashboard {
                 description: c.description ?? '',
                 emoji: '⭐',
                 color: 'linear-gradient(135deg, #fffde7, #fff9c4)',
-                objectCount: specimens.filter((s) => (s.collectionId ?? s.CollectionId) === cId).length,
+                objectCount: specimens.filter((s) => (s.collectionId ?? s.CollectionId) === cId)
+                  .length,
                 tags: [],
-                lastUpdated: c.createdAt ? new Date(c.createdAt).toLocaleDateString('de-DE') : 'Unbekannt',
+                lastUpdated: c.createdAt
+                  ? new Date(c.createdAt).toLocaleDateString('de-DE')
+                  : 'Unbekannt',
               };
             });
 
@@ -182,7 +180,6 @@ export class Dashboard {
             this.quickStats[2].value = String(this.favCollections.length);
             // Erzwinge das Zeichnen der UI
             this.cdr.detectChanges();
-
           },
           error: (err) => console.error('Fehler im forkJoin der Favoriten:', err),
         });

@@ -66,7 +66,7 @@ public class TaxonomyController : ControllerBase
     {
         var list = await _db.Taxonomies
             .Where(t => !t.Validated)
-            .Select(taxonomy => new // Empfehlung: Direkt die gleiche Projektion wie bei den anderen nutzen
+            .Select(taxonomy => new 
             {
                 taxonomy.Id,
                 taxonomy.Kingdom,
@@ -116,5 +116,28 @@ public class TaxonomyController : ControllerBase
         await _db.SaveChangesAsync();
 
         return Ok(new { message = "Taxonomie erfolgreich validiert." });
+    }
+
+    [Authorize(Roles = "admin,moderator")]
+    [HttpDelete("{id}/reject")]
+    public async Task<IActionResult> RejectAndRemoveTaxonomy(int id)
+    {
+        var taxonomy = await _db.Taxonomies.FindAsync(id);
+        if (taxonomy is null) return NotFound(new { message = "Taxonomie nicht gefunden." });
+
+      
+        var linkedSpecimens = await _db.Specimens.Where(s => s.TaxonomyId == id).ToListAsync();
+        
+        
+        if (linkedSpecimens.Any())
+        {
+            _db.Specimens.RemoveRange(linkedSpecimens);
+        }
+
+      
+        _db.Taxonomies.Remove(taxonomy);
+        await _db.SaveChangesAsync();
+
+        return Ok(new { message = "Taxonomie und alle verknüpften Exemplare erfolgreich gelöscht." });
     }
 }

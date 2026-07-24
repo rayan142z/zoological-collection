@@ -1,78 +1,176 @@
-<div class="page-container" style="max-width: 600px; margin: 2rem auto; padding: 0 1rem;">
-  
-  <div class="edit-header" style="margin-bottom: 1.5rem;">
-    <button (click)="goBack()" class="secondary-button" style="background: none; border: none; color: #64748b; cursor: pointer; display: inline-flex; align-items: center; padding: 0; font-size: 0.95rem;">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 0.25rem;"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+<div class="page-container" style="max-width: 600px; margin: 2rem auto; padding: 0 1rem">
+  <div class="edit-header" style="margin-bottom: 1.5rem">
+    <button
+      (click)="goBack()"
+      class="secondary-button"
+      style="
+        background: none;
+        border: none;
+        color: #64748b;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        padding: 0;
+        font-size: 0.95rem;
+      "
+    >
+      <svg
+        width="16"
+        height="16"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        style="margin-right: 0.25rem"
+      >
+        <path d="M19 12H5M12 5l-7 7 7 7" />
+      </svg>
       Abbrechen
     </button>
-    <h1 class="serif" style="margin-top: 0.5rem; margin-bottom: 0.25rem;">Objekt bearbeiten</h1>
-    <p style="color: #64748b; margin: 0; font-size: 0.9rem;">Passe die Stammdaten des Präparats an.</p>
+    <h1 class="serif" style="margin-top: 0.5rem; margin-bottom: 0.25rem">Objekt bearbeiten</h1>
+    <p style="color: #64748b; margin: 0; font-size: 0.9rem">
+      Passe die Stammdaten des Präparats an.
+    </p>
   </div>
 
-  <div class="section-card" style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 1.5rem;">
+  <div
+    class="section-card"
+    style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 1.5rem"
+  >
     <form (ngSubmit)="onSubmit()">
-
-      <div class="form-group" style="margin-bottom: 1.25rem;">
-        <label class="form-label" style="display: block; font-weight: 500; margin-bottom: 0.5rem; color: #334155;">Name <span style="color: #ef4444;">*</span></label>
-        <input class="form-input" type="text" style="width: 100%; padding: 0.625rem; border: 1px solid #cbd5e1; border-radius: 6px;"
-          [ngModel]="name()" (ngModelChange)="name.set($event)" name="name" required/>
+      <div class="form-group" style="margin-bottom: 1.25rem">
+        <label
+          class="form-label"
+          style="display: block; font-weight: 500; margin-bottom: 0.5rem; color: #334155"
+          >Name <span style="color: #ef4444">*</span></label
+        >
+        <input
+          class="form-input"
+          type="text"
+          style="width: 100%; padding: 0.625rem; border: 1px solid #cbd5e1; border-radius: 6px"
+          [ngModel]="name()"
+          (ngModelChange)="name.set($event)"
+          name="name"
+          required
+        />
       </div>
 
-      <div class="form-group" style="margin-bottom: 1.25rem;">
-        <label class="form-label" style="display: block; font-weight: 500; margin-bottom: 0.5rem; color: #334155;">Beschreibung</label>
-        <textarea class="form-textarea" rows="5" style="width: 100%; padding: 0.625rem; border: 1px solid #cbd5e1; border-radius: 6px; font-family: inherit; resize: vertical;"
-          [ngModel]="description()" (ngModelChange)="description.set($event)" name="description" placeholder="Objektbeschreibung eingeben..."></textarea>
+      <div class="form-group" style="margin-bottom: 1.25rem">
+        <label
+          class="form-label"
+          style="display: block; font-weight: 500; margin-bottom: 0.5rem; color: #334155"
+          >Beschreibung</label
+        >
+        <textarea
+          class="form-textarea"
+          rows="5"
+          style="
+            width: 100%;
+            padding: 0.625rem;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            font-family: inherit;
+            resize: vertical;
+          "
+          [ngModel]="description()"
+          (ngModelChange)="description.set($event)"
+          name="description"
+          placeholder="Objektbeschreibung eingeben..."
+        ></textarea>
       </div>
 
       <!-- Größe / Size -->
-      <div class="form-group" style="margin-bottom: 1.25rem;">
-        <label for="size" style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: #1e293b;">Größe</label>
-        <input 
-          type="text" 
-          id="size" 
-          [(ngModel)]="size" 
-          name="size" 
-          class="form-control" 
-          style="width: 100%; padding: 0.75rem; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 1rem;"
+      <div class="form-group" style="margin-bottom: 1.25rem">
+        <label
+          for="size"
+          style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: #1e293b"
+          >Größe</label
+        >
+        <input
+          type="text"
+          id="size"
+          [(ngModel)]="size"
+          name="size"
+          class="form-control"
+          style="
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            font-size: 1rem;
+          "
           placeholder="z.B. Klein / 10cm"
         />
       </div>
 
       <!-- Gewicht -->
-      <div class="form-group" style="margin-bottom: 1.25rem;">
-        <label for="weight" style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: #1e293b;">Gewicht</label>
-        <input 
-          type="number" 
-          step="0.01" 
-          id="weight" 
-          [(ngModel)]="weight" 
-          name="weight" 
-          class="form-control" 
-          style="width: 100%; padding: 0.75rem; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 1rem;"
+      <div class="form-group" style="margin-bottom: 1.25rem">
+        <label
+          for="weight"
+          style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: #1e293b"
+          >Gewicht</label
+        >
+        <input
+          type="number"
+          step="0.01"
+          id="weight"
+          [(ngModel)]="weight"
+          name="weight"
+          class="form-control"
+          style="
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            font-size: 1rem;
+          "
           placeholder="z.B. 22"
         />
       </div>
 
       <!-- Geburtsjahr -->
-      <div class="form-group" style="margin-bottom: 1.25rem;">
-        <label for="birthYear" style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: #1e293b;">Geburtsjahr</label>
-        <input 
-          type="number" 
-          id="birthYear" 
-          [(ngModel)]="birthYear" 
-          name="birthYear" 
-          class="form-control" 
-          style="width: 100%; padding: 0.75rem; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 1rem;"
+      <div class="form-group" style="margin-bottom: 1.25rem">
+        <label
+          for="birthYear"
+          style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: #1e293b"
+          >Geburtsjahr</label
+        >
+        <input
+          type="number"
+          id="birthYear"
+          [(ngModel)]="birthYear"
+          name="birthYear"
+          class="form-control"
+          style="
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            font-size: 1rem;
+          "
           placeholder="z.B. 2022"
         />
       </div>
 
-
-
-      <div class="form-group" style="margin-bottom: 2rem;">
-        <label class="form-label" style="display: block; font-weight: 500; margin-bottom: 0.5rem; color: #334155;">Status</label>
-        <select class="form-select" style="width: 100%; padding: 0.625rem; border: 1px solid #cbd5e1; border-radius: 6px; background: #fff;"
-          [ngModel]="status()" (ngModelChange)="status.set($event)" name="status">
+      <div class="form-group" style="margin-bottom: 2rem">
+        <label
+          class="form-label"
+          style="display: block; font-weight: 500; margin-bottom: 0.5rem; color: #334155"
+          >Status</label
+        >
+        <select
+          class="form-select"
+          style="
+            width: 100%;
+            padding: 0.625rem;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            background: #fff;
+          "
+          [ngModel]="status()"
+          (ngModelChange)="status.set($event)"
+          name="status"
+        >
           <option value="available">Verfügbar</option>
           <option value="lost">Verloren</option>
           <option value="destroyed">Zerstört</option>
@@ -80,39 +178,100 @@
       </div>
 
       <div class="edit-image-container">
-        <label class="form-label" style="display: block; font-weight: 500; margin-bottom: 0.5rem; color: #334155;">Bild ändern</label>
-        
+        <label
+          class="form-label"
+          style="display: block; font-weight: 500; margin-bottom: 0.5rem; color: #334155"
+          >Bild ändern</label
+        >
+
         <div class="drop-zone" (click)="triggerFileInput()">
           <p>{{ selectedFile ? selectedFile.name : 'Klicke hier, um ein Bild auszuwählen' }}</p>
         </div>
 
-        <input type="file" id="photo-input" (change)="onFileSelected($event)" accept="image/*" style="display: none;">
+        <input
+          type="file"
+          id="photo-input"
+          (change)="onFileSelected($event)"
+          accept="image/*"
+          style="display: none"
+        />
       </div>
 
       @if (errorMessage()) {
-        <p style="color: #ef4444; font-size: 0.9rem; margin-bottom: 1rem;">{{ errorMessage() }}</p>
+        <p style="color: #ef4444; font-size: 0.9rem; margin-bottom: 1rem">{{ errorMessage() }}</p>
       }
 
-      <div class="edit-actions" style="display: flex; gap: 1rem; width: 100%;">
-        <button class="secondary-button" type="button" (click)="goBack()" 
-                style="flex: 1; display: inline-flex; align-items: center; justify-content: center; padding: 0.75rem; border: 1px solid #cbd5e1; border-radius: 6px; background: #fff; cursor: pointer;">
+      <div class="edit-actions" style="display: flex; gap: 1rem; width: 100%">
+        <button
+          class="secondary-button"
+          type="button"
+          (click)="goBack()"
+          style="
+            flex: 1;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.75rem;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            background: #fff;
+            cursor: pointer;
+          "
+        >
           Abbrechen
         </button>
-        <button class="primary-button" type="submit" [disabled]="isSaving()" 
-                style="flex: 1; display: inline-flex; align-items: center; justify-content: center; padding: 0.75rem; border: none; border-radius: 6px; background: #0f172a; color: #fff; cursor: pointer; font-weight: 500;">
+        <button
+          class="primary-button"
+          type="submit"
+          [disabled]="isSaving()"
+          style="
+            flex: 1;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.75rem;
+            border: none;
+            border-radius: 6px;
+            background: #0f172a;
+            color: #fff;
+            cursor: pointer;
+            font-weight: 500;
+          "
+        >
           {{ isSaving() ? 'Speichert...' : 'Speichern' }}
         </button>
       </div>
-      <div class="danger-zone" style="margin-top: 3rem; padding: 1.5rem; border: 1px solid #ffcdd2; background-color: #ffebee; border-radius: 8px;">
-        <h3 style="color: #c62828; margin-top: 0;" class="serif">⚠️ Gefahrenbereich</h3>
-        <p style="color: #5d4037; font-size: 0.9rem; margin-bottom: 1rem;">
+      <div
+        class="danger-zone"
+        style="
+          margin-top: 3rem;
+          padding: 1.5rem;
+          border: 1px solid #ffcdd2;
+          background-color: #ffebee;
+          border-radius: 8px;
+        "
+      >
+        <h3 style="color: #c62828; margin-top: 0" class="serif">⚠️ Gefahrenbereich</h3>
+        <p style="color: #5d4037; font-size: 0.9rem; margin-bottom: 1rem">
           Das Löschen dieses Exemplars ist endgültig und kann nicht rückgängig gemacht werden.
         </p>
-        <button type="button" class="btn btn-danger" (click)="deleteSpecimen()" style="background-color: #d32f2f; color: white; border: none; padding: 0.6rem 1.2rem; border-radius: 4px; cursor: pointer; font-weight: bold;">
+        <button
+          type="button"
+          class="btn btn-danger"
+          (click)="deleteSpecimen()"
+          style="
+            background-color: #d32f2f;
+            color: white;
+            border: none;
+            padding: 0.6rem 1.2rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+          "
+        >
           🗑️ Exemplar unwiderruflich löschen
         </button>
       </div>
-
     </form>
   </div>
 </div>

@@ -7,13 +7,16 @@ import { ApiService } from '../../services/api.service'; // Pfad anpassen
   standalone: true,
   imports: [CommonModule],
   templateUrl: './taxonomy-validation.html',
-  styleUrls: ['./taxonomy-validation.css']
+  styleUrls: ['./taxonomy-validation.css'],
 })
 export class TaxonomyValidationComponent implements OnInit {
   unvalidatedTaxonomies: any[] = [];
   isLoading = true;
 
-  constructor(private api: ApiService, private cdr: ChangeDetectorRef) {}
+  constructor(
+    private api: ApiService,
+    private cdr: ChangeDetectorRef,
+  ) {}
 
   ngOnInit(): void {
     this.loadUnvalidated();
@@ -31,20 +34,31 @@ export class TaxonomyValidationComponent implements OnInit {
         console.error('Fehler beim Laden unvalidierter Taxonomien:', err);
         this.isLoading = false;
         this.cdr.detectChanges();
-      }
+      },
+    });
+  }
+
+  rejectTaxonomy(id: number) {
+    this.api.delete(`taxonomy/${id}/reject`).subscribe({
+      next: (res: any) => {
+        console.log(res.message);
+        this.loadUnvalidated();
+      },
+      error: (err) => {
+        console.error('Fehler beim Löschen der Taxonomie', err);
+      },
     });
   }
 
   approveTaxonomy(id: number): void {
     this.api.put(`taxonomy/${id}/validate`, {}).subscribe({
       next: () => {
-        // Erfolgreich validiert -> Direkt aus der Liste entfernen
-        this.unvalidatedTaxonomies = this.unvalidatedTaxonomies.filter(t => t.id !== id);
+        this.unvalidatedTaxonomies = this.unvalidatedTaxonomies.filter((t) => t.id !== id);
         this.cdr.detectChanges();
       },
       error: (err) => {
         console.error('Fehler beim Validieren:', err);
-      }
+      },
     });
   }
 }

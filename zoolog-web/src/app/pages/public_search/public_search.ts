@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, ChangeDetectorRef, NgZone} from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectorRef, NgZone } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
@@ -19,7 +19,7 @@ interface PublicCollection {
     status: string;
   };
   createdAt: string;
-  specimenCount: number; 
+  specimenCount: number;
 }
 
 // Interface passend zu deinen Specimen/Objekten
@@ -44,12 +44,12 @@ interface SpecimenSearchResult {
   standalone: true,
   imports: [FormsModule, RouterLink, CommonModule],
   templateUrl: './public_search.html',
-  styleUrl: './public_search.css'
+  styleUrl: './public_search.css',
 })
 export class PublicSearch implements OnInit {
   private readonly api = inject(ApiService);
   private readonly cdr = inject(ChangeDetectorRef);
-  private readonly zone = inject(NgZone)
+  private readonly zone = inject(NgZone);
 
   // Umschalter: 'collections' oder 'specimens'
   searchMode: 'collections' | 'specimens' = 'collections';
@@ -57,7 +57,7 @@ export class PublicSearch implements OnInit {
   // Gemeinsamer / Sammlungssuch-Term
   searchTerm = '';
   collections: PublicCollection[] = [];
-  
+
   // Erweiterte Filter für Spezies & Taxonomie
   specimenQuery = '';
   selectedClass = '';
@@ -70,7 +70,7 @@ export class PublicSearch implements OnInit {
   maxWeight: number | null = null;
   minSize: number | null = null;
   maxSize: number | null = null;
-  
+
   // Geodaten & Radius-Suche
   centerLat: number | null = null;
   centerLng: number | null = null;
@@ -109,22 +109,22 @@ export class PublicSearch implements OnInit {
     this.isLoading = true;
     this.cdr.detectChanges();
 
-    const path = this.searchTerm.trim() 
-        ? `collections/search-public?query=${encodeURIComponent(this.searchTerm.trim())}`
-        : 'collections/search-public';
-    
+    const path = this.searchTerm.trim()
+      ? `collections/search-public?query=${encodeURIComponent(this.searchTerm.trim())}`
+      : 'collections/search-public';
+
     this.api.get<PublicCollection[]>(path).subscribe({
-        next: (data) => {
-          this.collections = data;
-          this.isLoading = false;
-          this.cdr.detectChanges(); 
-        },
-        error: (err) => {
-          console.error('Fehler bei der Suche nach öffentlichen Sammlungen:', err);
-          this.collections = [];
-          this.isLoading = false;
-          this.cdr.detectChanges(); 
-        }
+      next: (data) => {
+        this.collections = data;
+        this.isLoading = false;
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        console.error('Fehler bei der Suche nach öffentlichen Sammlungen:', err);
+        this.collections = [];
+        this.isLoading = false;
+        this.cdr.detectChanges();
+      },
     });
   }
 
@@ -133,18 +133,24 @@ export class PublicSearch implements OnInit {
     this.cdr.detectChanges();
 
     const params: string[] = [];
-    if (this.specimenQuery.trim()) params.push(`query=${encodeURIComponent(this.specimenQuery.trim())}`);
-    if (this.selectedClass.trim()) params.push(`className=${encodeURIComponent(this.selectedClass.trim())}`);
-    if (this.selectedSpecies.trim()) params.push(`species=${encodeURIComponent(this.selectedSpecies.trim())}`);
-    if (this.selectedGenus.trim()) params.push(`genus=${encodeURIComponent(this.selectedGenus.trim())}`);
-    if (this.selectedFamily.trim()) params.push(`family=${encodeURIComponent(this.selectedFamily.trim())}`);
-    if (this.selectedOrder.trim()) params.push(`order=${encodeURIComponent(this.selectedOrder.trim())}`);
-    
+    if (this.specimenQuery.trim())
+      params.push(`query=${encodeURIComponent(this.specimenQuery.trim())}`);
+    if (this.selectedClass.trim())
+      params.push(`className=${encodeURIComponent(this.selectedClass.trim())}`);
+    if (this.selectedSpecies.trim())
+      params.push(`species=${encodeURIComponent(this.selectedSpecies.trim())}`);
+    if (this.selectedGenus.trim())
+      params.push(`genus=${encodeURIComponent(this.selectedGenus.trim())}`);
+    if (this.selectedFamily.trim())
+      params.push(`family=${encodeURIComponent(this.selectedFamily.trim())}`);
+    if (this.selectedOrder.trim())
+      params.push(`order=${encodeURIComponent(this.selectedOrder.trim())}`);
+
     if (this.minWeight !== null) params.push(`minWeight=${this.minWeight}`);
     if (this.maxWeight !== null) params.push(`maxWeight=${this.maxWeight}`);
     if (this.minSize !== null) params.push(`minSize=${this.minSize}`);
     if (this.maxSize !== null) params.push(`maxSize=${this.maxSize}`);
-    
+
     if (this.centerLat !== null && this.centerLng !== null && this.radiusKm !== null) {
       params.push(`lat=${this.centerLat}`);
       params.push(`lng=${this.centerLng}`);
@@ -165,7 +171,7 @@ export class PublicSearch implements OnInit {
         this.specimens = [];
         this.isLoading = false;
         this.cdr.detectChanges();
-      }
+      },
     });
   }
 
@@ -206,7 +212,7 @@ export class PublicSearch implements OnInit {
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 19,
-      attribution: '© OpenStreetMap contributors'
+      attribution: '© OpenStreetMap contributors',
     }).addTo(this.map);
 
     // Initialer Marker & Kreis (nur wenn tempLat/tempLng explizit gesetzt sind, ansonsten leer starten)
@@ -256,7 +262,7 @@ export class PublicSearch implements OnInit {
         radius: radiusMeters,
         color: '#0a4b11',
         fillColor: '#0a4b11',
-        fillOpacity: 0.15
+        fillOpacity: 0.15,
       }).addTo(this.map);
     }
   }
@@ -269,17 +275,13 @@ export class PublicSearch implements OnInit {
     this.executeSearch();
   }
 
-  
-
-  
-
   clearGeoFilter(): void {
     this.centerLat = null;
     this.centerLng = null;
     this.radiusKm = null;
     this.tempLat = null;
     this.tempLng = null;
-    
+
     // Marker und Kreis komplett von der Karte löschen
     this.destroyMapElements();
 

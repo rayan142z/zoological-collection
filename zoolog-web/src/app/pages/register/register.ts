@@ -19,7 +19,7 @@ export class Register {
     username: '',
     email: '',
     password: '',
-    terms: false
+    terms: false,
   });
 
   readonly showPw = signal(false);
@@ -33,10 +33,14 @@ export class Register {
   readonly errorMsg = signal('');
 
   readonly features = signal([
-    { icon: '🛡️', title: 'Sammlung verwalten', desc: 'Erfasse und organisiere Exponate effizient.' },
+    {
+      icon: '🛡️',
+      title: 'Sammlung verwalten',
+      desc: 'Erfasse und organisiere Exponate effizient.',
+    },
     { icon: '🌿', title: 'Digitales Archiv', desc: 'Sicherer Zugriff auf alle Präparate.' },
     { icon: '🔍', title: 'Präzise Suche', desc: 'Filtere nach Taxonomie und Fundort.' },
-    { icon: '📊', title: 'Statistiken', desc: 'Echtzeit-Einblicke in den Sammlungsbestand.' }
+    { icon: '📊', title: 'Statistiken', desc: 'Echtzeit-Einblicke in den Sammlungsbestand.' },
   ]);
 
   readonly strengthPct = computed(() => {
@@ -83,7 +87,9 @@ export class Register {
       },
       error: (err) => {
         this.isLoading.set(false);
-        this.errorMsg.set(err.error?.message ?? 'Registrierung fehlgeschlagen. Bitte erneut versuchen.');
+        this.errorMsg.set(
+          err.error?.message ?? 'Registrierung fehlgeschlagen. Bitte erneut versuchen.',
+        );
       },
     });
   }

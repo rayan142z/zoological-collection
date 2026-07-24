@@ -1,5 +1,4 @@
 <div class="auth-layout">
-
   <!-- LEFT PANEL -->
   <aside class="auth-panel">
     <div class="panel-bg">
@@ -24,27 +23,24 @@
 
         <div class="specimen-showcase">
           @for (s of specimens(); track s.name; let i = $index) {
-            <div class="specimen-item"
-                 [style.animation-delay]="i * 180 + 'ms'">
-            <div class="specimen-orb">
-              <span>{{ s.icon }}</span>
+            <div class="specimen-item" [style.animation-delay]="i * 180 + 'ms'">
+              <div class="specimen-orb">
+                <span>{{ s.icon }}</span>
+              </div>
+              <div class="specimen-meta">
+                <strong>{{ s.name }}</strong>
+                <em>{{ s.latin }}</em>
+              </div>
             </div>
-            <div class="specimen-meta">
-              <strong>{{ s.name }}</strong>
-              <em>{{ s.latin }}</em>
-            </div>
-          </div>
           }
         </div>
       </div>
-
     </div>
   </aside>
 
   <!-- RIGHT PANEL -->
   <main class="auth-form-side">
     <div class="form-wrapper">
-
       <div class="form-top-badge">
         <span class="badge-dot"></span>
         Sichere Verbindung
@@ -56,14 +52,24 @@
       </div>
 
       <form class="auth-form" (ngSubmit)="onLogin()" #loginForm="ngForm" novalidate>
-
-        <div class="field-group" [class.field-focused]="emailFocused()" [class.field-filled]="loginData().email">
+        <div
+          class="field-group"
+          [class.field-focused]="emailFocused()"
+          [class.field-filled]="loginData().email"
+        >
           <label class="field-label" for="login-email">E-Mail</label>
           <div class="field-wrap">
             <span class="field-icon">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-                <rect x="2" y="4" width="20" height="16" rx="2"/>
-                <path d="m22 7-10 7L2 7"/>
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.8"
+              >
+                <rect x="2" y="4" width="20" height="16" rx="2" />
+                <path d="m22 7-10 7L2 7" />
               </svg>
             </span>
             <input
@@ -81,13 +87,24 @@
           </div>
         </div>
 
-        <div class="field-group" [class.field-focused]="pwFocused()" [class.field-filled]="loginData().password">
+        <div
+          class="field-group"
+          [class.field-focused]="pwFocused()"
+          [class.field-filled]="loginData().password"
+        >
           <label class="field-label" for="login-pw">Passwort</label>
           <div class="field-wrap">
             <span class="field-icon">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-                <rect x="3" y="11" width="18" height="11" rx="2"/>
-                <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.8"
+              >
+                <rect x="3" y="11" width="18" height="11" rx="2" />
+                <path d="M7 11V7a5 5 0 0 1 10 0v4" />
               </svg>
             </span>
             <input
@@ -104,15 +121,33 @@
             />
             <button type="button" class="pw-toggle" (click)="showPw.set(!showPw())" tabindex="-1">
               @if (!showPw()) {
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-                  <circle cx="12" cy="12" r="3"/>
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                >
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                  <circle cx="12" cy="12" r="3" />
                 </svg>
               } @else {
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-                  <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/>
-                  <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/>
-                  <line x1="1" y1="1" x2="23" y2="23"/>
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                >
+                  <path
+                    d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"
+                  />
+                  <path
+                    d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"
+                  />
+                  <line x1="1" y1="1" x2="23" y2="23" />
                 </svg>
               }
             </button>
@@ -121,7 +156,12 @@
 
         <div class="form-extras">
           <label class="remember-label">
-            <input type="checkbox" [ngModel]="loginData().remember" (ngModelChange)="loginData.set({...loginData(), remember: $event})" name="remember" />
+            <input
+              type="checkbox"
+              [ngModel]="loginData().remember"
+              (ngModelChange)="loginData.set({...loginData(), remember: $event})"
+              name="remember"
+            />
             <span class="remember-box"></span>
             Angemeldet bleiben
           </label>
@@ -135,19 +175,14 @@
         </button>
 
         @if (errorMsg()) {
-          <div class="error-banner">
-            <span>⚠</span> {{ errorMsg() }}
-          </div>
+          <div class="error-banner"><span>⚠</span> {{ errorMsg() }}</div>
         }
-
       </form>
 
       <p class="form-switch">
         Noch kein Konto?
         <a routerLink="/register" class="switch-link">Jetzt registrieren</a>
       </p>
-
     </div>
   </main>
-
 </div>

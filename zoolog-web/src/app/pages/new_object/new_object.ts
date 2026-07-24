@@ -1,4 +1,13 @@
-import { Component, OnInit, inject, signal, computed, effect, AfterViewInit, OnDestroy} from '@angular/core';
+import {
+  Component,
+  OnInit,
+  inject,
+  signal,
+  computed,
+  effect,
+  AfterViewInit,
+  OnDestroy,
+} from '@angular/core';
 import { RouterLink, ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { DatePipe, CommonModule } from '@angular/common';
@@ -29,9 +38,9 @@ interface CollectionOption {
   standalone: true,
   imports: [RouterLink, FormsModule, DatePipe, CommonModule],
   templateUrl: './new_object.html',
-  styleUrl: './new_object.css'
+  styleUrl: './new_object.css',
 })
-export class NewObject implements OnInit, AfterViewInit,  OnDestroy{
+export class NewObject implements OnInit, AfterViewInit, OnDestroy {
   private readonly api = inject(ApiService);
   private readonly auth = inject(Auth);
   private readonly route = inject(ActivatedRoute);
@@ -42,58 +51,63 @@ export class NewObject implements OnInit, AfterViewInit,  OnDestroy{
   currentStep = signal(1);
 
   // Formular-Signals für die Grunddaten inklusive weight, birthYear und size
-  name          = signal('');
-  description   = signal('');
+  name = signal('');
+  description = signal('');
   dateCollected = signal('');
-  status        = signal('');
-  weight        = signal<number | null>(null);
-  birthYear     = signal<number | null>(null);
-  size          = signal<number | null>(null);
-  
-  collectionId  = signal<number | null>(null);
-  taxonomyId    = signal<number | null>(null);
-  
-  latitude      = signal<number | null>(null);
-  longitude     = signal<number | null>(null);
+  status = signal('');
+  weight = signal<number | null>(null);
+  birthYear = signal<number | null>(null);
+  size = signal<number | null>(null);
+
+  collectionId = signal<number | null>(null);
+  taxonomyId = signal<number | null>(null);
+
+  latitude = signal<number | null>(null);
+  longitude = signal<number | null>(null);
 
   collectionLocked = false;
 
   taxMode = signal<'search' | 'create'>('search');
   newTaxonomy = {
-    kingdom: '', phylum: '', class: '', order: '', family: '', genus: '', species: ''
+    kingdom: '',
+    phylum: '',
+    class: '',
+    order: '',
+    family: '',
+    genus: '',
+    species: '',
   };
   toggleTaxMode() {
     this.taxMode.set(this.taxMode() === 'search' ? 'create' : 'search');
-    this.taxonomyId.set(null); 
-    this.taxonomySearch.set(''); 
+    this.taxonomyId.set(null);
+    this.taxonomySearch.set('');
   }
 
   targetCollectionName = signal<string>('');
-  taxonomySearch   = signal<string>('');
+  taxonomySearch = signal<string>('');
 
   // Optionen vom Backend geladen
-  taxonomyOptions   = signal<TaxonomyOption[]>([]);
+  taxonomyOptions = signal<TaxonomyOption[]>([]);
   collectionOptions = signal<CollectionOption[]>([]);
 
   // Live gefilterte Taxonomien
   filteredTaxonomies = computed(() => {
     const query = this.taxonomySearch().toLowerCase().trim();
     if (!query) return this.taxonomyOptions();
-    return this.taxonomyOptions().filter(t => 
-      t.genus.toLowerCase().includes(query) || 
-      t.species.toLowerCase().includes(query)
+    return this.taxonomyOptions().filter(
+      (t) => t.genus.toLowerCase().includes(query) || t.species.toLowerCase().includes(query),
     );
   });
 
   // Liefert das aktuell ausgewählte Taxonomie-Objekt für die Sidebar-Vorschau
-  selectedTaxonomy = computed(() =>
-    this.taxonomyOptions().find((t) => t.id === this.taxonomyId()) ?? null
+  selectedTaxonomy = computed(
+    () => this.taxonomyOptions().find((t) => t.id === this.taxonomyId()) ?? null,
   );
 
   private map!: L.Map;
   private marker!: L.Marker;
 
-  constructor(){
+  constructor() {
     effect(() => {
       if (this.currentStep() === 1) {
         setTimeout(() => this.initMap(), 100);
@@ -114,9 +128,9 @@ export class NewObject implements OnInit, AfterViewInit,  OnDestroy{
         const colId = Number(routeCollectionId);
         this.collectionId.set(colId);
         this.collectionLocked = true;
-        
+
         this.api.get<CollectionOption[]>('collections').subscribe((data) => {
-          const matched = data.find(c => c.id === colId);
+          const matched = data.find((c) => c.id === colId);
           if (matched) {
             this.targetCollectionName.set(matched.name);
           }
@@ -150,19 +164,19 @@ export class NewObject implements OnInit, AfterViewInit,  OnDestroy{
     this.map = L.map('map').setView([startLat, startLng], 10);
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
     }).addTo(this.map);
 
     const defaultIcon = L.icon({
       iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
       shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
       iconSize: [25, 41],
-      iconAnchor: [12, 41]
+      iconAnchor: [12, 41],
     });
 
-    this.marker = L.marker([startLat, startLng], { 
+    this.marker = L.marker([startLat, startLng], {
       icon: defaultIcon,
-      draggable: true 
+      draggable: true,
     }).addTo(this.map);
 
     this.marker.on('dragend', () => {
@@ -191,13 +205,13 @@ export class NewObject implements OnInit, AfterViewInit,  OnDestroy{
           const lng = Number(position.coords.longitude.toFixed(6));
           this.latitude.set(lat);
           this.longitude.set(lng);
-          
+
           if (this.map && this.marker) {
             this.map.setView([lat, lng], 14);
             this.marker.setLatLng([lat, lng]);
           }
         },
-        () => alert('Standortzugriff verweigert oder nicht verfügbar.')
+        () => alert('Standortzugriff verweigert oder nicht verfügbar.'),
       );
     }
   }
@@ -207,19 +221,31 @@ export class NewObject implements OnInit, AfterViewInit,  OnDestroy{
     this.taxonomySearch.set(`${tax.genus} ${tax.species}`);
   }
 
-  nextStep(): void { if (this.currentStep() < 3) this.currentStep.update(s => s + 1); }
-  prevStep(): void  { if (this.currentStep() > 1) this.currentStep.update(s => s - 1); }
-  goToStep(step: number): void { if (step < this.currentStep()) this.currentStep.set(step); }
+  nextStep(): void {
+    if (this.currentStep() < 3) this.currentStep.update((s) => s + 1);
+  }
+  prevStep(): void {
+    if (this.currentStep() > 1) this.currentStep.update((s) => s - 1);
+  }
+  goToStep(step: number): void {
+    if (step < this.currentStep()) this.currentStep.set(step);
+  }
 
   onSubmit(): void {
     const collectionId = this.collectionId();
     const taxonomyId = this.taxonomyId();
     const lat = this.latitude();
     const lng = this.longitude();
-  
-    const newTaxonomy = this.newTaxonomy.genus && this.newTaxonomy.species && this.newTaxonomy.kingdom && this.newTaxonomy.phylum && this.newTaxonomy.class && this.newTaxonomy.family;
 
-    if (!collectionId || !(taxonomyId || newTaxonomy ) || lat === null || lng === null) {
+    const newTaxonomy =
+      this.newTaxonomy.genus &&
+      this.newTaxonomy.species &&
+      this.newTaxonomy.kingdom &&
+      this.newTaxonomy.phylum &&
+      this.newTaxonomy.class &&
+      this.newTaxonomy.family;
+
+    if (!collectionId || !(taxonomyId || newTaxonomy) || lat === null || lng === null) {
       this.saveError.set('Fehlende Daten');
       return;
     }
@@ -227,14 +253,14 @@ export class NewObject implements OnInit, AfterViewInit,  OnDestroy{
     this.isSaving.set(true);
     this.saveError.set('');
 
-    console.log("Gewicht vor Senden:", this.weight());
-    console.log("Geburtsjahr vor Senden:", this.birthYear());
+    console.log('Gewicht vor Senden:', this.weight());
+    console.log('Geburtsjahr vor Senden:', this.birthYear());
 
     const formData = new FormData();
     formData.append('Name', this.name());
     formData.append('Description', this.description() || '');
     formData.append('DateCollected', this.dateCollected() || '');
-    
+
     // Übergabe der neuen Spalten weight, birthYear und size
     if (this.weight() !== null) formData.append('Weight', this.weight()!.toString());
     if (this.birthYear() !== null) formData.append('BirthYear', this.birthYear()!.toString());
@@ -243,7 +269,7 @@ export class NewObject implements OnInit, AfterViewInit,  OnDestroy{
     formData.append('CollectionId', collectionId.toString());
     formData.append('Latitude', lat.toString());
     formData.append('Longitude', lng.toString());
-    
+
     if (this.taxMode() === 'search') {
       formData.append('TaxonomyId', this.taxonomyId()!.toString());
     } else {
@@ -256,9 +282,6 @@ export class NewObject implements OnInit, AfterViewInit,  OnDestroy{
       formData.append('Family', this.newTaxonomy.family);
       formData.append('Orders', this.newTaxonomy.order);
     }
-
-   
-    
 
     if (this.selectedFile) {
       formData.append('imageFile', this.selectedFile);
@@ -275,7 +298,9 @@ export class NewObject implements OnInit, AfterViewInit,  OnDestroy{
       },
       error: (err) => {
         this.isSaving.set(false);
-        this.saveError.set(err.error?.message ?? 'Speichern fehlgeschlagen. Bitte erneut versuchen.');
+        this.saveError.set(
+          err.error?.message ?? 'Speichern fehlgeschlagen. Bitte erneut versuchen.',
+        );
       },
     });
   }
@@ -298,10 +323,10 @@ export class NewObject implements OnInit, AfterViewInit,  OnDestroy{
 
   getStatusClass(): string {
     const map: Record<string, string> = {
-      'verfügbar':   'status-available',
-      'ausgeliehen': 'status-loaned',
-      'verloren':    'status-lost',
-      'zerstört':    'status-destroyed',
+      verfügbar: 'status-available',
+      ausgeliehen: 'status-loaned',
+      verloren: 'status-lost',
+      zerstört: 'status-destroyed',
     };
     return map[this.status()] || '';
   }
@@ -321,7 +346,7 @@ export class NewObject implements OnInit, AfterViewInit,  OnDestroy{
       this.marker.setLatLng([formattedLat, formattedLng]);
     } else {
       this.marker = L.marker([formattedLat, formattedLng], {
-        draggable: true 
+        draggable: true,
       }).addTo(this.map);
 
       this.marker.on('dragend', () => {

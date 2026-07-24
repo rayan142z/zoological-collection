@@ -17,18 +17,16 @@ interface CollectionResponse {
   standalone: true,
   imports: [FormsModule, RouterLink],
   templateUrl: './new_collection.html',
-  styleUrl: './new_collection.css'
+  styleUrl: './new_collection.css',
 })
 export class NewCollection {
   private readonly api = inject(ApiService);
   private readonly router = inject(Router);
 
   collectionName = '';
-  visibility = 'public'; 
+  visibility = 'public';
   description = '';
   selectedCsvFile: File | null = null;
-
-  
 
   onSubmit(): void {
     if (!this.collectionName || this.collectionName.trim().length < 2) {
@@ -38,15 +36,14 @@ export class NewCollection {
 
     const payload = {
       name: this.collectionName.trim(),
-      description: this.description.trim() || null, 
-      isPublic: this.visibility === 'public'        
+      description: this.description.trim() || null,
+      isPublic: this.visibility === 'public',
     };
-    console.log("Sende Datei:", this.selectedCsvFile);
+    console.log('Sende Datei:', this.selectedCsvFile);
     this.api.post<CollectionResponse>('collections', payload).subscribe({
       next: (newCollection) => {
         console.log('Sammlung erfolgreich erstellt:', newCollection);
-        
-        
+
         if (this.selectedCsvFile) {
           const formData = new FormData();
           formData.append('file', this.selectedCsvFile);
@@ -59,25 +56,26 @@ export class NewCollection {
             },
             error: (err) => {
               console.error('CSV-Import fehlgeschlagen:', err);
-              alert('Sammlung wurde erstellt, aber der CSV-Import der Exemplare ist fehlgeschlagen.');
-              
+              alert(
+                'Sammlung wurde erstellt, aber der CSV-Import der Exemplare ist fehlgeschlagen.',
+              );
+
               this.router.navigate(['/objects', newCollection.id]);
-            }
+            },
           });
         } else {
-         
           this.router.navigate(['/objects', newCollection.id]);
         }
       },
       error: (err) => {
         console.error('Fehler beim Erstellen der Sammlung:', err);
-        
+
         if (err.status === 401) {
           alert('Du musst eingeloggt sein, um eine Sammlung zu erstellen.');
         } else {
           alert('Die Sammlung konnte nicht gespeichert werden. Bitte überprüfe deine Eingaben.');
         }
-      }
+      },
     });
   }
 

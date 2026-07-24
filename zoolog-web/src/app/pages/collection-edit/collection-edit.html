@@ -1,62 +1,172 @@
-<div class="page-container" style="max-width: 600px; margin: 2rem auto; padding: 0 1rem;">
-  
+<div class="page-container" style="max-width: 600px; margin: 2rem auto; padding: 0 1rem">
   <!-- Header-Bereich -->
-  <div class="edit-header" style="margin-bottom: 1.5rem;">
-    <button (click)="goBack()" class="secondary-button" style="background: none; border: none; color: #64748b; cursor: pointer; display: inline-flex; align-items: center; padding: 0; font-size: 0.95rem;">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 0.25rem;">
-        <path d="M19 12H5M12 5l-7 7 7 7"/>
+  <div class="edit-header" style="margin-bottom: 1.5rem">
+    <button
+      (click)="goBack()"
+      class="secondary-button"
+      style="
+        background: none;
+        border: none;
+        color: #64748b;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        padding: 0;
+        font-size: 0.95rem;
+      "
+    >
+      <svg
+        width="16"
+        height="16"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        style="margin-right: 0.25rem"
+      >
+        <path d="M19 12H5M12 5l-7 7 7 7" />
       </svg>
       Abbrechen
     </button>
-    <h1 class="serif" style="margin-top: 0.5rem; margin-bottom: 0.25rem;">Sammlung bearbeiten</h1>
-    <p style="color: #64748b; margin: 0; font-size: 0.9rem;">Passe die Stammdaten der Sammlung an.</p>
+    <h1 class="serif" style="margin-top: 0.5rem; margin-bottom: 0.25rem">Sammlung bearbeiten</h1>
+    <p style="color: #64748b; margin: 0; font-size: 0.9rem">
+      Passe die Stammdaten der Sammlung an.
+    </p>
   </div>
 
   <!-- Haupt-Formular-Karte -->
-  <div class="section-card" style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 1.5rem; margin-bottom: 2rem;">
+  <div
+    class="section-card"
+    style="
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+    "
+  >
     <form (ngSubmit)="saveCollection()">
-
       <!-- Feld: Name (Jetzt mit normalem Two-Way-Binding) -->
-      <div class="form-group" style="margin-bottom: 1.25rem;">
-        <label class="form-label" style="display: block; font-weight: 500; margin-bottom: 0.5rem; color: #334155;">
-          Name <span style="color: #ef4444;">*</span>
+      <div class="form-group" style="margin-bottom: 1.25rem">
+        <label
+          class="form-label"
+          style="display: block; font-weight: 500; margin-bottom: 0.5rem; color: #334155"
+        >
+          Name <span style="color: #ef4444">*</span>
         </label>
-        <input class="form-input" type="text" style="width: 100%; padding: 0.625rem; border: 1px solid #cbd5e1; border-radius: 6px;"
-          [(ngModel)]="collection.name" name="name" required />
+        <input
+          class="form-input"
+          type="text"
+          style="width: 100%; padding: 0.625rem; border: 1px solid #cbd5e1; border-radius: 6px"
+          [(ngModel)]="collection.name"
+          name="name"
+          required
+        />
       </div>
 
       <!-- Feld: Beschreibung (Ebenfalls normales Two-Way-Binding) -->
-      <div class="form-group" style="margin-bottom: 2rem;">
-        <label class="form-label" style="display: block; font-weight: 500; margin-bottom: 0.5rem; color: #334155;">Beschreibung</label>
-        <textarea class="form-textarea" rows="5" style="width: 100%; padding: 0.625rem; border: 1px solid #cbd5e1; border-radius: 6px; font-family: inherit; resize: vertical;"
-          [(ngModel)]="collection.description" name="description" placeholder="Sammlungsbeschreibung eingeben..."></textarea>
+      <div class="form-group" style="margin-bottom: 2rem">
+        <label
+          class="form-label"
+          style="display: block; font-weight: 500; margin-bottom: 0.5rem; color: #334155"
+          >Beschreibung</label
+        >
+        <textarea
+          class="form-textarea"
+          rows="5"
+          style="
+            width: 100%;
+            padding: 0.625rem;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            font-family: inherit;
+            resize: vertical;
+          "
+          [(ngModel)]="collection.description"
+          name="description"
+          placeholder="Sammlungsbeschreibung eingeben..."
+        ></textarea>
       </div>
 
       <!-- Aktionen (Speichern & Abbrechen) -->
-      <div class="edit-actions" style="display: flex; gap: 1rem; width: 100%;">
-        <button class="secondary-button" type="button" (click)="goBack()" 
-                style="flex: 1; display: inline-flex; align-items: center; justify-content: center; padding: 0.75rem; border: 1px solid #cbd5e1; border-radius: 6px; background: #fff; cursor: pointer;">
+      <div class="edit-actions" style="display: flex; gap: 1rem; width: 100%">
+        <button
+          class="secondary-button"
+          type="button"
+          (click)="goBack()"
+          style="
+            flex: 1;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.75rem;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            background: #fff;
+            cursor: pointer;
+          "
+        >
           Abbrechen
         </button>
-        <button class="primary-button" type="submit" 
-                style="flex: 1; display: inline-flex; align-items: center; justify-content: center; padding: 0.75rem; border: none; border-radius: 6px; background: #034a03; color: #fff; cursor: pointer; font-weight: 500;">
+        <button
+          class="primary-button"
+          type="submit"
+          style="
+            flex: 1;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.75rem;
+            border: none;
+            border-radius: 6px;
+            background: #034a03;
+            color: #fff;
+            cursor: pointer;
+            font-weight: 500;
+          "
+        >
           Speichern
         </button>
       </div>
-
     </form>
   </div>
 
   <!-- Gefahrenbereich -->
-  <div class="danger-zone" style="padding: 1.5rem; border: 1px solid #ffcdd2; background-color: #ffebee; border-radius: 8px;">
-    <h3 style="color: #c62828; margin-top: 0; font-size: 1.1rem; font-weight: 600;" class="serif">⚠️ Gefahrenbereich</h3>
-    <p style="color: #5d4037; font-size: 0.9rem; margin-bottom: 1rem;">
+  <div
+    class="danger-zone"
+    style="
+      padding: 1.5rem;
+      border: 1px solid #ffcdd2;
+      background-color: #ffebee;
+      border-radius: 8px;
+    "
+  >
+    <h3 style="color: #c62828; margin-top: 0; font-size: 1.1rem; font-weight: 600" class="serif">
+      ⚠️ Gefahrenbereich
+    </h3>
+    <p style="color: #5d4037; font-size: 0.9rem; margin-bottom: 1rem">
       Das Löschen dieser Sammlung ist endgültig und entfernt alle darin enthaltenen Objekte.
     </p>
-    <button type="button" class="btn btn-danger" (click)="deleteCollection()" 
-            style="background-color: #d32f2f; color: white; border: none; padding: 0.6rem 1.2rem; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;">
+    <button
+      type="button"
+      class="btn btn-danger"
+      (click)="deleteCollection()"
+      style="
+        background-color: #d32f2f;
+        color: white;
+        border: none;
+        padding: 0.6rem 1.2rem;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: bold;
+        width: 100%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+      "
+    >
       <span>🗑️</span> Diese Sammlung löschen
     </button>
   </div>
-
 </div>

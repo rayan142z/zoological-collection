@@ -1,8 +1,16 @@
 <div class="page-container">
-
   <div class="new-object-header">
     <a class="back-link" routerLink="/objects">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+      <svg
+        width="16"
+        height="16"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+      >
+        <path d="M19 12H5M12 5l-7 7 7 7" />
+      </svg>
       Zurück zu Sammlungen
     </a>
     <h1 class="new-object-title serif">Neues Objekt erfassen</h1>
@@ -10,7 +18,12 @@
   </div>
 
   <div class="wizard-steps">
-    <div class="step" [class.step-active]="currentStep() === 1" [class.step-done]="currentStep() > 1" (click)="goToStep(1)">
+    <div
+      class="step"
+      [class.step-active]="currentStep() === 1"
+      [class.step-done]="currentStep() > 1"
+      (click)="goToStep(1)"
+    >
       <div class="step-circle">{{ currentStep() > 1 ? '✓' : '1' }}</div>
       <div class="step-info">
         <span class="step-number">Schritt 1</span>
@@ -18,7 +31,12 @@
       </div>
     </div>
     <div class="step-line" [class.step-line-done]="currentStep() > 1"></div>
-    <div class="step" [class.step-active]="currentStep() === 2" [class.step-done]="currentStep() > 2" (click)="goToStep(2)">
+    <div
+      class="step"
+      [class.step-active]="currentStep() === 2"
+      [class.step-done]="currentStep() > 2"
+      (click)="goToStep(2)"
+    >
       <div class="step-circle">{{ currentStep() > 2 ? '✓' : '2' }}</div>
       <div class="step-info">
         <span class="step-number">Schritt 2</span>
@@ -37,7 +55,13 @@
 
   <div class="form-layout">
     <form class="form-main" (ngSubmit)="onSubmit()">
-      <input id="photo-input" type="file" accept="image/*" style="display:none" (change)="onFileSelected($event)"/>
+      <input
+        id="photo-input"
+        type="file"
+        accept="image/*"
+        style="display: none"
+        (change)="onFileSelected($event)"
+      />
 
       @if (currentStep() === 1) {
         <div class="section-card">
@@ -46,84 +70,169 @@
           <div class="form-group">
             <label class="form-label">Ziel-Sammlung</label>
             <div class="selected-collection-badge">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 8px; vertical-align: middle;">
-                <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                style="margin-right: 8px; vertical-align: middle"
+              >
+                <path
+                  d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"
+                />
               </svg>
-              <span style="font-weight: 600;">{{ targetCollectionName() || 'Lädt Sammlung...' }}</span>
+              <span style="font-weight: 600">{{
+                targetCollectionName() || 'Lädt Sammlung...'
+              }}</span>
             </div>
           </div>
 
           <div class="form-group">
             <label class="form-label">Name <span class="required">*</span></label>
-            <input class="form-input" type="text" placeholder="z.B. Hirschkäfer"
-              [ngModel]="name()" (ngModelChange)="name.set($event)" name="name"/>
+            <input
+              class="form-input"
+              type="text"
+              placeholder="z.B. Hirschkäfer"
+              [ngModel]="name()"
+              (ngModelChange)="name.set($event)"
+              name="name"
+            />
           </div>
 
           <!-- Zusätzliche Felder: Größe, Gewicht und Geburtsjahr -->
           <div class="form-row">
             <div class="form-group">
               <label class="form-label">Größe</label>
-              <input class="form-input" type="number" step="0.01" placeholder="z.B. 12.5"
-                [ngModel]="size()" (ngModelChange)="size.set($event)" name="size"/>
+              <input
+                class="form-input"
+                type="number"
+                step="0.01"
+                placeholder="z.B. 12.5"
+                [ngModel]="size()"
+                (ngModelChange)="size.set($event)"
+                name="size"
+              />
             </div>
             <div class="form-group">
               <label class="form-label">Gewicht</label>
-              <input class="form-input" type="number" step="0.01" placeholder="z.B. 45.2"
-                [ngModel]="weight()" (ngModelChange)="weight.set($event)" name="weight"/>
+              <input
+                class="form-input"
+                type="number"
+                step="0.01"
+                placeholder="z.B. 45.2"
+                [ngModel]="weight()"
+                (ngModelChange)="weight.set($event)"
+                name="weight"
+              />
             </div>
           </div>
 
           <div class="form-row">
             <div class="form-group">
               <label class="form-label">Geburtsjahr</label>
-              <input class="form-input" type="number" placeholder="z.B. 2021"
-                [ngModel]="birthYear()" (ngModelChange)="birthYear.set($event)" name="birthYear"/>
+              <input
+                class="form-input"
+                type="number"
+                placeholder="z.B. 2021"
+                [ngModel]="birthYear()"
+                (ngModelChange)="birthYear.set($event)"
+                name="birthYear"
+              />
             </div>
             <div class="form-group">
               <label class="form-label">Sammlungsdatum <span class="required">*</span></label>
-              <input class="form-input" type="date"
-                [ngModel]="dateCollected()" (ngModelChange)="dateCollected.set($event)" name="dateCollected"/>
+              <input
+                class="form-input"
+                type="date"
+                [ngModel]="dateCollected()"
+                (ngModelChange)="dateCollected.set($event)"
+                name="dateCollected"
+              />
             </div>
           </div>
 
           <div class="form-group">
             <label class="form-label">Notiz <span class="required">*</span></label>
-            <textarea class="form-textarea" placeholder="Schreibe eine Notiz..."
-              [ngModel]="description()" (ngModelChange)="description.set($event)" name="description"></textarea>
+            <textarea
+              class="form-textarea"
+              placeholder="Schreibe eine Notiz..."
+              [ngModel]="description()"
+              (ngModelChange)="description.set($event)"
+              name="description"
+            ></textarea>
           </div>
 
           <div class="form-group">
             <div class="location-picker-container">
               <label class="form-label">Fundort auf Karte wählen</label>
-              
+
               <!-- Das Karten-Element -->
-              <div id="map" style="height: 350px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #ccc;"></div>
+              <div
+                id="map"
+                style="
+                  height: 350px;
+                  border-radius: 8px;
+                  margin-bottom: 15px;
+                  border: 1px solid #ccc;
+                "
+              ></div>
 
               @if (latitude() && longitude()) {
-                <div class="coords-badge" style="padding: 8px; background: #e9ecef; border-radius: 4px; display: inline-block; margin-bottom: 15px;">
-                  📍 Gewählte Koordinaten: <strong>{{ latitude() }}</strong>, <strong>{{ longitude() }}</strong>
+                <div
+                  class="coords-badge"
+                  style="
+                    padding: 8px;
+                    background: #e9ecef;
+                    border-radius: 4px;
+                    display: inline-block;
+                    margin-bottom: 15px;
+                  "
+                >
+                  📍 Gewählte Koordinaten: <strong>{{ latitude() }}</strong
+                  >, <strong>{{ longitude() }}</strong>
                 </div>
               }
             </div>
-            
+
             <!-- Koordinaten-Anzeige -->
             <div class="coordinates-row">
               <div class="coord-box">
                 <span class="coord-label">Breitengrad (Latitude)</span>
-                <input class="form-input read-only-input" type="text" [value]="latitude() ?? ''" readonly />
+                <input
+                  class="form-input read-only-input"
+                  type="text"
+                  [value]="latitude() ?? ''"
+                  readonly
+                />
               </div>
               <div class="coord-box">
                 <span class="coord-label">Längengrad (Longitude)</span>
-                <input class="form-input read-only-input" type="text" [value]="longitude() ?? ''" readonly />
+                <input
+                  class="form-input read-only-input"
+                  type="text"
+                  [value]="longitude() ?? ''"
+                  readonly
+                />
               </div>
             </div>
           </div>
-          
+
           <div class="step-nav">
             <span></span>
             <button class="primary-button" type="button" (click)="nextStep()">
               Weiter
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path d="M5 12h14M12 5l7 7-7 7" />
+              </svg>
             </button>
           </div>
         </div>
@@ -134,17 +243,34 @@
           <h2 class="section-title">Taxonomie</h2>
 
           <div class="form-group autocomplete-container">
-            <div style="display: flex; justify-content: space-between; align-items: baseline;">
+            <div style="display: flex; justify-content: space-between; align-items: baseline">
               <label class="form-label">Art / Gattung <span class="required">*</span></label>
-              <button type="button" (click)="toggleTaxMode()" class="btn-toggle" style="font-size: 0.8rem; cursor: pointer; color: #3b82f6; border: none; background: none;">
+              <button
+                type="button"
+                (click)="toggleTaxMode()"
+                class="btn-toggle"
+                style="
+                  font-size: 0.8rem;
+                  cursor: pointer;
+                  color: #3b82f6;
+                  border: none;
+                  background: none;
+                "
+              >
                 {{ taxMode() === 'search' ? 'Neue Art Beantragen' : 'Zur Suche zurückkehren' }}
               </button>
             </div>
 
             @if (taxMode() === 'search') {
-              <input class="form-input" type="text" placeholder="z.B. Lucanus cervus…"
-                    [ngModel]="taxonomySearch()" (ngModelChange)="taxonomySearch.set($event); taxonomyId.set(null)" name="taxonomySearch"/>
-              
+              <input
+                class="form-input"
+                type="text"
+                placeholder="z.B. Lucanus cervus…"
+                [ngModel]="taxonomySearch()"
+                (ngModelChange)="taxonomySearch.set($event); taxonomyId.set(null)"
+                name="taxonomySearch"
+              />
+
               @if (taxonomySearch() && !taxonomyId()) {
                 <div class="autocomplete-dropdown">
                   @for (tax of filteredTaxonomies(); track tax.id) {
@@ -157,13 +283,48 @@
                 </div>
               }
             } @else {
-              <div class="manual-tax-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                <input class="form-input" [(ngModel)]="newTaxonomy.genus" name="genus" placeholder="Gattung">
-                <input class="form-input" [(ngModel)]="newTaxonomy.species" name="species" placeholder="Art">
-                <input class="form-input" [(ngModel)]="newTaxonomy.kingdom" name="kingdom" placeholder="Reich" style="grid-column: span 2;">
-                <input class="form-input" [(ngModel)]="newTaxonomy.phylum" name="phylum" placeholder="Stamm">
-                <input class="form-input" [(ngModel)]="newTaxonomy.class" name="class" placeholder="Klasse">
-                <input class="form-input" [(ngModel)]="newTaxonomy.family" name="family" placeholder="Familie" style="grid-column: span 2;">
+              <div
+                class="manual-tax-grid"
+                style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px"
+              >
+                <input
+                  class="form-input"
+                  [(ngModel)]="newTaxonomy.genus"
+                  name="genus"
+                  placeholder="Gattung"
+                />
+                <input
+                  class="form-input"
+                  [(ngModel)]="newTaxonomy.species"
+                  name="species"
+                  placeholder="Art"
+                />
+                <input
+                  class="form-input"
+                  [(ngModel)]="newTaxonomy.kingdom"
+                  name="kingdom"
+                  placeholder="Reich"
+                  style="grid-column: span 2"
+                />
+                <input
+                  class="form-input"
+                  [(ngModel)]="newTaxonomy.phylum"
+                  name="phylum"
+                  placeholder="Stamm"
+                />
+                <input
+                  class="form-input"
+                  [(ngModel)]="newTaxonomy.class"
+                  name="class"
+                  placeholder="Klasse"
+                />
+                <input
+                  class="form-input"
+                  [(ngModel)]="newTaxonomy.family"
+                  name="family"
+                  placeholder="Familie"
+                  style="grid-column: span 2"
+                />
               </div>
             }
           </div>
@@ -197,12 +358,30 @@
 
           <div class="step-nav">
             <button class="secondary-button" type="button" (click)="prevStep()">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path d="M19 12H5M12 5l-7 7 7 7" />
+              </svg>
               Zurück
             </button>
             <button class="primary-button" type="button" (click)="nextStep()">
               Weiter
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path d="M5 12h14M12 5l7 7-7 7" />
+              </svg>
             </button>
           </div>
         </div>
@@ -213,7 +392,7 @@
           <h2 class="section-title">Foto hochladen</h2>
           <label class="upload-zone" for="photo-input">
             @if (previewUrl()) {
-              <img [src]="previewUrl()" class="upload-preview-img" alt="Vorschau"/>
+              <img [src]="previewUrl()" class="upload-preview-img" alt="Vorschau" />
               <span class="upload-change-hint">Klicken zum Ändern</span>
             } @else {
               <div class="upload-icon">🖼️</div>
@@ -223,21 +402,40 @@
           </label>
           <div class="step-nav">
             <button class="secondary-button" type="button" (click)="prevStep()">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path d="M19 12H5M12 5l-7 7 7 7" />
+              </svg>
               Zurück
             </button>
             @if (saveError()) {
-              <p class="required-hint" style="color: var(--red, #c0392b);">{{ saveError() }}</p>
+              <p class="required-hint" style="color: var(--red, #c0392b)">{{ saveError() }}</p>
             }
             <button class="primary-button" type="submit" [disabled]="isSaving()">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v14z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v14z" />
+                <polyline points="17 21 17 13 7 13 7 21" />
+                <polyline points="7 3 7 8 15 8" />
+              </svg>
               {{ isSaving() ? 'Speichert…' : 'Objekt speichern' }}
             </button>
           </div>
           <p class="required-hint"><span class="required">*</span> Pflichtfelder</p>
         </div>
       }
-
     </form>
 
     <div class="form-sidebar">
@@ -246,24 +444,39 @@
         <div class="preview-body">
           <div class="preview-img-area" (click)="triggerFileInput()" title="Foto hinzufügen">
             @if (previewUrl()) {
-              <img [src]="previewUrl()" class="preview-photo" alt="Foto"/>
+              <img [src]="previewUrl()" class="preview-photo" alt="Foto" />
             } @else {
               <span class="preview-emoji">🦎</span>
             }
             <div class="preview-img-overlay">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="white"
+                stroke-width="2"
+              >
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                <polyline points="17 8 12 3 7 8" />
+                <line x1="12" y1="3" x2="12" y2="15" />
+              </svg>
               <span>Foto hinzufügen</span>
             </div>
           </div>
           <p class="preview-name serif">{{ name() || 'Objektname' }}</p>
           <p class="preview-latin">
-            <em>{{ selectedTaxonomy() ? (selectedTaxonomy()!.genus + ' ' + selectedTaxonomy()!.species) : 'Taxonomie wählen' }}</em>
+            <em>{{
+              selectedTaxonomy()
+                ? selectedTaxonomy()!.genus + ' ' + selectedTaxonomy()!.species
+                : 'Taxonomie wählen'
+            }}</em>
           </p>
           @if (status()) {
             <span class="badge {{ getStatusClass() }}">{{ status() }}</span>
           }
           @if (dateCollected()) {
-            <p class="preview-date">{{ dateCollected() | date:'dd.MM.yyyy' }}</p>
+            <p class="preview-date">{{ dateCollected() | date: 'dd.MM.yyyy' }}</p>
           }
         </div>
       </div>
@@ -276,20 +489,39 @@
         <p class="progress-label">Schritt {{ currentStep() }} von 3</p>
         <div class="progress-steps">
           <div class="progress-step-row">
-            <div class="progress-dot" [class.done]="currentStep() > 1" [class.current]="currentStep() === 1"></div>
-            <span class="progress-step-label" [class.done]="currentStep() > 1" [class.current]="currentStep() === 1">Grunddaten</span>
+            <div
+              class="progress-dot"
+              [class.done]="currentStep() > 1"
+              [class.current]="currentStep() === 1"
+            ></div>
+            <span
+              class="progress-step-label"
+              [class.done]="currentStep() > 1"
+              [class.current]="currentStep() === 1"
+              >Grunddaten</span
+            >
           </div>
           <div class="progress-step-row">
-            <div class="progress-dot" [class.done]="currentStep() > 2" [class.current]="currentStep() === 2"></div>
-            <span class="progress-step-label" [class.done]="currentStep() > 2" [class.current]="currentStep() === 2">Taxonomie</span>
+            <div
+              class="progress-dot"
+              [class.done]="currentStep() > 2"
+              [class.current]="currentStep() === 2"
+            ></div>
+            <span
+              class="progress-step-label"
+              [class.done]="currentStep() > 2"
+              [class.current]="currentStep() === 2"
+              >Taxonomie</span
+            >
           </div>
           <div class="progress-step-row">
             <div class="progress-dot" [class.current]="currentStep() === 3"></div>
-            <span class="progress-step-label" [class.current]="currentStep() === 3">Foto & Speichern</span>
+            <span class="progress-step-label" [class.current]="currentStep() === 3"
+              >Foto & Speichern</span
+            >
           </div>
         </div>
       </div>
     </div>
-
   </div>
 </div>

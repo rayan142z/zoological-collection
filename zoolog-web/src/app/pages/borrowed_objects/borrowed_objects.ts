@@ -10,7 +10,7 @@ interface LoanItem {
   id: number;
   specimenId: number;
   specimenName: string;
-  partnerName: string; // Entweder an wen verliehen wurde oder von wem es kommt
+  partnerName: string;
   loanDate: string;
   returnDate: string | null;
   status: string;
@@ -20,13 +20,9 @@ interface LoanItem {
 @Component({
   selector: 'app-borrowed-objects',
   standalone: true,
- imports: [
-    CommonModule, 
-    DatePipe, // <-- Hier im imports-Array registriert
-    RouterLink
-  ],
+  imports: [CommonModule, DatePipe, RouterLink],
   templateUrl: './borrowed_objects.html',
-  styleUrl: './borrowed_objects.css' 
+  styleUrl: './borrowed_objects.css',
 })
 export class BorrowedObjects implements OnInit {
   private readonly api = inject(ApiService);
@@ -37,8 +33,8 @@ export class BorrowedObjects implements OnInit {
   isLoading = true;
   errorMessage = '';
 
-  loanedOut: LoanItem[] = []; // Tiere, die ich verliehen habe
-  borrowedIn: LoanItem[] = []; // Tiere, die ich geliehen habe
+  loanedOut: LoanItem[] = [];
+  borrowedIn: LoanItem[] = [];
 
   ngOnInit(): void {
     this.currentUserId = this.auth.getCurrentUserId();
@@ -46,11 +42,22 @@ export class BorrowedObjects implements OnInit {
   }
 
   loadLoansData(): void {
-    // Lädt parallel alle Ausleihen, Exemplare und Benutzer, um die IDs in lesbare Namen aufzulösen
     forkJoin({
-      loans: this.api.get<any[]>('loan').pipe(first(), timeout(5000), catchError(() => of([]))),
-      specimens: this.api.get<any[]>('specimen').pipe(first(), timeout(5000), catchError(() => of([]))),
-      users: this.api.get<any[]>('users').pipe(first(), timeout(5000), catchError(() => of([])))
+      loans: this.api.get<any[]>('loan').pipe(
+        first(),
+        timeout(5000),
+        catchError(() => of([])),
+      ),
+      specimens: this.api.get<any[]>('specimen').pipe(
+        first(),
+        timeout(5000),
+        catchError(() => of([])),
+      ),
+      users: this.api.get<any[]>('users').pipe(
+        first(),
+        timeout(5000),
+        catchError(() => of([])),
+      ),
     }).subscribe(({ loans, specimens, users }) => {
       if (!this.currentUserId) {
         this.errorMessage = 'Benutzer nicht angemeldet.';
@@ -58,36 +65,34 @@ export class BorrowedObjects implements OnInit {
         return;
       }
 
-      // Hilfs-Maps für schnelles Nachschlagen von Namen anhand von IDs
-      const specimenMap = new Map(specimens.map(s => [s.id, s.name]));
-      const userMap = new Map(users.map(u => [u.id, u.username]));
+      const specimenMap = new Map(specimens.map((s) => [s.id, s.name]));
+      const userMap = new Map(users.map((u) => [u.id, u.username]));
 
-      const mappedLoans: LoanItem[] = loans.map(l => ({
+      const mappedLoans: LoanItem[] = loans.map((l) => ({
         id: l.id,
         specimenId: l.specimenId,
         specimenName: specimenMap.get(l.specimenId) ?? `Exemplar #${l.specimenId}`,
-        partnerName: '', // Wird gleich je nach Richtung gesetzt
+        partnerName: '',
         loanDate: l.loanDate,
         returnDate: l.returnDate,
         status: l.status,
         notes: l.notes,
         _loanedFrom: l.loanedFrom,
-        _loanedTo: l.loanedTo
+        _loanedTo: l.loanedTo,
       }));
 
-      // Aufteilung in "Verliehen von mir" vs "Geliehen an mich"
       this.loanedOut = mappedLoans
-        .filter(l => (l as any)._loanedFrom === this.currentUserId && l.status !== 'returned')
-        .map(l => ({
+        .filter((l) => (l as any)._loanedFrom === this.currentUserId && l.status !== 'returned')
+        .map((l) => ({
           ...l,
-          partnerName: userMap.get((l as any)._loanedTo) ?? 'Unbekannter Nutzer'
+          partnerName: userMap.get((l as any)._loanedTo) ?? 'Unbekannter Nutzer',
         }));
 
       this.borrowedIn = mappedLoans
-        .filter(l => (l as any)._loanedTo === this.currentUserId && l.status !== 'returned')
-        .map(l => ({
+        .filter((l) => (l as any)._loanedTo === this.currentUserId && l.status !== 'returned')
+        .map((l) => ({
           ...l,
-          partnerName: userMap.get((l as any)._loanedFrom) ?? 'Unbekannter Nutzer'
+          partnerName: userMap.get((l as any)._loanedFrom) ?? 'Unbekannter Nutzer',
         }));
 
       this.isLoading = false;
@@ -103,12 +108,12 @@ export class BorrowedObjects implements OnInit {
     this.api.post(`loan/return/${loanId}`, { specimenId }).subscribe({
       next: () => {
         alert('Exemplar erfolgreich zurückgegeben!');
-        this.loadLoansData(); // Liste neu laden
+        this.loadLoansData();
       },
       error: (err) => {
         console.error('Fehler beim Zurückgeben:', err);
         alert('Fehler beim Zurückgeben des Exemplars.');
-      }
+      },
     });
   }
 }

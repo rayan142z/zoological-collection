@@ -9,7 +9,7 @@ describe('Profile', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [Profile],
-      providers: [provideRouter([])]
+      providers: [provideRouter([])],
     }).compileComponents();
 
     fixture = TestBed.createComponent(Profile);

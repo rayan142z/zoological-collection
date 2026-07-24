@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common'; 
+import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ApiService } from '../../services/api.service';
@@ -11,18 +11,18 @@ import { HttpHeaders } from '@angular/common/http';
 @Component({
   selector: 'app-collection-edit',
   imports: [
-    CommonModule, 
-    FormsModule,   // <-- 2. Hier unbedingt hinzufügen!
-    RouterModule
+    CommonModule,
+    FormsModule, // <-- 2. Hier unbedingt hinzufügen!
+    RouterModule,
   ],
   templateUrl: './collection-edit.html',
-  styleUrls: ['./collection-edit.css']
+  styleUrls: ['./collection-edit.css'],
 })
 export class CollectionEditComponent implements OnInit {
   collectionId!: number;
   collection: any = {
     name: '',
-    description: ''
+    description: '',
   };
 
   constructor(
@@ -30,7 +30,7 @@ export class CollectionEditComponent implements OnInit {
     private router: Router,
     private api: ApiService,
     private cdr: ChangeDetectorRef,
-    private location: Location
+    private location: Location,
   ) {}
 
   ngOnInit(): void {
@@ -44,7 +44,7 @@ export class CollectionEditComponent implements OnInit {
         this.collection = data;
         this.cdr.detectChanges();
       },
-      error: (err) => console.error('Fehler beim Laden der Sammlung:', err)
+      error: (err) => console.error('Fehler beim Laden der Sammlung:', err),
     });
   }
 
@@ -61,7 +61,7 @@ export class CollectionEditComponent implements OnInit {
 
     const payload = {
       name: this.collection.name,
-      description: this.collection.description
+      description: this.collection.description,
     };
 
     this.api.put(`collections/${this.collectionId}`, payload).subscribe({
@@ -73,7 +73,7 @@ export class CollectionEditComponent implements OnInit {
       error: (err) => {
         console.error('Fehler beim Speichern der Sammlung:', err);
         alert('Änderungen konnten nicht gespeichert werden.');
-      }
+      },
     });
   }
 
@@ -82,10 +82,14 @@ export class CollectionEditComponent implements OnInit {
   }
 
   deleteCollection(): void {
-    const firstConfirm = confirm(`Möchtest du die Sammlung "${this.collection.name}" wirklich löschen?`);
+    const firstConfirm = confirm(
+      `Möchtest du die Sammlung "${this.collection.name}" wirklich löschen?`,
+    );
     if (!firstConfirm) return;
 
-    const secondConfirm = confirm(`⚠️ WICHTIG: Wenn du diese Sammlung löschst, werden eventuell auch ALLE darin enthaltenen Exemplare unwiderruflich gelöscht. Bist du absolut sicher?`);
+    const secondConfirm = confirm(
+      `⚠️ WICHTIG: Wenn du diese Sammlung löschst, werden eventuell auch ALLE darin enthaltenen Exemplare unwiderruflich gelöscht. Bist du absolut sicher?`,
+    );
     if (!secondConfirm) return;
 
     this.api.delete(`collections/${this.collectionId}`).subscribe({
@@ -95,7 +99,7 @@ export class CollectionEditComponent implements OnInit {
       error: (err) => {
         console.error('Fehler beim Löschen der Sammlung:', err);
         alert('Die Sammlung konnte nicht gelöscht werden.');
-      }
+      },
     });
   }
 }

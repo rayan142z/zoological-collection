@@ -17,7 +17,7 @@ export class Profile {
   private api = inject(ApiService); // Nutzt nun deinen zentralen Api-Service
 
   currentUser = this.auth.currentUser;
-  
+
   // Zustand für den Bearbeitungsmodus
   isEditing = signal<boolean>(false);
 
@@ -26,7 +26,7 @@ export class Profile {
     username: '',
     email: '',
     job: '',
-    description: ''
+    description: '',
   };
 
   // Wechselt in den Editier-Modus und befüllt das Formular mit den aktuellen Werten
@@ -37,7 +37,7 @@ export class Profile {
         username: user.username,
         email: user.email,
         job: user.job || '',
-        description: user.description || ''
+        description: user.description || '',
       };
       this.isEditing.set(true);
     }
@@ -62,7 +62,7 @@ export class Profile {
           name: this.editForm.username, // Alias synchron halten
           email: this.editForm.email,
           job: this.editForm.job,
-          description: this.editForm.description
+          description: this.editForm.description,
         };
 
         // Session im LocalStorage und Signal aktualisieren
@@ -74,7 +74,7 @@ export class Profile {
       error: (err) => {
         console.error('Fehler beim Aktualisieren des Profils', err);
         alert('Änderungen konnten nicht gespeichert werden.');
-      }
+      },
     });
   }
 

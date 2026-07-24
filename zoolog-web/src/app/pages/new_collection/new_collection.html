@@ -1,7 +1,5 @@
 <div class="page-container">
-  <div class="breadcrumb">
-    
-  </div>
+  <div class="breadcrumb"></div>
 
   <div class="objects-header">
     <div>
@@ -9,38 +7,43 @@
     </div>
   </div>
 
-  <div class="card" style="padding: 2.5rem; margin-top: 1.5rem; width: 100%;">
-    <form (ngSubmit)="onSubmit()" style="display: flex; flex-direction: column; gap: 1.5rem;">
-      
-      <div style="display: flex; flex-direction: column; gap: 0.5rem;">
-        <label style="font-weight: 600; color: #1e293b;">
-          Name der Sammlung <span style="color: #ef4444;">*</span>
+  <div class="card" style="padding: 2.5rem; margin-top: 1.5rem; width: 100%">
+    <form (ngSubmit)="onSubmit()" style="display: flex; flex-direction: column; gap: 1.5rem">
+      <div style="display: flex; flex-direction: column; gap: 0.5rem">
+        <label style="font-weight: 600; color: #1e293b">
+          Name der Sammlung <span style="color: #ef4444">*</span>
         </label>
-        <input 
-          type="text" 
-          class="form-input" 
-          placeholder="z.B. Herpetologische Sammlung, Insekten..." 
-          [(ngModel)]="collectionName" 
-          name="collectionName" 
+        <input
+          type="text"
+          class="form-input"
+          placeholder="z.B. Herpetologische Sammlung, Insekten..."
+          [(ngModel)]="collectionName"
+          name="collectionName"
           required
-          style="width: 100%; padding: 0.75rem; border: 1px solid #cbd5e1; border-radius: 6px;"
+          style="width: 100%; padding: 0.75rem; border: 1px solid #cbd5e1; border-radius: 6px"
         />
       </div>
 
-      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; align-items: flex-end;">
-        
-        <div style="display: flex; flex-direction: column; gap: 0.5rem;">
-          <label style="font-weight: 600; color: #1e293b;">Daten-Import (Optional)</label>
+      <div
+        style="
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+          gap: 1.5rem;
+          align-items: flex-end;
+        "
+      >
+        <div style="display: flex; flex-direction: column; gap: 0.5rem">
+          <label style="font-weight: 600; color: #1e293b">Daten-Import (Optional)</label>
           <div class="import-container">
-  <!-- Unsichtbarer Datei-Auswähler -->
-            <input 
-              type="file" 
-              #csvInput 
-              style="display: none;" 
-              accept=".csv" 
-              (change)="onCsvSelected($event)" 
+            <!-- Unsichtbarer Datei-Auswähler -->
+            <input
+              type="file"
+              #csvInput
+              style="display: none"
+              accept=".csv"
+              (change)="onCsvSelected($event)"
             />
-            
+
             <!-- Dein sichtbarer Button -->
             <button type="button" class="secondary-button" (click)="csvInput.click()">
               📂 CSV Exemplare importieren
@@ -48,66 +51,130 @@
           </div>
         </div>
 
-        <div style="display: flex; flex-direction: column; gap: 0.5rem;">
-          <label style="font-weight: 600; color: #1e293b;">Sichtbarkeit</label>
-          <div style="display: flex; gap: 0.75rem; width: 100%; height: 45px;">
-            
-            <label 
-              class="primary-button" 
-              [style.background]="visibility === 'public' ? 'var(--green-dark, #15803d)' : '#f1f5f9'"
+        <div style="display: flex; flex-direction: column; gap: 0.5rem">
+          <label style="font-weight: 600; color: #1e293b">Sichtbarkeit</label>
+          <div style="display: flex; gap: 0.75rem; width: 100%; height: 45px">
+            <label
+              class="primary-button"
+              [style.background]="
+                visibility === 'public' ? 'var(--green-dark, #15803d)' : '#f1f5f9'
+              "
               [style.color]="visibility === 'public' ? '#ffffff' : '#475569'"
-              [style.border]="visibility === 'public' ? '1px solid transparent' : '1px solid #cbd5e1'"
-              style="flex: 1; display: flex; align-items: center; justify-content: center; gap: 0.5rem; cursor: pointer; transition: all 0.2s;"
+              [style.border]="
+                visibility === 'public' ? '1px solid transparent' : '1px solid #cbd5e1'
+              "
+              style="
+                flex: 1;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 0.5rem;
+                cursor: pointer;
+                transition: all 0.2s;
+              "
             >
-              <input type="radio" name="visibility" value="public" [(ngModel)]="visibility" style="display: none;" />
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+              <input
+                type="radio"
+                name="visibility"
+                value="public"
+                [(ngModel)]="visibility"
+                style="display: none"
+              />
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                <circle cx="12" cy="12" r="3" />
               </svg>
               Öffentlich
             </label>
 
-            <label 
-              class="primary-button" 
-              [style.background]="visibility === 'private' ? 'var(--green-dark, #15803d)' : '#f1f5f9'"
+            <label
+              class="primary-button"
+              [style.background]="
+                visibility === 'private' ? 'var(--green-dark, #15803d)' : '#f1f5f9'
+              "
               [style.color]="visibility === 'private' ? '#ffffff' : '#475569'"
-              [style.border]="visibility === 'private' ? '1px solid transparent' : '1px solid #cbd5e1'"
-              style="flex: 1; display: flex; align-items: center; justify-content: center; gap: 0.5rem; cursor: pointer; transition: all 0.2s;"
+              [style.border]="
+                visibility === 'private' ? '1px solid transparent' : '1px solid #cbd5e1'
+              "
+              style="
+                flex: 1;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 0.5rem;
+                cursor: pointer;
+                transition: all 0.2s;
+              "
             >
-              <input type="radio" name="visibility" value="private" [(ngModel)]="visibility" style="display: none;" />
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>
+              <input
+                type="radio"
+                name="visibility"
+                value="private"
+                [(ngModel)]="visibility"
+                style="display: none"
+              />
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path
+                  d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"
+                />
+                <line x1="1" y1="1" x2="23" y2="23" />
               </svg>
               Privat
             </label>
-
           </div>
         </div>
-
       </div>
 
-      <div style="display: flex; flex-direction: column; gap: 0.5rem;">
-        <label style="font-weight: 600; color: #1e293b;">Beschreibung</label>
-        <textarea 
-          class="form-input" 
-          rows="4" 
-          placeholder="Optionale Beschreibung der Sammlung, Fundorte oder Schwerpunkte..." 
-          [(ngModel)]="description" 
+      <div style="display: flex; flex-direction: column; gap: 0.5rem">
+        <label style="font-weight: 600; color: #1e293b">Beschreibung</label>
+        <textarea
+          class="form-input"
+          rows="4"
+          placeholder="Optionale Beschreibung der Sammlung, Fundorte oder Schwerpunkte..."
+          [(ngModel)]="description"
           name="description"
-          style="width: 100%; padding: 0.75rem; border: 1px solid #cbd5e1; border-radius: 6px; resize: vertical;"
+          style="
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            resize: vertical;
+          "
         ></textarea>
       </div>
 
-      <hr style="border: 0; border-top: 1px solid #e2e8f0; margin: 0.5rem 0;" />
+      <hr style="border: 0; border-top: 1px solid #e2e8f0; margin: 0.5rem 0" />
 
-      <div style="display: flex; justify-content: flex-end; gap: 1rem;">
-        <a routerLink="/dashboard" class="primary-button" style="background: #64748b; text-decoration: none; line-height: 1.5; display: flex; align-items: center;">
+      <div style="display: flex; justify-content: flex-end; gap: 1rem">
+        <a
+          routerLink="/dashboard"
+          class="primary-button"
+          style="
+            background: #64748b;
+            text-decoration: none;
+            line-height: 1.5;
+            display: flex;
+            align-items: center;
+          "
+        >
           Abbrechen
         </a>
-        <button type="submit" class="primary-button">
-          Sammlung erstellen
-        </button>
+        <button type="submit" class="primary-button">Sammlung erstellen</button>
       </div>
-
     </form>
   </div>
 </div>
