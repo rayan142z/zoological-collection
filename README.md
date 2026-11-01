@@ -2,7 +2,7 @@
 
 A web app for managing zoological specimen collections. You can catalogue specimens with taxonomy, photos and the location where they were found, organise them into public or private collections, search across collections with taxonomy, weight, size and map-radius filters, and lend specimens to other users. Moderators review new taxonomy entries before they become public.
 
-The project started as a university computer science group project (Uni Siegen, Group 6).
+The project started as a university group project (Uni Siegen, Group 6).
 
 **▶ Live demo:** https://rayan142z.github.io/zoological-collection/ (active once GitHub Pages is enabled, see below)
 
