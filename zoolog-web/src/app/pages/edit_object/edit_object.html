@@ -25,11 +25,11 @@
       >
         <path d="M19 12H5M12 5l-7 7 7 7" />
       </svg>
-      Abbrechen
+      {{ 'Abbrechen' | t }}
     </button>
-    <h1 class="serif" style="margin-top: 0.5rem; margin-bottom: 0.25rem">Objekt bearbeiten</h1>
+    <h1 class="serif" style="margin-top: 0.5rem; margin-bottom: 0.25rem">{{ 'Objekt bearbeiten' | t }}</h1>
     <p style="color: #64748b; margin: 0; font-size: 0.9rem">
-      Passe die Stammdaten des Präparats an.
+      {{ 'Passe die Stammdaten des Präparats an.' | t }}
     </p>
   </div>
 
@@ -42,7 +42,7 @@
         <label
           class="form-label"
           style="display: block; font-weight: 500; margin-bottom: 0.5rem; color: #334155"
-          >Name <span style="color: #ef4444">*</span></label
+          >{{ 'Name' | t }} <span style="color: #ef4444">*</span></label
         >
         <input
           class="form-input"
@@ -59,7 +59,7 @@
         <label
           class="form-label"
           style="display: block; font-weight: 500; margin-bottom: 0.5rem; color: #334155"
-          >Beschreibung</label
+          >{{ 'Beschreibung' | t }}</label
         >
         <textarea
           class="form-textarea"
@@ -75,7 +75,7 @@
           [ngModel]="description()"
           (ngModelChange)="description.set($event)"
           name="description"
-          placeholder="Objektbeschreibung eingeben..."
+          [placeholder]="'Objektbeschreibung eingeben...' | t"
         ></textarea>
       </div>
 
@@ -84,7 +84,7 @@
         <label
           for="size"
           style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: #1e293b"
-          >Größe</label
+          >{{ 'Größe' | t }}</label
         >
         <input
           type="text"
@@ -99,7 +99,7 @@
             border-radius: 6px;
             font-size: 1rem;
           "
-          placeholder="z.B. Klein / 10cm"
+          [placeholder]="'z.B. Klein / 10cm' | t"
         />
       </div>
 
@@ -108,7 +108,7 @@
         <label
           for="weight"
           style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: #1e293b"
-          >Gewicht</label
+          >{{ 'Gewicht' | t }}</label
         >
         <input
           type="number"
@@ -124,7 +124,7 @@
             border-radius: 6px;
             font-size: 1rem;
           "
-          placeholder="z.B. 22"
+          [placeholder]="'z.B. 22' | t"
         />
       </div>
 
@@ -133,7 +133,7 @@
         <label
           for="birthYear"
           style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: #1e293b"
-          >Geburtsjahr</label
+          >{{ 'Geburtsjahr' | t }}</label
         >
         <input
           type="number"
@@ -148,7 +148,7 @@
             border-radius: 6px;
             font-size: 1rem;
           "
-          placeholder="z.B. 2022"
+          [placeholder]="'z.B. 2022' | t"
         />
       </div>
 
@@ -171,9 +171,9 @@
           (ngModelChange)="status.set($event)"
           name="status"
         >
-          <option value="available">Verfügbar</option>
-          <option value="lost">Verloren</option>
-          <option value="destroyed">Zerstört</option>
+          <option value="available">{{ 'Verfügbar' | t }}</option>
+          <option value="lost">{{ 'Verloren' | t }}</option>
+          <option value="destroyed">{{ 'Zerstört' | t }}</option>
         </select>
       </div>
 
@@ -181,7 +181,7 @@
         <label
           class="form-label"
           style="display: block; font-weight: 500; margin-bottom: 0.5rem; color: #334155"
-          >Bild ändern</label
+          >{{ 'Bild ändern' | t }}</label
         >
 
         <div class="drop-zone" (click)="triggerFileInput()">
@@ -218,7 +218,7 @@
             cursor: pointer;
           "
         >
-          Abbrechen
+          {{ 'Abbrechen' | t }}
         </button>
         <button
           class="primary-button"
@@ -251,9 +251,9 @@
           border-radius: 8px;
         "
       >
-        <h3 style="color: #c62828; margin-top: 0" class="serif">⚠️ Gefahrenbereich</h3>
+        <h3 style="color: #c62828; margin-top: 0" class="serif">{{ '⚠️ Gefahrenbereich' | t }}</h3>
         <p style="color: #5d4037; font-size: 0.9rem; margin-bottom: 1rem">
-          Das Löschen dieses Exemplars ist endgültig und kann nicht rückgängig gemacht werden.
+          {{ 'Das Löschen dieses Exemplars ist endgültig und kann nicht rückgängig gemacht werden.' | t }}
         </p>
         <button
           type="button"
@@ -269,7 +269,7 @@
             font-weight: bold;
           "
         >
-          🗑️ Exemplar unwiderruflich löschen
+          {{ '🗑️ Exemplar unwiderruflich löschen' | t }}
         </button>
       </div>
     </form>

@@ -1,32 +1,57 @@
-<nav class="navbar">
+<nav class="navbar" [class.menu-open]="menuOpen()" aria-label="Hauptnavigation">
 
-  <div class="navbar-left">
-    <div class="logo-box">
+  <a class="navbar-left" routerLink="/dashboard" (click)="closeMenu()">
+    <span class="logo-box" aria-hidden="true">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="white">
         <path d="M12 2C7 2 3 6 3 11c0 3 1.5 5.5 4 7v2h10v-2c2.5-1.5 4-4 4-7 0-5-4-9-9-9z"/>
       </svg>
-    </div>
+    </span>
     <span class="brand-name">Zoolog</span>
-  </div>
+  </a>
 
-  <div class="navbar-center">
-    <a class="nav-link" routerLink="/dashboard" routerLinkActive="active">Übersicht</a>
-    <a class="nav-link" routerLink="/public_search" routerLinkActive="active">Suche</a>
-    <a class="nav-link" routerLink="/borrowed_objects"   routerLinkActive="active">Leih Informationen</a>
-    @if (isAdminOrMod()) {
-      <a class="nav-link" routerLink="/taxonomy-validation" routerLinkActive="active">Anträge</a>
-    }
-    <a class="nav-link" routerLink="/about-us"  routerLinkActive="active">Über uns</a>
-  </div>
+  <button
+    type="button"
+    class="nav-burger"
+    [attr.aria-expanded]="menuOpen()"
+    aria-controls="nav-menu"
+    [attr.aria-label]="(menuOpen() ? 'Menü schließen' : 'Menü öffnen') | t"
+    (click)="menuOpen.set(!menuOpen())"
+  >
+    <span></span><span></span><span></span>
+  </button>
 
-  <div class="navbar-right">
-    @if (currentUser(); as user) {
-      <a class="nav-user" routerLink="/profile">{{ user.username || user.email }}</a>
-      <button class="btn-ghost" type="button" (click)="logout()">Abmelden</button>
-    } @else {
-      <a class="btn-ghost"   routerLink="/login">Login</a>
-      <a class="btn-primary" routerLink="/register">Registrieren</a>
-    }
+  <div class="nav-menu" id="nav-menu">
+    <div class="navbar-center">
+      <a class="nav-link" routerLink="/dashboard" routerLinkActive="active" (click)="closeMenu()">{{ 'Übersicht' | t }}</a>
+      <a class="nav-link" routerLink="/public_search" routerLinkActive="active" (click)="closeMenu()">{{ 'Suche' | t }}</a>
+      @if (currentUser()) {
+        <a class="nav-link" routerLink="/borrowed_objects" routerLinkActive="active" (click)="closeMenu()">{{ 'Leihverkehr' | t }}</a>
+      }
+      @if (isAdminOrMod()) {
+        <a class="nav-link" routerLink="/taxonomy-validation" routerLinkActive="active" (click)="closeMenu()">{{ 'Anträge' | t }}</a>
+      }
+      <a class="nav-link" routerLink="/about-us" routerLinkActive="active" (click)="closeMenu()">{{ 'Über uns' | t }}</a>
+    </div>
+
+    <div class="navbar-right">
+      <button
+        type="button"
+        class="lang-switch"
+        (click)="i18n.toggle()"
+        [attr.aria-label]="'Sprache wechseln' | t"
+        [title]="'Sprache wechseln' | t"
+      >
+        <span [class.on]="i18n.lang() === 'de'">DE</span>
+        <span [class.on]="i18n.lang() === 'en'">EN</span>
+      </button>
+      @if (currentUser(); as user) {
+        <a class="nav-user" routerLink="/profile" (click)="closeMenu()">{{ user.username || user.email }}</a>
+        <button class="btn-ghost" type="button" (click)="logout()">{{ 'Abmelden' | t }}</button>
+      } @else {
+        <a class="btn-ghost" routerLink="/login" (click)="closeMenu()">{{ 'Anmelden' | t }}</a>
+        <a class="btn-primary" routerLink="/register" (click)="closeMenu()">{{ 'Registrieren' | t }}</a>
+      }
+    </div>
   </div>
 
 </nav>

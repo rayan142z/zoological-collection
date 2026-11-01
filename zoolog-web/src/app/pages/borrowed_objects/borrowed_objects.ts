@@ -5,6 +5,8 @@ import { ApiService } from '../../services/api.service';
 import { Auth } from '../../services/auth';
 import { forkJoin, of } from 'rxjs';
 import { catchError, timeout, first } from 'rxjs/operators';
+import { TPipe } from '../../i18n/t.pipe';
+import { I18n } from '../../i18n/i18n.service';
 
 interface LoanItem {
   id: number;
@@ -20,7 +22,7 @@ interface LoanItem {
 @Component({
   selector: 'app-borrowed-objects',
   standalone: true,
-  imports: [CommonModule, DatePipe, RouterLink],
+  imports: [CommonModule, DatePipe, RouterLink, TPipe],
   templateUrl: './borrowed_objects.html',
   styleUrl: './borrowed_objects.css',
 })
@@ -28,6 +30,7 @@ export class BorrowedObjects implements OnInit {
   private readonly api = inject(ApiService);
   private readonly auth = inject(Auth);
   private readonly cdr = inject(ChangeDetectorRef);
+  private readonly i18n = inject(I18n);
 
   currentUserId: number | null = null;
   isLoading = true;
@@ -35,6 +38,18 @@ export class BorrowedObjects implements OnInit {
 
   loanedOut: LoanItem[] = [];
   borrowedIn: LoanItem[] = [];
+
+  groups() {
+    return [
+      { title: 'Von mir verliehen', partner: 'Verliehen an', items: this.loanedOut, empty: 'Du hast aktuell keine Exemplare verliehen.', canReturn: false },
+      { title: 'An mich verliehen', partner: 'Verliehen von', items: this.borrowedIn, empty: 'Du hast aktuell keine fremden Exemplare ausgeliehen.', canReturn: true },
+    ];
+  }
+
+  /** Aktive Leihe mit Rückgabedatum in der Vergangenheit */
+  isOverdue(item: LoanItem): boolean {
+    return !!item.returnDate && item.returnDate < new Date().toISOString().split('T')[0];
+  }
 
   ngOnInit(): void {
     this.currentUserId = this.auth.getCurrentUserId();
@@ -100,19 +115,16 @@ export class BorrowedObjects implements OnInit {
     });
   }
 
-  returnLoan(loanId: number, specimenId: number): void {
-    if (!confirm('Möchtest du dieses Exemplar wirklich als zurückgegeben markieren?')) {
+  returnLoan(loanId: number): void {
+    if (!confirm(this.i18n.t('Möchtest du dieses Exemplar wirklich als zurückgegeben markieren?'))) {
       return;
     }
 
-    this.api.post(`loan/return/${loanId}`, { specimenId }).subscribe({
-      next: () => {
-        alert('Exemplar erfolgreich zurückgegeben!');
-        this.loadLoansData();
-      },
+    this.api.put(`loan/${loanId}/return`, {}).subscribe({
+      next: () => this.loadLoansData(),
       error: (err) => {
         console.error('Fehler beim Zurückgeben:', err);
-        alert('Fehler beim Zurückgeben des Exemplars.');
+        alert(this.i18n.t('Fehler beim Zurückgeben des Exemplars.'));
       },
     });
   }

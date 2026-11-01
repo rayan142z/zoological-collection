@@ -10,13 +10,13 @@
 
     <div class="panel-content">
       <div class="panel-body">
-        <p class="panel-eyebrow">Wissenschaftliches Archiv</p>
+        <p class="panel-eyebrow">{{ 'Wissenschaftliches Archiv' | t }}</p>
         <h1 class="panel-headline">
-          Natur<br />
-          <em>bewahren.</em>
+          {{ 'Natur' | t }}<br />
+          <em>{{ 'bewahren.' | t }}</em>
         </h1>
         <p class="panel-sub">
-          Erfasse, verwalte und erforsche zoologische Präparate — digital, präzise, dauerhaft.
+          {{ 'Erfasse, verwalte und erforsche zoologische Präparate — digital, präzise, dauerhaft.' | t }}
         </p>
 
         <div class="panel-divider"></div>
@@ -28,7 +28,7 @@
                 <span>{{ s.icon }}</span>
               </div>
               <div class="specimen-meta">
-                <strong>{{ s.name }}</strong>
+                <strong>{{ s.name | t }}</strong>
                 <em>{{ s.latin }}</em>
               </div>
             </div>
@@ -39,17 +39,29 @@
   </aside>
 
   <!-- RIGHT PANEL -->
-  <main class="auth-form-side">
+  <div class="auth-form-side">
     <div class="form-wrapper">
-      <div class="form-top-badge">
-        <span class="badge-dot"></span>
-        Sichere Verbindung
-      </div>
 
       <div class="form-header">
-        <h2 class="form-title">Willkommen zurück</h2>
-        <p class="form-subtitle">Melde dich bei deiner Sammlung an</p>
+        <h2 class="form-title">{{ 'Willkommen zurück' | t }}</h2>
+        <p class="form-subtitle">{{ 'Melde dich bei deiner Sammlung an' | t }}</p>
       </div>
+
+      @if (isDemo) {
+        <section class="demo-accounts" aria-labelledby="demo-accounts-title">
+          <h3 id="demo-accounts-title">{{ 'Demo ausprobieren' | t }}</h3>
+          <p>{{ 'Ein Klick meldet dich mit einem Beispielkonto an.' | t }}</p>
+          <div class="demo-grid">
+            @for (a of demoAccounts; track a.username) {
+              <button type="button" class="demo-account" (click)="loginAs(a.username)" [disabled]="isLoading()">
+                <strong>{{ a.label | t }}</strong>
+                <span>{{ a.hint | t }}</span>
+              </button>
+            }
+          </div>
+          <p class="demo-divider"><span>{{ 'oder manuell anmelden' | t }}</span></p>
+        </section>
+      }
 
       <form class="auth-form" (ngSubmit)="onLogin()" #loginForm="ngForm" novalidate>
         <div
@@ -57,7 +69,7 @@
           [class.field-focused]="emailFocused()"
           [class.field-filled]="loginData().email"
         >
-          <label class="field-label" for="login-email">E-Mail</label>
+          <label class="field-label" for="login-email">{{ 'E-Mail oder Benutzername' | t }}</label>
           <div class="field-wrap">
             <span class="field-icon">
               <svg
@@ -74,7 +86,8 @@
             </span>
             <input
               id="login-email"
-              type="email"
+              type="text"
+              autocomplete="username"
               class="field-input"
               placeholder="name@beispiel.de"
               [ngModel]="loginData().email"
@@ -92,7 +105,7 @@
           [class.field-focused]="pwFocused()"
           [class.field-filled]="loginData().password"
         >
-          <label class="field-label" for="login-pw">Passwort</label>
+          <label class="field-label" for="login-pw">{{ 'Passwort' | t }}</label>
           <div class="field-wrap">
             <span class="field-icon">
               <svg
@@ -112,6 +125,7 @@
               [type]="showPw() ? 'text' : 'password'"
               class="field-input"
               placeholder="••••••••"
+              autocomplete="current-password"
               [ngModel]="loginData().password"
               (ngModelChange)="loginData.set({...loginData(), password: $event})"
               name="password"
@@ -119,7 +133,7 @@
               (blur)="pwFocused.set(false)"
               required
             />
-            <button type="button" class="pw-toggle" (click)="showPw.set(!showPw())" tabindex="-1">
+            <button type="button" class="pw-toggle" (click)="showPw.set(!showPw())" [attr.aria-label]="(showPw() ? 'Passwort verbergen' : 'Passwort anzeigen') | t">
               @if (!showPw()) {
                 <svg
                   width="16"
@@ -163,26 +177,25 @@
               name="remember"
             />
             <span class="remember-box"></span>
-            Angemeldet bleiben
+            {{ 'Angemeldet bleiben' | t }}
           </label>
-          <a href="#" class="forgot-link">Passwort vergessen?</a>
         </div>
 
         <button type="submit" class="submit-btn" [class.loading]="isLoading()">
-          <span class="btn-text">Einloggen</span>
+          <span class="btn-text">{{ 'Einloggen' | t }}</span>
           <span class="btn-arrow">→</span>
           <span class="btn-loader"></span>
         </button>
 
         @if (errorMsg()) {
-          <div class="error-banner"><span>⚠</span> {{ errorMsg() }}</div>
+          <div class="error-banner" role="alert"><span aria-hidden="true">⚠</span> {{ errorMsg() | t }}</div>
         }
       </form>
 
       <p class="form-switch">
-        Noch kein Konto?
-        <a routerLink="/register" class="switch-link">Jetzt registrieren</a>
+        {{ 'Noch kein Konto?' | t }}
+        <a routerLink="/register" class="switch-link">{{ 'Jetzt registrieren' | t }}</a>
       </p>
     </div>
-  </main>
+  </div>
 </div>

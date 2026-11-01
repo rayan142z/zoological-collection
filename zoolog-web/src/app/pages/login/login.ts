@@ -3,11 +3,14 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { Auth } from '../../services/auth';
+import { TPipe } from '../../i18n/t.pipe';
+import { environment } from '../../../environments/environment';
+import { DEMO_PASSWORD } from '../../demo/demo-data';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule, RouterLink, TPipe],
   templateUrl: './login.html',
   styleUrl: './login.css',
 })
@@ -27,6 +30,18 @@ export class Login {
     { icon: '🪲', name: 'Hirschkäfer', latin: 'Lucanus cervus' },
     { icon: '🐭', name: 'Waldmaus', latin: 'Apodemus sylvaticus' },
   ]);
+
+  readonly isDemo = environment.demo;
+  readonly demoAccounts = [
+    { username: 'besucher', label: 'Nutzer', hint: 'Eigene Sammlungen, Favoriten, Leihen' },
+    { username: 'kuratorin', label: 'Moderatorin', hint: 'Prüft neue Taxonomie-Anträge' },
+    { username: 'admin', label: 'Admin', hint: 'Voller Zugriff auf alle Daten' },
+  ];
+
+  loginAs(username: string): void {
+    this.loginData.set({ email: username, password: DEMO_PASSWORD, remember: false });
+    this.onLogin();
+  }
 
   readonly panelStats = signal([
     { value: '3.4k+', label: 'Präparate' },

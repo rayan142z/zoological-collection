@@ -14,6 +14,7 @@ import { EditObject } from './pages/edit_object/edit_object';
 import { PublicSearch } from './pages/public_search/public_search';
 import { CollectionEditComponent } from './pages/collection-edit/collection-edit';
 import { TaxonomyValidationComponent } from './pages/taxonomy-validation/taxonomy-validation';
+import { NotFound } from './pages/not_found/not_found';
 
 export const routes: Routes = [
     { path: 'login',      component: Login },
@@ -26,16 +27,17 @@ export const routes: Routes = [
     
     { path: 'objects/:id', component: Objects },   // collection detail (filtered view)
     { path: 'object/:id',  component: ObjectInfo },
-    { path: 'edit-object/:id', component: EditObject },
+    { path: 'edit-object/:id', component: EditObject, canActivate: [authGuard] },
     { path: 'about-us',   component: AboutUs },
-    { path: 'borrowed_objects', component: BorrowedObjects },
+    { path: 'borrowed_objects', component: BorrowedObjects, canActivate: [authGuard] },
     { path: 'collections/new', component: NewCollection, canActivate: [authGuard] },
     { path: 'public_search', component: PublicSearch },
-    { path: 'collection-edit/:id', component: CollectionEditComponent },
-    { path: 'taxonomy-validation', component: TaxonomyValidationComponent },
+    { path: 'collection-edit/:id', component: CollectionEditComponent, canActivate: [authGuard] },
+    { path: 'taxonomy-validation', component: TaxonomyValidationComponent, canActivate: [authGuard] },
     // new-object is nested inside a collection
     { path: 'objects/:id/new', component: NewObject, canActivate: [authGuard] },
     { path: 'new-object/:id', component: NewObject, canActivate: [authGuard] },  // fallback direct link
 
     { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
+    { path: '**', component: NotFound },
 ];

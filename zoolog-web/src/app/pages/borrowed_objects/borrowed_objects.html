@@ -1,87 +1,75 @@
-<div class="loans-container">
-  <h2>Leih-Übersicht</h2>
+<div class="page-container">
+  <header class="loans-header">
+    <p class="eyebrow">{{ 'Leihverkehr' | t }}</p>
+    <h1 class="serif">{{ 'Leih-Übersicht' | t }}</h1>
+    <p class="text-muted">{{ 'Exemplare, die du verliehen oder dir ausgeliehen hast.' | t }}</p>
+  </header>
 
   @if (isLoading) {
-    <p>Lade Leih-Informationen...</p>
+    <div class="loan-section" aria-busy="true">
+      <div class="sk"></div>
+      <div class="sk"></div>
+      <div class="sk"></div>
+    </div>
   } @else if (errorMessage) {
-    <p class="error">{{ errorMessage }}</p>
+    <p class="error-message" role="alert">{{ errorMessage | t }}</p>
   } @else {
-    <!-- Sektion 1: Von mir verliehene Exemplare -->
-    <section class="loan-section">
-      <h3>Von mir verliehene Tiere</h3>
-      @if (loanedOut.length === 0) {
-        <p class="empty-text">Du hast aktuell keine Tiere verliehen.</p>
-      } @else {
-        <table class="loans-table">
-          <thead>
-            <tr>
-              <th>Exemplar</th>
-              <th>Verliehen an</th>
-              <th>Leihdatum</th>
-              <th>Rückgabe bis</th>
-              <th>Notiz</th>
-            </tr>
-          </thead>
-          <tbody>
-            @for (item of loanedOut; track item.id) {
-              <tr>
-                <td>
-                  <a [routerLink]="['/object', item.specimenId]">{{ item.specimenName }}</a>
-                </td>
-                <td>{{ item.partnerName }}</td>
-                <td>{{ item.loanDate | date: 'mediumDate' }}</td>
-                <td>
-                  {{ item.returnDate ? (item.returnDate | date: 'mediumDate') : 'Unbefristet' }}
-                </td>
-                <td>{{ item.notes || '-' }}</td>
-              </tr>
-            }
-          </tbody>
-        </table>
-      }
-    </section>
+    @for (group of groups(); track group.title) {
+      <section class="loan-section">
+        <h2 class="section-heading serif">
+          {{ group.title | t }}
+          <span class="count">{{ group.items.length }}</span>
+        </h2>
 
-    <!-- Sektion 2: Von anderen an mich geliehene Exemplare -->
-    <section class="loan-section" style="margin-top: 40px">
-      <h3>Von anderen an mich geliehene Tiere</h3>
-      @if (borrowedIn.length === 0) {
-        <p class="empty-text">Du hast aktuell keine Fremd-Exemplare ausgeliehen.</p>
-      } @else {
-        <table class="loans-table">
-          <thead>
-            <tr>
-              <th>Exemplar</th>
-              <th>Verliehen von</th>
-              <th>Leihdatum</th>
-              <th>Rückgabe bis</th>
-              <th>Notiz</th>
-              <th>Aktion</th>
-              <!-- Neue Spalte -->
-            </tr>
-          </thead>
-          <tbody>
-            @for (item of borrowedIn; track item.id) {
+        @if (group.items.length === 0) {
+          <div class="empty">
+            <p>{{ group.empty | t }}</p>
+            <a routerLink="/public_search" class="secondary-button">{{ 'Sammlungen durchsuchen' | t }}</a>
+          </div>
+        } @else {
+          <table class="loans-table">
+            <thead>
               <tr>
-                <td>
-                  <a [routerLink]="['/object', item.specimenId]">{{ item.specimenName }}</a>
-                </td>
-                <td>{{ item.partnerName }}</td>
-                <td>{{ item.loanDate | date: 'mediumDate' }}</td>
-                <td>
-                  {{ item.returnDate ? (item.returnDate | date: 'mediumDate') : 'Unbefristet' }}
-                </td>
-                <td>{{ item.notes || '-' }}</td>
-                <td>
-                  <!-- Der Zurückgeben-Button -->
-                  <button class="btn-return" (click)="returnLoan(item.id, item.specimenId)">
-                    Zurückgeben
-                  </button>
-                </td>
+                <th scope="col">{{ 'Exemplar' | t }}</th>
+                <th scope="col">{{ group.partner | t }}</th>
+                <th scope="col">{{ 'Leihdatum' | t }}</th>
+                <th scope="col">{{ 'Rückgabe bis' | t }}</th>
+                <th scope="col">{{ 'Notiz' | t }}</th>
+                @if (group.canReturn) {
+                  <th scope="col"><span class="sr-only">{{ 'Aktion' | t }}</span></th>
+                }
               </tr>
-            }
-          </tbody>
-        </table>
-      }
-    </section>
+            </thead>
+            <tbody>
+              @for (item of group.items; track item.id) {
+                <tr [class.overdue]="isOverdue(item)">
+                  <td [attr.data-label]="'Exemplar' | t">
+                    <a [routerLink]="['/object', item.specimenId]">{{ item.specimenName }}</a>
+                  </td>
+                  <td [attr.data-label]="group.partner | t">{{ item.partnerName }}</td>
+                  <td [attr.data-label]="'Leihdatum' | t">{{ item.loanDate | date: 'dd.MM.yyyy' }}</td>
+                  <td [attr.data-label]="'Rückgabe bis' | t">
+                    <span>
+                      {{ item.returnDate ? (item.returnDate | date: 'dd.MM.yyyy') : ('Unbefristet' | t) }}
+                      @if (isOverdue(item)) {
+                        <span class="badge status-lost">{{ 'Überfällig' | t }}</span>
+                      }
+                    </span>
+                  </td>
+                  <td [attr.data-label]="'Notiz' | t" class="note">{{ item.notes || '–' }}</td>
+                  @if (group.canReturn) {
+                    <td class="action">
+                      <button type="button" class="primary-button" (click)="returnLoan(item.id)">
+                        {{ 'Zurückgeben' | t }}
+                      </button>
+                    </td>
+                  }
+                </tr>
+              }
+            </tbody>
+          </table>
+        }
+      </section>
+    }
   }
 </div>

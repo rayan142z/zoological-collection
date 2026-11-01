@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Zoolog.Models;
@@ -5,6 +6,7 @@ using Zoolog.Models;
 namespace Zoolog.Controllers;
 
 [ApiController]
+[Authorize]
 [Route("api/[controller]")]
 public class LoanController : ControllerBase
 {

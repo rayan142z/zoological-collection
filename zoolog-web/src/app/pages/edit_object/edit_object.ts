@@ -19,10 +19,12 @@ interface SpecimenDetail {
   photoPath?: string;
 }
 
+import { TPipe } from '../../i18n/t.pipe';
+
 @Component({
   selector: 'app-edit-object',
   standalone: true,
-  imports: [RouterLink, FormsModule, CommonModule],
+  imports: [TPipe, RouterLink, FormsModule, CommonModule],
   templateUrl: './edit_object.html',
   styleUrl: './edit_object.css',
 })

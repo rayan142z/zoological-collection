@@ -18,7 +18,7 @@
       <div class="profile-details">
         <!-- NAME -->
         <div class="detail-item">
-          <label>Name</label>
+          <label>{{ 'Name' | t }}</label>
           @if (isEditing()) {
             <input type="text" class="edit-input" [(ngModel)]="editForm.username" />
           } @else {
@@ -28,7 +28,7 @@
 
         <!-- EMAIL -->
         <div class="detail-item">
-          <label>E-Mail-Adresse</label>
+          <label>{{ 'E-Mail-Adresse' | t }}</label>
           @if (isEditing()) {
             <input type="email" class="edit-input" [(ngModel)]="editForm.email" />
           } @else {
@@ -38,12 +38,12 @@
 
         <!-- JOB -->
         <div class="detail-item">
-          <label>Tätigkeit / Bereich</label>
+          <label>{{ 'Tätigkeit / Bereich' | t }}</label>
           @if (isEditing()) {
             <input
               type="text"
               class="edit-input"
-              placeholder="z. B. Forscher, Museum"
+              [placeholder]="'z. B. Forscher, Museum' | t"
               [(ngModel)]="editForm.job"
             />
           } @else {
@@ -51,7 +51,7 @@
               @if (user.job) {
                 {{ user.job }}
               } @else {
-                <span class="placeholder-text">Keine Angabe</span>
+                <span class="placeholder-text">{{ 'Keine Angabe' | t }}</span>
               }
             </p>
           }
@@ -59,11 +59,11 @@
 
         <!-- DESCRIPTION -->
         <div class="detail-item">
-          <label>Über mich</label>
+          <label>{{ 'Über mich' | t }}</label>
           @if (isEditing()) {
             <textarea
               class="edit-textarea"
-              placeholder="Beschreibe dich kurz..."
+              [placeholder]="'Beschreibe dich kurz...' | t"
               [(ngModel)]="editForm.description"
             ></textarea>
           } @else {
@@ -71,7 +71,7 @@
               @if (user.description) {
                 {{ user.description }}
               } @else {
-                <span class="placeholder-text">Noch keine Beschreibung hinzugefügt.</span>
+                <span class="placeholder-text">{{ 'Noch keine Beschreibung hinzugefügt.' | t }}</span>
               }
             </p>
           }
@@ -82,13 +82,13 @@
       <div class="profile-actions">
         @if (isEditing()) {
           <div class="edit-actions-group">
-            <button class="btn-save" (click)="saveChanges()">Speichern</button>
-            <button class="btn-cancel" (click)="cancelEditing()">Abbrechen</button>
+            <button class="btn-save" (click)="saveChanges()">{{ 'Speichern' | t }}</button>
+            <button class="btn-cancel" (click)="cancelEditing()">{{ 'Abbrechen' | t }}</button>
           </div>
         } @else {
           <div class="default-actions-group">
-            <button class="btn-edit" (click)="startEditing()">Profil bearbeiten</button>
-            <button class="btn-logout" (click)="logout()">Abmelden</button>
+            <button class="btn-edit" (click)="startEditing()">{{ 'Profil bearbeiten' | t }}</button>
+            <button class="btn-logout" (click)="logout()">{{ 'Abmelden' | t }}</button>
           </div>
         }
       </div>
@@ -96,6 +96,6 @@
   </div>
 } @else {
   <div class="loading-container">
-    <p>Profil wird geladen...</p>
+    <p>{{ 'Profil wird geladen...' | t }}</p>
   </div>
 }

@@ -39,10 +39,12 @@ interface SpecimenSearchResult {
   collectionName?: string;
 }
 
+import { TPipe } from '../../i18n/t.pipe';
+
 @Component({
   selector: 'app-public-search',
   standalone: true,
-  imports: [FormsModule, RouterLink, CommonModule],
+  imports: [TPipe, FormsModule, RouterLink, CommonModule],
   templateUrl: './public_search.html',
   styleUrl: './public_search.css',
 })

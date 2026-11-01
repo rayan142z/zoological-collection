@@ -3,9 +3,9 @@
     <!-- Dein bestehender Code für angemeldete Nutzer ... -->
     <div class="dashboard-hero">
       <div class="hero-text">
-        <p class="hero-eyebrow">Willkommen zurück</p>
-        <h1 class="dashboard-title serif">Übersicht</h1>
-        <p class="dashboard-subtitle">Deine zoologischen Sammlungen auf einen Blick</p>
+        <p class="hero-eyebrow">{{ 'Willkommen zurück' | t }}</p>
+        <h1 class="dashboard-title serif">{{ 'Übersicht' | t }}</h1>
+        <p class="dashboard-subtitle">{{ 'Deine zoologischen Sammlungen auf einen Blick' | t }}</p>
       </div>
     </div>
 
@@ -15,9 +15,9 @@
         <div class="section-header-left">
           <span class="section-icon">🗂️</span>
           <div>
-            <h2 class="section-heading serif">Meine Sammlungen</h2>
+            <h2 class="section-heading serif">{{ 'Meine Sammlungen' | t }}</h2>
             <p class="section-meta">
-              {{ myCollections.length }} Sammlungen · {{ totalObjects(myCollections) }} Objekte
+              {{ '{n} Sammlungen · {m} Objekte' | t: { n: myCollections.length, m: totalObjects(myCollections) } }}
             </p>
           </div>
         </div>
@@ -28,7 +28,7 @@
           <a class="collection-card" [routerLink]="['/objects', col.id]">
             <div class="col-card-top" [style.background]="col.color">
               <span class="col-emoji">{{ col.emoji }}</span>
-              <div class="col-card-badge">{{ col.objectCount }} Obj.</div>
+              <div class="col-card-badge">{{ col.objectCount }} {{ 'Obj.' | t }}</div>
             </div>
             <div class="col-card-body">
               <h3 class="col-name serif">{{ col.name }}</h3>
@@ -38,7 +38,7 @@
               </div>
             </div>
             <div class="col-card-footer">
-              <span class="col-updated">Zuletzt: {{ col.lastUpdated }}</span>
+              <span class="col-updated">{{ 'Erstellt:' | t }} {{ col.lastUpdated }}</span>
               <span class="col-arrow">→</span>
             </div>
           </a>
@@ -64,7 +64,7 @@
                 <line x1="5" y1="12" x2="19" y2="12" />
               </svg>
             </div>
-            <span class="new-col-label">Neue Sammlung erstellen</span>
+            <span class="new-col-label">{{ 'Neue Sammlung erstellen' | t }}</span>
           </div>
         </a>
       </div>
@@ -73,13 +73,10 @@
     <!-- Ausführliches Willkommensbanner für Gäste -->
     <div class="dashboard-hero welcome-guest-hero">
       <div class="hero-text">
-        <p class="hero-eyebrow">🎓 Ursprünglich gestartet als Informatik-Studienprojekt</p>
-        <h1 class="dashboard-title serif">Zoologisches Archiv & Forschungsportal</h1>
+        <p class="hero-eyebrow">{{ '🎓 Ursprünglich gestartet als Informatik-Studienprojekt' | t }}</p>
+        <h1 class="dashboard-title serif">{{ 'Zoologisches Archiv & Forschungsportal' | t }}</h1>
         <p class="dashboard-subtitle">
-          Willkommen auf unserer zentralen Plattform für naturkundliche Bestände! Was als
-          universitäres Projekt im Rahmen des Informatikstudiums an der Universität begann, hat sich
-          zu einem umfassenden, professionellen Tool für den wissenschaftlichen Austausch, die
-          Artenbestimmung und die digitale Inventarisierung entwickelt.
+          {{ 'Willkommen auf unserer zentralen Plattform für naturkundliche Bestände! Was als universitäres Projekt im Rahmen des Informatikstudiums an der Universität begann, hat sich zu einem umfassenden, professionellen Tool für den wissenschaftlichen Austausch, die Artenbestimmung und die digitale Inventarisierung entwickelt.' | t }}
         </p>
       </div>
 
@@ -88,49 +85,37 @@
         <div class="hero-feature-item">
           <span class="feature-emoji">🗂️</span>
           <div>
-            <strong>Sammlungen digital verwalten:</strong> Erstelle, strukturiere und pflege eigene
-            zoologische Sammlungen, ordne sie übersichtlich Kategorien zu und behalte den gesamten
-            Bestand von der Erfassung bis zur Archivierung stets im Blick.
+            <strong>{{ 'Sammlungen digital verwalten:' | t }}</strong> {{ 'Erstelle, strukturiere und pflege eigene zoologische Sammlungen, ordne sie übersichtlich Kategorien zu und behalte den gesamten Bestand von der Erfassung bis zur Archivierung stets im Blick.' | t }}
           </div>
         </div>
         <div class="hero-feature-item">
           <span class="feature-emoji">🤝</span>
           <div>
-            <strong>Objekte verwalten & verleihen:</strong> Koordiniere Ausleihen, Leihfristen und
-            den geregelten wissenschaftlichen Austausch von Exemplaren unkompliziert, sicher und
-            nachvollziehbar mit anderen Forschenden und Institutionen.
+            <strong>{{ 'Objekte verwalten & verleihen:' | t }}</strong> {{ 'Koordiniere Ausleihen, Leihfristen und den geregelten wissenschaftlichen Austausch von Exemplaren unkompliziert, sicher und nachvollziehbar mit anderen Forschenden und Institutionen.' | t }}
           </div>
         </div>
         <div class="hero-feature-item">
           <span class="feature-emoji">🔍</span>
           <div>
-            <strong>Detaillierte Filter- & Suchfunktion:</strong> Durchsuche alle freigegebenen
-            Bestände gezielt nach spezifischen Kriterien wie Arten, Gattungen, Familien,
-            geografischen Fundorten oder individuellen Merkmalen.
+            <strong>{{ 'Detaillierte Filter- & Suchfunktion:' | t }}</strong> {{ 'Durchsuche alle freigegebenen Bestände gezielt nach spezifischen Kriterien wie Arten, Gattungen, Familien, geografischen Fundorten oder individuellen Merkmalen.' | t }}
           </div>
         </div>
         <div class="hero-feature-item">
           <span class="feature-emoji">🔬</span>
           <div>
-            <strong>Wissenschaftlich forschen:</strong> Nutze fundierte taxonomische Verknüpfungen,
-            präzise Geo-Koordinaten und historische Fundortdaten für tiefergehende naturkundliche
-            Studien und ökologische Analysen.
+            <strong>{{ 'Wissenschaftlich forschen:' | t }}</strong> {{ 'Nutze fundierte taxonomische Verknüpfungen, präzise Geo-Koordinaten und historische Fundortdaten für tiefergehende naturkundliche Studien und ökologische Analysen.' | t }}
           </div>
         </div>
         <div class="hero-feature-item">
           <span class="feature-emoji">🌐</span>
           <div>
-            <strong>Akademisches Networking:</strong> Vernetze dich mit Gleichgesinnten, teile
-            spannende Entdeckungen, profitiere von einer aktiven Forscher-Community und erweitere
-            kontinuierlich dein zoologisches Netzwerk.
+            <strong>{{ 'Akademisches Networking:' | t }}</strong> {{ 'Vernetze dich mit Gleichgesinnten, teile spannende Entdeckungen, profitiere von einer aktiven Forscher-Community und erweitere kontinuierlich dein zoologisches Netzwerk.' | t }}
           </div>
         </div>
         <div class="hero-feature-item">
           <span class="feature-emoji">📊</span>
           <div>
-            <strong>Statistiken & Einblicke:</strong> Erhalte live auf einen Blick aussagekräftige
-            Kennzahlen über die Gesamtzahl aller öffentlichen Sammlungen, registrierten Exemplare
-            und aktiven Portal-Nutzer.
+            <strong>{{ 'Statistiken & Einblicke:' | t }}</strong> {{ 'Erhalte live auf einen Blick aussagekräftige Kennzahlen über die Gesamtzahl aller öffentlichen Sammlungen, registrierten Exemplare und aktiven Portal-Nutzer.' | t }}
           </div>
         </div>
       </div>
@@ -151,7 +136,7 @@
             <rect x="3" y="14" width="7" height="7" />
             <rect x="14" y="14" width="7" height="7" />
           </svg>
-          Zur Suchfunktion
+          {{ 'Zur Suchfunktion' | t }}
         </a>
         <a
           routerLink="/login"
@@ -163,7 +148,7 @@
             justify-content: center;
           "
         >
-          Anmelden
+          {{ 'Anmelden' | t }}
         </a>
         <a
           routerLink="/register"
@@ -175,7 +160,7 @@
             justify-content: center;
           "
         >
-          Registrieren
+          {{ 'Registrieren' | t }}
         </a>
       </div>
 
@@ -183,15 +168,15 @@
       <div class="guest-stats-strip">
         <div class="gstat">
           <span class="gstat-val">{{ portalStats.totalCollections }}</span>
-          <span class="gstat-lbl">Sammlungen</span>
+          <span class="gstat-lbl">{{ 'Sammlungen' | t }}</span>
         </div>
         <div class="gstat">
           <span class="gstat-val">{{ portalStats.totalObjects }}</span>
-          <span class="gstat-lbl">Objekte & Exemplare</span>
+          <span class="gstat-lbl">{{ 'Objekte & Exemplare' | t }}</span>
         </div>
         <div class="gstat">
           <span class="gstat-val">{{ portalStats.totalUsers }}</span>
-          <span class="gstat-lbl">Aktive Nutzer</span>
+          <span class="gstat-lbl">{{ 'Aktive Nutzer' | t }}</span>
         </div>
       </div>
     </div>
@@ -204,9 +189,9 @@
         <div class="section-header-left">
           <span class="section-icon">⭐</span>
           <div>
-            <h2 class="section-heading serif">Favorisierte Sammlungen</h2>
+            <h2 class="section-heading serif">{{ 'Favorisierte Sammlungen' | t }}</h2>
             <p class="section-meta">
-              {{ favCollections.length }} Sammlungen · {{ totalObjects(favCollections) }} Objekte
+              {{ '{n} Sammlungen · {m} Objekte' | t: { n: favCollections.length, m: totalObjects(favCollections) } }}
             </p>
           </div>
         </div>
@@ -217,7 +202,7 @@
           <a class="collection-card" [routerLink]="['/objects', col.id]">
             <div class="col-card-top" [style.background]="col.color">
               <span class="col-emoji">{{ col.emoji }}</span>
-              <div class="col-card-badge">{{ col.objectCount }} Obj.</div>
+              <div class="col-card-badge">{{ col.objectCount }} {{ 'Obj.' | t }}</div>
             </div>
             <div class="col-card-body">
               <h3 class="col-name serif">{{ col.name }}</h3>
@@ -227,12 +212,35 @@
               </div>
             </div>
             <div class="col-card-footer">
-              <span class="col-updated">Zuletzt: {{ col.lastUpdated }}</span>
+              <span class="col-updated">{{ 'Erstellt:' | t }} {{ col.lastUpdated }}</span>
               <span class="col-arrow">→</span>
             </div>
           </a>
         }
       </div>
+    </section>
+  }
+
+  @if (classStats.length > 0) {
+    <section class="dash-section class-chart" aria-labelledby="class-chart-title">
+      <div class="section-header">
+        <div class="section-header-left">
+          <span class="section-icon" aria-hidden="true">📊</span>
+          <div>
+            <h2 id="class-chart-title" class="section-heading serif">{{ 'Sammlung nach Klassen' | t }}</h2>
+            <p class="section-meta">{{ 'Exemplare je Tierklasse in allen öffentlichen Sammlungen' | t }}</p>
+          </div>
+        </div>
+      </div>
+      <ul class="bar-list">
+        @for (c of classStats; track c.name) {
+          <li class="bar-row">
+            <span class="bar-label latin">{{ c.name }}</span>
+            <span class="bar-track"><span class="bar-fill" [style.width.%]="c.pct"></span></span>
+            <span class="bar-value">{{ c.count }}</span>
+          </li>
+        }
+      </ul>
     </section>
   }
 </div>

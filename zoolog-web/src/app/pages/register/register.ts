@@ -4,10 +4,12 @@ import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { Auth } from '../../services/auth';
 
+import { TPipe } from '../../i18n/t.pipe';
+
 @Component({
   selector: 'app-register',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [TPipe, CommonModule, FormsModule, RouterLink],
   templateUrl: './register.html',
   styleUrl: './register.css',
 })

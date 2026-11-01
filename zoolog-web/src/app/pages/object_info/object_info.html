@@ -1,224 +1,159 @@
 <div class="page-container">
   @if (isLoading) {
-    <div class="loading-state" style="text-align: center; padding: 3rem">
-      <p>Lade Objektdetails...</p>
+    <div class="detail-skeleton" aria-busy="true" [attr.aria-label]="'Lade Objektdetails…' | t">
+      <div class="sk sk-title"></div>
+      <div class="detail-layout">
+        <div class="sk sk-image"></div>
+        <div class="sk sk-panel"></div>
+      </div>
     </div>
   }
 
   @if (!isLoading && errorMessage) {
     <div class="empty-state">
-      <div class="empty-icon">⚠️</div>
-      <p class="empty-title serif">{{ errorMessage }}</p>
-      <button class="primary-button" (click)="goBack()">Zurück zur Übersicht</button>
+      <div class="empty-icon" aria-hidden="true">🔍</div>
+      <p class="empty-title serif">{{ errorMessage | t }}</p>
+      <p class="text-muted">{{ 'Das Objekt existiert nicht oder ist nicht öffentlich.' | t }}</p>
+      <a class="primary-button" routerLink="/public_search">{{ 'Zur Suche' | t }}</a>
     </div>
   }
 
   @if (!isLoading && specimen) {
-    <div class="objects-header">
+    <nav class="breadcrumb" [attr.aria-label]="'Brotkrumen' | t">
+      <a routerLink="/dashboard">{{ 'Übersicht' | t }}</a>
+      <span aria-hidden="true">›</span>
+      <a [routerLink]="['/objects', specimen.collectionId]">{{ specimen.collectionName }}</a>
+      <span aria-hidden="true">›</span>
+      <span>{{ specimen.name }}</span>
+    </nav>
+
+    <header class="detail-header">
       <div>
         <h1 class="objects-title serif">{{ specimen.name }}</h1>
+        <p class="latin detail-latin">{{ specimen.genus }} {{ specimen.species }}</p>
       </div>
-      <div class="header-actions" style="display: flex; gap: 1rem; min-width: 280px">
-        <button
-          class="primary-button"
-          (click)="goBack()"
-          title="Zurück"
-          style="
-            flex: 1;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-          "
-        >
-          <svg
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            style="margin-right: 0.5rem"
-          >
+      <div class="detail-actions">
+        <button type="button" class="secondary-button" (click)="goBack()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
             <line x1="19" y1="12" x2="5" y2="12" />
             <polyline points="12 19 5 12 12 5" />
           </svg>
-          Zurück
+          {{ 'Zurück' | t }}
+        </button>
+        <button type="button" class="secondary-button" (click)="copyLink()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
+            <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
+          </svg>
+          {{ (linkCopied ? 'Link kopiert' : 'Link teilen') | t }}
         </button>
 
-        @if (
-          specimen.status != 'on loan' &&
-          (specimen?.collectionCreatedBy === currentUserId || isAdmin)
-        ) {
-          <a
-            [routerLink]="['/edit-object', specimen.id]"
-            class="primary-button"
-            style="
-              flex: 1;
-              display: inline-flex;
-              align-items: center;
-              justify-content: center;
-              text-align: center;
-              text-decoration: none;
-            "
-          >
-            <svg
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              style="margin-right: 0.5rem"
-            >
+        @if (canManage) {
+          <a [routerLink]="['/edit-object', specimen.id]" class="secondary-button">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
               <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
               <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4Z" />
             </svg>
-            Bearbeiten
+            {{ 'Bearbeiten' | t }}
           </a>
-        }
-        @if (
-          specimen.status != 'on loan' &&
-          (specimen?.collectionCreatedBy === currentUserId || isAdmin)
-        ) {
-          <button
-            (click)="openLoanModal()"
-            class="primary-button"
-            style="
-              flex: 1;
-              display: inline-flex;
-              align-items: center;
-              justify-content: center;
-              text-align: center;
-              text-decoration: none;
-            "
-          >
-            📦 Exemplar verleihen
-          </button>
-        }
-        @if (showLoanModal) {
-          <div class="modal-backdrop">
-            <div class="modal-content">
-              <h3>Exemplar verleihen</h3>
-
-              <form [formGroup]="loanForm" (ngSubmit)="submitLoan()">
-                <!-- Person / Ausleiher zum Tippen mit Vorschlagsliste -->
-                <div class="form-group" style="position: relative">
-                  <label for="loanedTo">Verliehen an:</label>
-                  <input
-                    type="text"
-                    formControlName="loanedTo"
-                    (input)="onSearchChange($event)"
-                    (blur)="onBlurWithDelay()"
-                    class="form-input"
-                    placeholder="Namen eingeben..."
-                    autocomplete="off"
-                  />
-
-                  <!-- Vorschlags-Dropdown -->
-                  @if (showSuggestions && filteredPersons.length > 0) {
-                    <ul
-                      class="suggestions-list"
-                      style="
-                        position: absolute;
-                        background: white;
-                        border: 1px solid #ccc;
-                        width: 100%;
-                        list-style: none;
-                        padding: 0;
-                        margin: 0;
-                        z-index: 1000;
-                      "
-                    >
-                      @for (person of filteredPersons; track person) {
-                        <li
-                          (click)="selectPerson(person)"
-                          style="padding: 8px; cursor: pointer; border-bottom: 1px solid #eee"
-                        >
-                          {{ person }}
-                        </li>
-                      }
-                    </ul>
-                  }
-                </div>
-
-                <!-- Geplantes Rückgabedatum -->
-                <div class="form-group">
-                  <label>Geplantes Rückgabedatum:</label>
-                  <input type="date" formControlName="returnDate" class="form-input" />
-                </div>
-
-                <!-- Notiz -->
-                <div class="form-group">
-                  <label>Notiz:</label>
-                  <textarea
-                    formControlName="notes"
-                    class="form-textarea"
-                    placeholder="Optionale Anmerkungen..."
-                  ></textarea>
-                </div>
-
-                <!-- Aktionen -->
-                <div class="modal-actions">
-                  <button type="button" (click)="closeLoanModal()" class="btn-cancel">
-                    Abbrechen
-                  </button>
-                  <button type="submit" class="btn-submit">Speichern</button>
-                </div>
-              </form>
-            </div>
-          </div>
+          @if (specimen.status === 'verfügbar') {
+            <button type="button" (click)="openLoanModal()" class="primary-button">
+              {{ 'Exemplar verleihen' | t }}
+            </button>
+          }
         }
       </div>
-    </div>
+    </header>
 
-    <hr style="border: 0; border-top: 1px solid #e2e8f0; margin: 1.5rem 0" />
-
-    <div
-      class="detail-layout"
-      style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem"
-    >
-      <div class="detail-visuals-area" style="display: flex; flex-direction: column; gap: 1rem">
-        <!-- Bild-Bereich -->
+    @if (showLoanModal) {
+      <div class="modal-backdrop" (click)="closeLoanModal()">
         <div
-          class="detail-image-area card"
-          style="
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: #f8fafc;
-            overflow: hidden;
-            min-height: 350px;
-            position: relative;
-          "
+          class="modal-content"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="loan-title"
+          (click)="$event.stopPropagation()"
         >
-          <span
-            class="badge {{ getStatusClass(specimen.status) }}"
-            style="position: absolute; top: 1rem; left: 1rem; z-index: 10"
-          >
-            {{ specimen.status }}
+          <h3 id="loan-title" class="serif">{{ 'Exemplar verleihen' | t }}</h3>
+
+          <form [formGroup]="loanForm" (ngSubmit)="submitLoan()">
+            <div class="form-group suggest-wrap">
+              <label class="form-label" for="loanedTo">{{ 'Verliehen an' | t }}</label>
+              <input
+                id="loanedTo"
+                type="text"
+                formControlName="loanedTo"
+                (input)="onSearchChange($event)"
+                (blur)="onBlurWithDelay()"
+                class="form-input"
+                [placeholder]="'Benutzernamen eingeben…' | t"
+                autocomplete="off"
+              />
+              @if (showSuggestions && filteredPersons.length > 0) {
+                <ul class="suggestions-list" role="listbox">
+                  @for (person of filteredPersons; track person) {
+                    <li role="option" tabindex="0" (click)="selectPerson(person)" (keydown.enter)="selectPerson(person)">
+                      {{ person }}
+                    </li>
+                  }
+                </ul>
+              }
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="returnDate">{{ 'Geplantes Rückgabedatum' | t }}</label>
+              <input id="returnDate" type="date" formControlName="returnDate" class="form-input" />
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="loanNotes">{{ 'Notiz' | t }}</label>
+              <textarea
+                id="loanNotes"
+                formControlName="notes"
+                class="form-textarea"
+                [placeholder]="'Optionale Anmerkungen…' | t"
+              ></textarea>
+            </div>
+
+            <div class="modal-actions">
+              <button type="button" (click)="closeLoanModal()" class="secondary-button">
+                {{ 'Abbrechen' | t }}
+              </button>
+              <button type="submit" class="primary-button">{{ 'Verleih speichern' | t }}</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    }
+
+    <div class="detail-layout">
+      <div class="detail-visuals">
+        <div class="detail-image card">
+          <span class="badge {{ getStatusClass(specimen.status) }} detail-status">
+            {{ specimen.status | t }}
           </span>
 
           @if (specimen.image) {
-            <img
-              [src]="'http://localhost:5227' + specimen.image"
-              [alt]="specimen.name"
-              style="width: 100%; height: 100%; object-fit: cover; max-height: 500px"
-            />
+            <button type="button" class="image-zoom" (click)="lightboxOpen = true" [attr.aria-label]="'Bild vergrößern' | t">
+              <img [src]="specimen.image | assetUrl" [alt]="specimen.name" />
+            </button>
           } @else {
-            <div class="img-placeholder" style="font-size: 5rem">🦎</div>
+            <div class="img-placeholder" aria-hidden="true">
+              <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2">
+                <rect x="3" y="3" width="18" height="18" rx="2" />
+                <circle cx="8.5" cy="8.5" r="1.5" />
+                <path d="m21 15-5-5L5 21" />
+              </svg>
+              <span>{{ 'Kein Foto vorhanden' | t }}</span>
+            </div>
           }
         </div>
 
-        <!-- Karten-Bereich (wird nur angezeigt, wenn Koordinaten da sind) -->
-        @if (specimen?.latitude && specimen?.longitude) {
-          <div
-            class="card"
-            style="height: 350px; overflow: hidden; border-radius: 8px; width: 100%"
-          >
+        @if (specimen.latitude && specimen.longitude) {
+          <div class="card detail-map">
             <div
               leaflet
-              style="height: 100%; width: 100%"
+              class="map-canvas"
               [leafletOptions]="mapOptions"
               [leafletLayers]="mapLayers"
               (leafletMapReady)="onMapReady($event)"
@@ -227,195 +162,86 @@
         }
       </div>
 
-      <div class="detail-info-area card" style="padding: 2rem">
-        <h2 class="serif" style="margin-top: 0; margin-bottom: 1.5rem; color: #1e293b">
-          Spezifikationen
-        </h2>
+      <div class="detail-info card">
+        <h2 class="serif">{{ 'Spezifikationen' | t }}</h2>
 
-        <div class="info-list" style="display: flex; flex-direction: column; gap: 1rem">
-          <div
-            style="
-              display: flex;
-              justify-content: space-between;
-              border-bottom: 1px solid #f1f5f9;
-              padding-bottom: 0.5rem;
-            "
-          >
-            <span style="color: #64748b; font-weight: 500">Wissenschaftlicher Name</span>
-            <span style="font-style: italic; color: #0f172a"
-              >{{ specimen.genus }} {{ specimen.species }}</span
-            >
+        <dl class="spec-list">
+          <div>
+            <dt>{{ 'Wissenschaftlicher Name' | t }}</dt>
+            <dd class="latin">{{ specimen.genus }} {{ specimen.species }}</dd>
           </div>
-
-          <div
-            style="
-              display: flex;
-              justify-content: space-between;
-              border-bottom: 1px solid #f1f5f9;
-              padding-bottom: 0.5rem;
-            "
-          >
-            <span style="color: #64748b; font-weight: 500">Gattung (Genus)</span>
-            <span style="color: #0f172a">{{ specimen.genus }}</span>
+          <div>
+            <dt>{{ 'Gattung (Genus)' | t }}</dt>
+            <dd>{{ specimen.genus }}</dd>
           </div>
-
-          <div
-            style="
-              display: flex;
-              justify-content: space-between;
-              border-bottom: 1px solid #f1f5f9;
-              padding-bottom: 0.5rem;
-            "
-          >
-            <span style="color: #64748b; font-weight: 500">Art (Species)</span>
-            <span style="font-style: italic; color: #0f172a">{{ specimen.species }}</span>
+          <div>
+            <dt>{{ 'Art (Species)' | t }}</dt>
+            <dd class="latin">{{ specimen.species }}</dd>
           </div>
-
-          <div
-            style="
-              display: flex;
-              justify-content: space-between;
-              border-bottom: 1px solid #f1f5f9;
-              padding-bottom: 0.5rem;
-            "
-          >
-            <span style="color: #64748b; font-weight: 500">Funddatum / Dokumentation</span>
-            <span style="color: #0f172a">{{ specimen.dateCollected | date: 'dd.MM.yyyy' }}</span>
+          <div>
+            <dt>{{ 'Funddatum' | t }}</dt>
+            <dd>{{ specimen.dateCollected | date: 'dd.MM.yyyy' }}</dd>
           </div>
-
-          <!-- NEU: Größe (Size) -->
           @if (specimen.size) {
-            <div
-              style="
-                display: flex;
-                justify-content: space-between;
-                border-bottom: 1px solid #f1f5f9;
-                padding-bottom: 0.5rem;
-              "
-            >
-              <span style="color: #64748b; font-weight: 500">Größe</span>
-              <span style="color: #0f172a">{{ specimen.size }} </span>
+            <div>
+              <dt>{{ 'Größe' | t }}</dt>
+              <dd>{{ specimen.size }}</dd>
             </div>
           }
-
-          <!-- NEU: Gewicht (Weight) -->
           @if (specimen.weight) {
-            <div
-              style="
-                display: flex;
-                justify-content: space-between;
-                border-bottom: 1px solid #f1f5f9;
-                padding-bottom: 0.5rem;
-              "
-            >
-              <span style="color: #64748b; font-weight: 500">Gewicht</span>
-              <span style="color: #0f172a">{{ specimen.weight }} kg</span>
+            <div>
+              <dt>{{ 'Gewicht' | t }}</dt>
+              <dd>{{ formatWeight(specimen.weight) }}</dd>
             </div>
           }
-
-          <!-- NEU: Geburtsjahr (BirthYear) -->
           @if (specimen.birthYear) {
-            <div
-              style="
-                display: flex;
-                justify-content: space-between;
-                border-bottom: 1px solid #f1f5f9;
-                padding-bottom: 0.5rem;
-              "
-            >
-              <span style="color: #64748b; font-weight: 500">Geburtsjahr</span>
-              <span style="color: #0f172a">{{ specimen.birthYear }}</span>
+            <div>
+              <dt>{{ 'Geburtsjahr' | t }}</dt>
+              <dd>{{ specimen.birthYear }}</dd>
             </div>
           }
-
-          @if (specimen.description) {
-            <div
-              class="section-card description-card"
-              style="
-                margin-top: 1.5rem;
-                padding: 1.5rem;
-                background: #ffffff;
-                border-radius: 8px;
-                border: 1px solid #e2e8f0;
-              "
-            >
-              <h3
-                style="
-                  font-size: 1.1rem;
-                  color: #1e293b;
-                  margin-top: 0;
-                  margin-bottom: 0.75rem;
-                  font-weight: 600;
-                "
-              >
-                Beschreibung
-              </h3>
-              <p
-                style="
-                  color: #475569;
-                  font-size: 0.975rem;
-                  line-height: 1.6;
-                  white-space: pre-line;
-                  margin: 0;
-                "
-              >
-                {{ specimen.description }}
-              </p>
-            </div>
-          } @else {
-            <div
-              class="section-card description-card"
-              style="
-                margin-top: 1.5rem;
-                padding: 1.5rem;
-                background: #ffffff;
-                border-radius: 8px;
-                border: 1px solid #e2e8f0;
-              "
-            >
-              <p style="color: #94a3b8; font-size: 0.95rem; font-style: italic; margin: 0">
-                Keine Beschreibung für dieses Objekt hinterlegt.
-              </p>
+          @if (specimen.latitude && specimen.longitude) {
+            <div>
+              <dt>{{ 'Koordinaten' | t }}</dt>
+              <dd>{{ specimen.latitude | number: '1.4-4' }}, {{ specimen.longitude | number: '1.4-4' }}</dd>
             </div>
           }
-
-          <div style="border-bottom: 1px solid #f1f5f9; padding-bottom: 0.5rem">
-            <div style="display: flex; justify-content: space-between">
-              <span style="color: #64748b; font-weight: 500">Zugehörige Sammlung</span>
-              <a
-                [routerLink]="['/collections', specimen.collectionId]"
-                style="color: var(--green-dark, #15803d); font-weight: 500"
-              >
-                {{ specimen.collectionName }}
-              </a>
-            </div>
-
-            @if (specimen.collectionDescription) {
-              <div
-                style="
-                  margin-top: 0.5rem;
-                  background: #f8fafc;
-                  padding: 0.5rem 0.75rem;
-                  border-left: 3px solid #cbd5e1;
-                  border-radius: 0 4px 4px 0;
-                "
-              >
-                <p
-                  style="
-                    margin: 0;
-                    font-size: 0.85rem;
-                    color: #475569;
-                    font-style: italic;
-                    line-height: 1.4;
-                  "
-                >
-                  {{ specimen.collectionDescription }}
-                </p>
-              </div>
-            }
+          <div>
+            <dt>{{ 'Zugehörige Sammlung' | t }}</dt>
+            <dd>
+              <a [routerLink]="['/objects', specimen.collectionId]">{{ specimen.collectionName }}</a>
+            </dd>
           </div>
-        </div>
+        </dl>
+
+        @if (specimen.collectionDescription) {
+          <p class="collection-note">{{ specimen.collectionDescription }}</p>
+        }
+
+        <section class="description">
+          <h3>{{ 'Beschreibung' | t }}</h3>
+          @if (specimen.description) {
+            <p>{{ specimen.description }}</p>
+          } @else {
+            <p class="text-hint">{{ 'Keine Beschreibung für dieses Objekt hinterlegt.' | t }}</p>
+          }
+        </section>
       </div>
     </div>
+
+    @if (lightboxOpen && specimen.image) {
+      <div
+        class="lightbox"
+        role="dialog"
+        aria-modal="true"
+        [attr.aria-label]="specimen.name"
+        (click)="lightboxOpen = false"
+        (keydown.escape)="lightboxOpen = false"
+      >
+        <button type="button" class="lightbox-close" (click)="lightboxOpen = false" [attr.aria-label]="'Schließen' | t" autofocus>×</button>
+        <img [src]="specimen.image | assetUrl" [alt]="specimen.name" />
+        <p class="lightbox-caption">{{ specimen.name }} · <em>{{ specimen.genus }} {{ specimen.species }}</em></p>
+      </div>
+    }
   }
 </div>

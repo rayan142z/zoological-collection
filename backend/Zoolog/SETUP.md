@@ -4,28 +4,14 @@ Diese Datei erklärt kurz, wie man das Backend lokal einrichtet, nachdem man das
 
 ## 1. Lokale Datenbank-Konfiguration
 
-Die Datei appsettings.Development.json wird nicht mehr in Git gespeichert, weil dort lokale Datenbank-Zugangsdaten stehen können.
-
-Erstelle die Datei zuerst aus der Beispiel-Datei:
-
-```
-cp appsettings.Development.json.example appsettings.Development.json
-```
-
-Danach öffnest du appsettings.Development.json und trägst deine echte SQL-Server-Verbindung ein.
-
-Beispiel:
+Zugangsdaten stehen **nie** in Git. `appsettings.Development.json` enthält nur einen leeren Connection String.
+Setze die echte Verbindung lokal mit user-secrets (im Ordner `backend/Zoolog`):
 
 ```
-{
-  "ConnectionStrings": {
-    "DefaultConnection": "Server=DEIN_SERVER;Database=DEINE_DATENBANK;User Id=DEIN_USER;Password=DEIN_PASSWORT;TrustServerCertificate=True;"
-  },
-  "allowedOrigins": "http://localhost:4200"
-}
+dotnet user-secrets set "ConnectionStrings:DefaultConnection" "Server=DEIN_SERVER;Database=DEINE_DATENBANK;User Id=DEIN_USER;Password=DEIN_PASSWORT;TrustServerCertificate=True;"
 ```
 
-Wichtig: appsettings.Development.json darf nicht committet werden.
+Auf einem Server alternativ als Umgebungsvariable: `ConnectionStrings__DefaultConnection`.
 
 ## 2. JWT-Konfiguration
 
@@ -53,7 +39,7 @@ dotnet user-secrets set "Jwt:Issuer" "Zoolog"
 dotnet user-secrets set "Jwt:Audience" "ZoologClient"
 ```
 
-Jedes Teammitglied kann lokal einen eigenen Key benutzen.
+Jedes Teammitglied kann lokal einen eigenen Key benutzen. Ohne Key erzeugt das Backend im Development-Modus bei jedem Start einen zufälligen Key (Logins verfallen dann beim Neustart). In Produktion ist `Jwt__Key` als Umgebungsvariable Pflicht.
 
 Wichtig ist nur, dass der Key lang genug ist.
 

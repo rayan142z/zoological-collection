@@ -33,10 +33,12 @@ interface CollectionOption {
   createdBy: number;
 }
 
+import { TPipe } from '../../i18n/t.pipe';
+
 @Component({
   selector: 'app-new-object',
   standalone: true,
-  imports: [RouterLink, FormsModule, DatePipe, CommonModule],
+  imports: [TPipe, RouterLink, FormsModule, DatePipe, CommonModule],
   templateUrl: './new_object.html',
   styleUrl: './new_object.css',
 })

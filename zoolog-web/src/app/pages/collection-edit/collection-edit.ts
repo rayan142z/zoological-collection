@@ -8,9 +8,11 @@ import { Location } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { HttpHeaders } from '@angular/common/http';
 
+import { TPipe } from '../../i18n/t.pipe';
+
 @Component({
   selector: 'app-collection-edit',
-  imports: [
+  imports: [TPipe, 
     CommonModule,
     FormsModule, // <-- 2. Hier unbedingt hinzufügen!
     RouterModule,

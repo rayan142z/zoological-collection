@@ -5,9 +5,11 @@ import { FormsModule } from '@angular/forms';
 import { Auth } from '../../services/auth';
 import { ApiService } from '../../services/api.service';
 
+import { TPipe } from '../../i18n/t.pipe';
+
 @Component({
   selector: 'app-profile',
-  imports: [RouterLink, NgClass, FormsModule],
+  imports: [TPipe, RouterLink, NgClass, FormsModule],
   templateUrl: './profile.html',
   styleUrl: './profile.css',
 })
