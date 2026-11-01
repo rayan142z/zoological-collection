@@ -557,6 +557,7 @@ public class SpecimenController : ControllerBase
         }
     }
 
+    [Authorize]
     [HttpGet("export-csv/{collectionId}")]
     public async Task<IActionResult> ExportCsv(int collectionId)
     {

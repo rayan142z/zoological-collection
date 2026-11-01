@@ -1,10 +1,12 @@
 import { Component, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
+import { TPipe } from '../../i18n/t.pipe';
+
 @Component({
   selector: 'app-about-us',
   standalone: true,
-  imports: [CommonModule],
+  imports: [TPipe, CommonModule],
   templateUrl: './about_us.html',
   styleUrl: './about_us.css',
 })

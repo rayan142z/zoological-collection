@@ -1,9 +1,9 @@
 <div class="validation-container" style="padding: 24px">
-  <h2>Taxonomien validieren</h2>
-  <p class="text-gray-600">Hier kannst du eingereichte Taxonomien überprüfen und freigeben.</p>
+  <h2>{{ 'Taxonomien validieren' | t }}</h2>
+  <p class="text-gray-600">{{ 'Hier kannst du eingereichte Taxonomien überprüfen und freigeben.' | t }}</p>
 
   @if (isLoading) {
-    <p>Lade ausstehende Taxonomien...</p>
+    <p>{{ 'Lade ausstehende Taxonomien...' | t }}</p>
   } @else if (unvalidatedTaxonomies.length === 0) {
     <div
       class="alert-success"
@@ -15,7 +15,7 @@
         margin-top: 16px;
       "
     >
-      🎉 Keine ausstehenden Taxonomien. Alles ist validiert!
+      {{ '🎉 Keine ausstehenden Taxonomien. Alles ist validiert!' | t }}
     </div>
   } @else {
     <div class="table-responsive" style="margin-top: 20px; overflow-x: auto">
@@ -23,13 +23,13 @@
         <thead>
           <tr style="border-bottom: 2px solid #e5e7eb">
             <th style="padding: 10px">ID</th>
-            <th style="padding: 10px">Reich (Kingdom)</th>
-            <th style="padding: 10px">Stamm (Phylum)</th>
-            <th style="padding: 10px">Klasse (Class)</th>
-            <th style="padding: 10px">Familie (Family)</th>
-            <th style="padding: 10px">Gattung (Genus)</th>
-            <th style="padding: 10px">Art (Species)</th>
-            <th style="padding: 10px; text-align: right">Aktion</th>
+            <th style="padding: 10px">{{ 'Reich (Kingdom)' | t }}</th>
+            <th style="padding: 10px">{{ 'Stamm (Phylum)' | t }}</th>
+            <th style="padding: 10px">{{ 'Klasse (Class)' | t }}</th>
+            <th style="padding: 10px">{{ 'Familie (Family)' | t }}</th>
+            <th style="padding: 10px">{{ 'Gattung (Genus)' | t }}</th>
+            <th style="padding: 10px">{{ 'Art (Species)' | t }}</th>
+            <th style="padding: 10px; text-align: right">{{ 'Aktion' | t }}</th>
           </tr>
         </thead>
         <tbody>
@@ -56,7 +56,7 @@
                       font-weight: 600;
                     "
                   >
-                    ✔ Validieren
+                    {{ '✔ Validieren' | t }}
                   </button>
                   <button
                     class="btn btn-danger"
@@ -71,7 +71,7 @@
                       font-weight: 600;
                     "
                   >
-                    ❌ Ablehnen
+                    {{ '❌ Ablehnen' | t }}
                   </button>
                 </div>
               </td>

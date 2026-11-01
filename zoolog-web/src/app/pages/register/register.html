@@ -10,13 +10,13 @@
 
     <div class="panel-content">
       <div class="panel-body">
-        <p class="panel-eyebrow">Werde Teil der Sammlung</p>
+        <p class="panel-eyebrow">{{ 'Werde Teil der Sammlung' | t }}</p>
         <h1 class="panel-headline">
-          Gemeinsam<br />
-          <em>entdecken.</em>
+          {{ 'Gemeinsam' | t }}<br />
+          <em>{{ 'entdecken.' | t }}</em>
         </h1>
         <p class="panel-sub">
-          Verwalte Präparate, verfolge Ausleihen und arbeite mit deinem Team — alles an einem Ort.
+          {{ 'Verwalte Präparate, verfolge Ausleihen und arbeite mit deinem Team — alles an einem Ort.' | t }}
         </p>
 
         <div class="panel-divider"></div>
@@ -48,22 +48,22 @@
           <rect x="3" y="11" width="18" height="11" rx="2" />
           <path d="M7 11V7a5 5 0 0 1 10 0v4" />
         </svg>
-        Deine Daten werden verschlüsselt gespeichert
+        {{ 'Deine Daten werden verschlüsselt gespeichert' | t }}
       </div>
     </div>
   </aside>
 
   <!-- RIGHT PANEL -->
-  <main class="auth-form-side">
+  <div class="auth-form-side">
     <div class="form-wrapper">
       <div class="form-top-badge">
         <span class="badge-dot"></span>
-        Kostenlos registrieren
+        {{ 'Kostenlos registrieren' | t }}
       </div>
 
       <div class="form-header">
-        <h2 class="form-title">Konto erstellen</h2>
-        <p class="form-subtitle">Tritt der Zoologischen Sammlung bei</p>
+        <h2 class="form-title">{{ 'Konto erstellen' | t }}</h2>
+        <p class="form-subtitle">{{ 'Tritt der Zoologischen Sammlung bei' | t }}</p>
       </div>
 
       <form class="auth-form" (ngSubmit)="onRegister()" novalidate>
@@ -73,7 +73,7 @@
             [class.field-focused]="userFocused()"
             [class.field-filled]="regData().username"
           >
-            <label class="field-label" for="reg-user">Benutzername</label>
+            <label class="field-label" for="reg-user">{{ 'Benutzername' | t }}</label>
             <div class="field-wrap">
               <span class="field-icon">
                 <svg
@@ -92,7 +92,7 @@
                 id="reg-user"
                 type="text"
                 class="field-input"
-                placeholder="z.B. max_mustermann"
+                [placeholder]="'z.B. max_mustermann' | t"
                 [ngModel]="regData().username"
                 (ngModelChange)="regData.set({...regData(), username: $event})"
                 name="username"
@@ -112,7 +112,7 @@
           [class.field-focused]="emailFocused()"
           [class.field-filled]="regData().email"
         >
-          <label class="field-label" for="reg-email">E-Mail-Adresse</label>
+          <label class="field-label" for="reg-email">{{ 'E-Mail-Adresse' | t }}</label>
           <div class="field-wrap">
             <span class="field-icon">
               <svg
@@ -147,7 +147,7 @@
           [class.field-focused]="pwFocused()"
           [class.field-filled]="regData().password"
         >
-          <label class="field-label" for="reg-pw">Passwort</label>
+          <label class="field-label" for="reg-pw">{{ 'Passwort' | t }}</label>
           <div class="field-wrap">
             <span class="field-icon">
               <svg
@@ -166,7 +166,7 @@
               id="reg-pw"
               [type]="showPw() ? 'text' : 'password'"
               class="field-input"
-              placeholder="Mindestens 8 Zeichen"
+              [placeholder]="'Mindestens 8 Zeichen' | t"
               [ngModel]="regData().password"
               (ngModelChange)="regData.set({...regData(), password: $event})"
               name="password"
@@ -234,7 +234,7 @@
           />
           <span class="terms-box"></span>
           <span class="terms-text">
-            Ich stimme den <a href="#" class="terms-link">Nutzungsbedingungen</a> zu
+            {{ 'Ich stimme den' | t }} <a href="#" class="terms-link">{{ 'Nutzungsbedingungen' | t }}</a> {{ 'zu' | t }}
           </span>
         </label>
 
@@ -244,7 +244,7 @@
           [class.loading]="isLoading()"
           [disabled]="!regData().terms"
         >
-          <span class="btn-text">Registrieren</span>
+          <span class="btn-text">{{ 'Registrieren' | t }}</span>
           <span class="btn-arrow">→</span>
           <span class="btn-loader"></span>
         </button>
@@ -255,9 +255,9 @@
       </form>
 
       <p class="form-switch">
-        Schon ein Konto?
-        <a routerLink="/login" class="switch-link">Zum Login</a>
+        {{ 'Schon ein Konto?' | t }}
+        <a routerLink="/login" class="switch-link">{{ 'Zum Login' | t }}</a>
       </p>
     </div>
-  </main>
+  </div>
 </div>

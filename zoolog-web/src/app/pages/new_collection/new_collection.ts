@@ -12,10 +12,12 @@ interface CollectionResponse {
   createdAt: string;
 }
 
+import { TPipe } from '../../i18n/t.pipe';
+
 @Component({
   selector: 'app-new-collection',
   standalone: true,
-  imports: [FormsModule, RouterLink],
+  imports: [TPipe, FormsModule, RouterLink],
   templateUrl: './new_collection.html',
   styleUrl: './new_collection.css',
 })

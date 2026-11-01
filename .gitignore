@@ -82,3 +82,10 @@ nunit-*.xml
 *.suo
 .vs/
 .idea/
+
+# IDE files
+.idea/
+*.Backup.tmp
+
+# Local secrets
+appsettings.*.local.json

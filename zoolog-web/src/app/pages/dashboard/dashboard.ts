@@ -31,10 +31,12 @@ interface SpecimenApiResponse {
   collectionId: number;
 }
 
+import { TPipe } from '../../i18n/t.pipe';
+
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [TPipe, CommonModule, RouterLink],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css',
 })
@@ -49,10 +51,13 @@ export class Dashboard {
   favoriteCount: number = 0;
 
   portalStats = {
-    totalCollections: 124,
-    totalObjects: 3.45,
-    totalUsers: 48,
+    totalCollections: 0,
+    totalObjects: 0,
+    totalUsers: 0,
   };
+
+  // Exemplare je Tierklasse (nur sichtbare/öffentliche Exemplare)
+  classStats: { name: string; count: number; pct: number }[] = [];
 
   // "Favoriten" und "Ausgeliehen" gibt es im Backend noch nicht (kein Favorites-Konzept,
   // kein LoanController. Als "—" markiert statt einer falschen Zahl.
@@ -72,6 +77,29 @@ export class Dashboard {
     this.loadMyCollections();
     this.loadFavorites();
     this.loadPortalStats();
+    this.loadClassStats();
+  }
+
+  private loadClassStats(): void {
+    forkJoin({
+      specimens: this.api.get<{ taxonomyId: number }[]>('specimen'),
+      taxonomies: this.api.get<{ id: number; class: string }[]>('taxonomy'),
+    }).subscribe({
+      next: ({ specimens, taxonomies }) => {
+        const classById = new Map(taxonomies.map((t) => [t.id, t.class || 'Unbekannt']));
+        const counts = new Map<string, number>();
+        for (const s of specimens) {
+          const cls = classById.get(s.taxonomyId) ?? 'Unbekannt';
+          counts.set(cls, (counts.get(cls) ?? 0) + 1);
+        }
+        const max = Math.max(1, ...counts.values());
+        this.classStats = [...counts.entries()]
+          .sort((a, b) => b[1] - a[1])
+          .map(([name, count]) => ({ name, count, pct: Math.round((count / max) * 100) }));
+        this.cdr.detectChanges();
+      },
+      error: (err) => console.error('Fehler beim Laden der Klassen-Statistik:', err),
+    });
   }
 
   private loadPortalStats(): void {

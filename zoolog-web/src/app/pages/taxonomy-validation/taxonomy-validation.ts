@@ -2,10 +2,12 @@ import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ApiService } from '../../services/api.service'; // Pfad anpassen
 
+import { TPipe } from '../../i18n/t.pipe';
+
 @Component({
   selector: 'app-taxonomy-validation',
   standalone: true,
-  imports: [CommonModule],
+  imports: [TPipe, CommonModule],
   templateUrl: './taxonomy-validation.html',
   styleUrls: ['./taxonomy-validation.css'],
 })

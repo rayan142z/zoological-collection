@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -155,6 +156,15 @@ public class UsersController : ControllerBase
         var user = await _context.Users.FindAsync(id);
         if (user is null) return NotFound();
 
+        // Normal users may only edit their own profile; role and status changes are admin-only.
+        var isAdmin = User.IsInRole("admin");
+        var isSelf = int.TryParse(User.FindFirstValue(ClaimTypes.NameIdentifier), out var currentUserId) && currentUserId == id;
+
+        if (!isSelf && !isAdmin)
+        {
+            return Forbid();
+        }
+
         var conflict = await _context.Users
             .AnyAsync(u => u.Id != id && (u.Username == request.Username || u.Email == request.Email));
 
@@ -165,8 +175,11 @@ public class UsersController : ControllerBase
 
         user.Username = request.Username;
         user.Email = request.Email;
-        user.UserRole = request.UserRole;
-        user.Status = request.Status;
+        if (isAdmin)
+        {
+            user.UserRole = request.UserRole;
+            user.Status = request.Status;
+        }
         
         // --- NEU: Wert in der DB-Entität aktualisieren ---
         user.Description = request.Description; 

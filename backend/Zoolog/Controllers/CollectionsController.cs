@@ -67,10 +67,16 @@ public class CollectionsController : ControllerBase
         return Ok(collections);
     }
 
+    private bool IsSelfOrAdmin(int userId) =>
+        User.IsInRole("admin") ||
+        (int.TryParse(User.FindFirstValue(ClaimTypes.NameIdentifier), out var currentUserId) && currentUserId == userId);
+
     // POST /api/collections/5/favorite
+    [Authorize]
     [HttpPost("{id}/favorite")]
     public async Task<IActionResult> AddFavorite(int id, [FromBody] int userId)
     {
+        if (!IsSelfOrAdmin(userId)) return Forbid();
         // Prüfen, ob der Favorit schon existiert
         var exists = await _context.CollectionFavorites
             .AnyAsync(cf => cf.UserId == userId && cf.CollectionId == id);
@@ -92,9 +98,11 @@ public class CollectionsController : ControllerBase
     }
 
     // DELETE /api/collections/5/favorite/user/1
+    [Authorize]
     [HttpDelete("{id}/favorite/user/{userId}")]
     public async Task<IActionResult> RemoveFavorite(int id, int userId)
     {
+        if (!IsSelfOrAdmin(userId)) return Forbid();
         var favorite = await _context.CollectionFavorites
             .FirstOrDefaultAsync(cf => cf.UserId == userId && cf.CollectionId == id);
 
@@ -108,9 +116,11 @@ public class CollectionsController : ControllerBase
     }
 
     // GET /api/collections/favorites/user/1
+    [Authorize]
     [HttpGet("favorites/user/{userId}")]
     public async Task<IActionResult> GetUserFavorites(int userId)
     {
+        if (!IsSelfOrAdmin(userId)) return Forbid();
         var favorites = await _context.CollectionFavorites
             .Where(cf => cf.UserId == userId)
             .Select(cf => cf.CollectionId) // Gibt direkt ein Array der favorisierten Collection-IDs zurück
@@ -260,8 +270,8 @@ public class CollectionsController : ControllerBase
     }
 
     // DELETE /api/collections/1
-    //[Authorize(Roles = "admin,moderator")]
-   [HttpDelete("{id}")]
+    [Authorize]
+    [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteCollection(int id)
     {
         // 1. Prüfen, ob die Sammlung überhaupt existiert
@@ -270,6 +280,13 @@ public class CollectionsController : ControllerBase
         if (collection == null) 
         {
             return NotFound(new { message = "Sammlung mit dieser ID nicht gefunden" });
+        }
+
+        // Nur Ersteller, Admins und Moderatoren dürfen Sammlungen löschen
+        var isOwner = int.TryParse(User.FindFirstValue(ClaimTypes.NameIdentifier), out var userId) && collection.CreatedBy == userId;
+        if (!isOwner && !User.IsInRole("admin") && !User.IsInRole("moderator"))
+        {
+            return Forbid();
         }
 
         // 2. Prüfen, ob sich in dieser Sammlung Exemplare befinden, die aktuell verliehen sind (Status != 'returned')

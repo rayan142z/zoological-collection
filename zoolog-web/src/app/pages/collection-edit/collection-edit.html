@@ -26,11 +26,11 @@
       >
         <path d="M19 12H5M12 5l-7 7 7 7" />
       </svg>
-      Abbrechen
+      {{ 'Abbrechen' | t }}
     </button>
-    <h1 class="serif" style="margin-top: 0.5rem; margin-bottom: 0.25rem">Sammlung bearbeiten</h1>
+    <h1 class="serif" style="margin-top: 0.5rem; margin-bottom: 0.25rem">{{ 'Sammlung bearbeiten' | t }}</h1>
     <p style="color: #64748b; margin: 0; font-size: 0.9rem">
-      Passe die Stammdaten der Sammlung an.
+      {{ 'Passe die Stammdaten der Sammlung an.' | t }}
     </p>
   </div>
 
@@ -52,7 +52,7 @@
           class="form-label"
           style="display: block; font-weight: 500; margin-bottom: 0.5rem; color: #334155"
         >
-          Name <span style="color: #ef4444">*</span>
+          {{ 'Name' | t }} <span style="color: #ef4444">*</span>
         </label>
         <input
           class="form-input"
@@ -69,7 +69,7 @@
         <label
           class="form-label"
           style="display: block; font-weight: 500; margin-bottom: 0.5rem; color: #334155"
-          >Beschreibung</label
+          >{{ 'Beschreibung' | t }}</label
         >
         <textarea
           class="form-textarea"
@@ -84,7 +84,7 @@
           "
           [(ngModel)]="collection.description"
           name="description"
-          placeholder="Sammlungsbeschreibung eingeben..."
+          [placeholder]="'Sammlungsbeschreibung eingeben...' | t"
         ></textarea>
       </div>
 
@@ -106,7 +106,7 @@
             cursor: pointer;
           "
         >
-          Abbrechen
+          {{ 'Abbrechen' | t }}
         </button>
         <button
           class="primary-button"
@@ -125,7 +125,7 @@
             font-weight: 500;
           "
         >
-          Speichern
+          {{ 'Speichern' | t }}
         </button>
       </div>
     </form>
@@ -142,10 +142,10 @@
     "
   >
     <h3 style="color: #c62828; margin-top: 0; font-size: 1.1rem; font-weight: 600" class="serif">
-      ⚠️ Gefahrenbereich
+      {{ '⚠️ Gefahrenbereich' | t }}
     </h3>
     <p style="color: #5d4037; font-size: 0.9rem; margin-bottom: 1rem">
-      Das Löschen dieser Sammlung ist endgültig und entfernt alle darin enthaltenen Objekte.
+      {{ 'Das Löschen dieser Sammlung ist endgültig und entfernt alle darin enthaltenen Objekte.' | t }}
     </p>
     <button
       type="button"
@@ -166,7 +166,7 @@
         gap: 0.5rem;
       "
     >
-      <span>🗑️</span> Diese Sammlung löschen
+      <span>🗑️</span> {{ 'Diese Sammlung löschen' | t }}
     </button>
   </div>
 </div>

@@ -1,3 +1,4 @@
+import { AssetUrlPipe } from '../../utils/asset-url.pipe';
 import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { DatePipe } from '@angular/common';
@@ -44,10 +45,12 @@ interface CollectionApiResponse {
   name: string;
 }
 
+import { TPipe } from '../../i18n/t.pipe';
+
 @Component({
   selector: 'app-objects',
   standalone: true,
-  imports: [FormsModule, DatePipe, RouterLink],
+  imports: [TPipe, FormsModule, DatePipe, RouterLink, AssetUrlPipe],
   templateUrl: './objects.html',
   styleUrl: './objects.css',
 })

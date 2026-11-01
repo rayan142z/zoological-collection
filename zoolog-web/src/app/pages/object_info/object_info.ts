@@ -1,3 +1,4 @@
+import { AssetUrlPipe } from '../../utils/asset-url.pipe';
 import { Component, OnInit, inject, ChangeDetectorRef, Input } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
@@ -18,12 +19,18 @@ import {
 import { LeafletModule } from '@asymmetrik/ngx-leaflet';
 import * as L from 'leaflet';
 
-const STATUS_EN_TO_DE: Record<string, string> = {
-  available: 'verfügbar',
-  loaned: 'ausgeliehen',
-  lost: 'verloren',
-  destroyed: 'zerstört',
-};
+import { STATUS_EN_TO_DE } from '../../utils/status-map';
+import { TPipe } from '../../i18n/t.pipe';
+import { I18n } from '../../i18n/i18n.service';
+
+// Marker-Icons vom CDN (die Leaflet-Bilder werden nicht mitgebündelt)
+const MARKER_ICON = L.icon({
+  iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
+  iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
+  shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+});
 
 interface SpecimenApiResponse {
   id: number;
@@ -82,7 +89,7 @@ interface UserDto {
 @Component({
   selector: 'app-object-info',
   standalone: true,
-  imports: [CommonModule, DatePipe, RouterLink, LeafletModule, FormsModule, ReactiveFormsModule],
+  imports: [CommonModule, DatePipe, RouterLink, LeafletModule, FormsModule, ReactiveFormsModule, AssetUrlPipe, TPipe],
   templateUrl: './object_info.html',
   styleUrl: './object_info.css',
 })
@@ -93,6 +100,7 @@ export class ObjectInfo implements OnInit {
   private readonly location = inject(Location);
   private readonly auth = inject(Auth);
   private readonly fb = inject(FormBuilder);
+  private readonly i18n = inject(I18n);
 
   specimen: ExtendedSpecimenDetail | null = null;
   isLoading = true;
@@ -103,6 +111,30 @@ export class ObjectInfo implements OnInit {
   currentUserId: number | null = null;
   loanForm!: FormGroup;
   showLoanModal = false;
+  lightboxOpen = false;
+  linkCopied = false;
+
+  /** Ersteller der Sammlung oder Admin dürfen bearbeiten und verleihen. */
+  get canManage(): boolean {
+    return !!this.specimen && (this.specimen.collectionCreatedBy === this.currentUserId || this.isAdmin);
+  }
+
+  /** Gewicht wird in kg gespeichert; kleine Werte lesbarer in Gramm. */
+  formatWeight(kg: number): string {
+    const fmt = (n: number) => n.toLocaleString(this.i18n.locale(), { maximumFractionDigits: 2 });
+    return kg < 1 ? `${fmt(kg * 1000)} g` : `${fmt(kg)} kg`;
+  }
+
+  copyLink(): void {
+    navigator.clipboard?.writeText(window.location.href).then(() => {
+      this.linkCopied = true;
+      this.cdr.detectChanges();
+      setTimeout(() => {
+        this.linkCopied = false;
+        this.cdr.detectChanges();
+      }, 2000);
+    });
+  }
 
   // Vollständige Benutzerliste für die Zuordnung Name <-> ID
   usersList: UserDto[] = [];
@@ -241,7 +273,7 @@ export class ObjectInfo implements OnInit {
         map.invalidateSize();
         map.setView(point, 13);
 
-        const marker = L.marker(point);
+        const marker = L.marker(point, { icon: MARKER_ICON });
         marker.addTo(map);
 
         this.mapLayers = [marker];
@@ -281,12 +313,12 @@ export class ObjectInfo implements OnInit {
     // Finde die ID des eingetippten Benutzers anhand des Namens
     const matchedUser = this.usersList.find((u) => u.username === typedName);
     if (!matchedUser) {
-      alert('Bitte wähle einen gültigen Benutzer aus der Vorschlagsliste aus.');
+      alert(this.i18n.t('Bitte wähle einen gültigen Benutzer aus der Vorschlagsliste aus.'));
       return;
     }
 
     if (this.loanForm.invalid) {
-      alert('Bitte fülle alle Pflichtfelder korrekt aus.');
+      alert(this.i18n.t('Bitte fülle alle Pflichtfelder korrekt aus.'));
       return;
     }
 
@@ -297,7 +329,7 @@ export class ObjectInfo implements OnInit {
     const tomorrowStr = tomorrow.toISOString().split('T')[0];
 
     if (returnDateStr < tomorrowStr) {
-      alert('Das Rückgabedatum muss mindestens auf morgen oder später liegen.');
+      alert(this.i18n.t('Das Rückgabedatum muss mindestens auf morgen oder später liegen.'));
       return;
     }
 
@@ -316,13 +348,13 @@ export class ObjectInfo implements OnInit {
 
     this.api.post('loan', payload).subscribe({
       next: () => {
-        alert('Objekt erfolgreich als verliehen eingetragen!');
+        alert(this.i18n.t('Objekt erfolgreich als verliehen eingetragen!'));
         this.closeLoanModal();
         this.goBack();
       },
       error: (err) => {
         console.error('Fehler beim Speichern des Verleihs:', err);
-        alert('Fehler beim Speichern.');
+        alert(this.i18n.t('Fehler beim Speichern.'));
       },
     });
   }

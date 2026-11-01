@@ -1,9 +1,9 @@
 <div class="page-container">
   <!-- Breadcrumb -->
   <div class="breadcrumb">
-    <a routerLink="/dashboard" class="breadcrumb-link">Übersicht</a>
+    <a routerLink="/dashboard" class="breadcrumb-link">{{ 'Übersicht' | t }}</a>
     <span class="breadcrumb-sep">›</span>
-    <span class="breadcrumb-current">Sammlungen</span>
+    <span class="breadcrumb-current">{{ 'Sammlungen' | t }}</span>
     @if (activeCollectionName) {
       <span class="breadcrumb-sep">›</span>
       <span class="breadcrumb-current">{{ activeCollectionName }}</span>
@@ -13,13 +13,13 @@
   <!-- Header -->
   <div class="objects-header">
     <div class="header-main-info">
-      <h1 class="objects-title serif">{{ activeCollectionName || 'Alle Objekte' }}</h1>
-      <p class="objects-subtitle">{{ filteredSpecimens.length }} Präparate in der Sammlung</p>
+      <h1 class="objects-title serif">{{ activeCollectionName || ('Alle Objekte' | t) }}</h1>
+      <p class="objects-subtitle">{{ '{n} Präparate in der Sammlung' | t: { n: filteredSpecimens.length } }}</p>
     </div>
 
     @if (collection && collection?.createdBy) {
       <div class="collection-owner-badge">
-        <span class="owner-label">Erstellt von</span>
+        <span class="owner-label">{{ 'Erstellt von' | t }}</span>
         <div class="owner-profile">
           <div class="owner-avatar">
             {{ (collection?.createdByUsername || 'U').charAt(0).toUpperCase() }}
@@ -43,7 +43,7 @@
                 </span>
               }
               <span class="tooltip-role">
-                {{ collection?.userRole || collection?.creator?.userRole || 'Mitglied' }}
+                {{ (collection?.userRole || collection?.creator?.userRole || 'Mitglied') | t }}
               </span>
             </div>
           </div>
@@ -57,13 +57,13 @@
           </p>
 
           <div class="tooltip-contact">
-            <span class="contact-label">Kontakt:</span>
+            <span class="contact-label">{{ 'Kontakt:' | t }}</span>
             @if (collection?.userEmail && collection?.userEmail !== 'Keine E-Mail hinterlegt') {
               <a [href]="'mailto:' + collection.userEmail" class="contact-email">
                 {{ collection.userEmail }}
               </a>
             } @else {
-              <span class="contact-email text-muted">Keine E-Mail hinterlegt</span>
+              <span class="contact-email text-muted">{{ 'Keine E-Mail hinterlegt' | t }}</span>
             }
           </div>
 
@@ -71,13 +71,13 @@
           @if (isAdmin && collection?.createdBy !== currentUserId) {
             <div class="tooltip-admin-actions">
               <div class="admin-warning-text">
-                <span>⚠️ Löscht auch alle Sammlungen des Nutzers</span>
+                <span>{{ '⚠️ Löscht auch alle Sammlungen des Nutzers' | t }}</span>
               </div>
               <button
                 class="btn-ban-user"
                 (click)="onBanUser(collection.createdBy, collection.createdByUsername)"
               >
-                <span class="ban-icon">🚫</span> User bannen
+                <span class="ban-icon">🚫</span> {{ 'User bannen' | t }}
               </button>
             </div>
           }
@@ -91,7 +91,7 @@
           class="toggle-btn"
           [class.active]="viewMode === 'grid'"
           (click)="viewMode = 'grid'"
-          title="Rasteransicht"
+          [title]="'Rasteransicht' | t"
         >
           <svg
             width="16"
@@ -111,7 +111,7 @@
           class="toggle-btn"
           [class.active]="viewMode === 'list'"
           (click)="viewMode = 'list'"
-          title="Listenansicht"
+          [title]="'Listenansicht' | t"
         >
           <svg
             width="16"
@@ -134,7 +134,7 @@
       <!-- Export-Button (nur bei ausgewählter Sammlung) -->
       @if (activeCollectionId !== null) {
         <button type="button" class="primary-button" (click)="exportCollection()">
-          <i class="fa fa-download"></i> Sammlung exportieren
+          <i class="fa fa-download"></i> {{ 'Sammlung exportieren' | t }}
         </button>
       }
 
@@ -154,7 +154,7 @@
             <line x1="12" y1="5" x2="12" y2="19" />
             <line x1="5" y1="12" x2="19" y2="12" />
           </svg>
-          Neues Objekt
+          {{ 'Neues Objekt' | t }}
         </a>
       }
 
@@ -163,7 +163,7 @@
         (collection && collection?.createdBy && collection?.createdBy === currentUserId) || isAdmin
       ) {
         <a [routerLink]="['/collection-edit', collection.id]" class="primary-button btn-edit-icon">
-          ⚙️ Bearbeiten
+          {{ '⚙️ Bearbeiten' | t }}
         </a>
       }
 
@@ -187,19 +187,19 @@
   <div class="stats-bar">
     <div class="stat-item">
       <span class="stat-dot dot-available"></span>
-      <span class="stat-label">{{ countByStatus('verfügbar') }} Verfügbar</span>
+      <span class="stat-label">{{ countByStatus('verfügbar') }} {{ 'Verfügbar' | t }}</span>
     </div>
     <div class="stat-item">
       <span class="stat-dot dot-loaned"></span>
-      <span class="stat-label">{{ countByStatus('ausgeliehen') }} Ausgeliehen</span>
+      <span class="stat-label">{{ countByStatus('ausgeliehen') }} {{ 'Ausgeliehen' | t }}</span>
     </div>
     <div class="stat-item">
       <span class="stat-dot dot-lost"></span>
-      <span class="stat-label">{{ countByStatus('verloren') }} Verloren</span>
+      <span class="stat-label">{{ countByStatus('verloren') }} {{ 'Verloren' | t }}</span>
     </div>
     <div class="stat-item">
       <span class="stat-dot dot-destroyed"></span>
-      <span class="stat-label">{{ countByStatus('zerstört') }} Zerstört</span>
+      <span class="stat-label">{{ countByStatus('zerstört') }} {{ 'Zerstört' | t }}</span>
     </div>
   </div>
 
@@ -221,7 +221,7 @@
       <input
         class="form-input search-input"
         type="text"
-        placeholder="Name oder Gattung suchen…"
+        [placeholder]="'Name oder Gattung suchen…' | t"
         [(ngModel)]="searchTerm"
       />
     </div>
@@ -231,35 +231,35 @@
         [class.pill-active]="selectedStatus === ''"
         (click)="selectedStatus = ''"
       >
-        Alle
+        {{ 'Alle' | t }}
       </button>
       <button
         class="pill"
         [class.pill-active]="selectedStatus === 'verfügbar'"
         (click)="selectedStatus = 'verfügbar'"
       >
-        Verfügbar
+        {{ 'Verfügbar' | t }}
       </button>
       <button
         class="pill"
         [class.pill-active]="selectedStatus === 'ausgeliehen'"
         (click)="selectedStatus = 'ausgeliehen'"
       >
-        Ausgeliehen
+        {{ 'Ausgeliehen' | t }}
       </button>
       <button
         class="pill"
         [class.pill-active]="selectedStatus === 'verloren'"
         (click)="selectedStatus = 'verloren'"
       >
-        Verloren
+        {{ 'Verloren' | t }}
       </button>
       <button
         class="pill"
         [class.pill-active]="selectedStatus === 'zerstört'"
         (click)="selectedStatus = 'zerstört'"
       >
-        Zerstört
+        {{ 'Zerstört' | t }}
       </button>
     </div>
   </div>
@@ -276,11 +276,11 @@
             style="text-decoration: none; color: inherit"
           >
             <div class="card-image-area">
-              <span class="badge {{ getStatusClass(specimen.status) }}">{{ specimen.status }}</span>
+              <span class="badge {{ getStatusClass(specimen.status) }}">{{ specimen.status | t }}</span>
 
               @if (specimen.photoPath) {
                 <img
-                  [src]="'http://localhost:5227' + specimen.photoPath"
+                  [src]="specimen.photoPath | assetUrl"
                   [alt]="specimen.name"
                   class="specimen-img"
                 />
@@ -315,11 +315,11 @@
             "
           >
             <div class="card-image-area">
-              <span class="badge {{ getStatusClass(specimen.status) }}">Ausgeliehen</span>
+              <span class="badge {{ getStatusClass(specimen.status) }}">{{ 'Ausgeliehen' | t }}</span>
 
               @if (specimen.photoPath) {
                 <img
-                  [src]="'http://localhost:5227' + specimen.photoPath"
+                  [src]="specimen.photoPath | assetUrl"
                   [alt]="specimen.name"
                   class="specimen-img"
                 />
@@ -353,11 +353,11 @@
             "
           >
             <div class="card-image-area">
-              <span class="badge {{ getStatusClass('zerstört') }}">Nicht Validiert</span>
+              <span class="badge {{ getStatusClass('zerstört') }}">{{ 'Nicht Validiert' | t }}</span>
 
               @if (specimen.photoPath) {
                 <img
-                  [src]="'http://localhost:5227' + specimen.photoPath"
+                  [src]="specimen.photoPath | assetUrl"
                   [alt]="specimen.name"
                   class="specimen-img"
                 />
@@ -398,7 +398,7 @@
                 <line x1="5" y1="12" x2="19" y2="12" />
               </svg>
             </div>
-            <span class="add-obj-label">Neues Objekt hinzufügen</span>
+            <span class="add-obj-label">{{ 'Neues Objekt hinzufügen' | t }}</span>
           </div>
         </a>
       }
@@ -409,10 +409,10 @@
   @if (viewMode === 'list') {
     <div class="list-view">
       <div class="list-header">
-        <span>Präparat</span>
-        <span>Taxonomie</span>
+        <span>{{ 'Präparat' | t }}</span>
+        <span>{{ 'Taxonomie' | t }}</span>
         <span>Status</span>
-        <span>Gesammelt</span>
+        <span>{{ 'Gesammelt' | t }}</span>
         <span>ID</span>
       </div>
       @for (specimen of filteredSpecimens; track specimen.id) {
@@ -424,7 +424,7 @@
           <div class="list-name-cell">
             <div class="list-thumb">
               @if (specimen.image) {
-                <img [src]="'http://localhost:5227' + specimen.photoPath" [alt]="specimen.name" />
+                <img [src]="specimen.photoPath | assetUrl" [alt]="specimen.name" />
               } @else {
                 <span>🦎</span>
               }
@@ -462,7 +462,7 @@
                 <line x1="5" y1="12" x2="19" y2="12" />
               </svg>
             </div>
-            <span class="list-name" style="color: var(--green-dark)">Neues Objekt hinzufügen</span>
+            <span class="list-name" style="color: var(--green-dark)">{{ 'Neues Objekt hinzufügen' | t }}</span>
           </div>
         </a>
       }
@@ -473,8 +473,8 @@
   @if (filteredSpecimens.length === 0) {
     <div class="empty-state">
       <div class="empty-icon">🔍</div>
-      <p class="empty-title serif">Keine Objekte gefunden</p>
-      <p class="empty-text">Versuche einen anderen Suchbegriff oder Filter.</p>
+      <p class="empty-title serif">{{ 'Keine Objekte gefunden' | t }}</p>
+      <p class="empty-text">{{ 'Versuche einen anderen Suchbegriff oder Filter.' | t }}</p>
     </div>
   }
 </div>

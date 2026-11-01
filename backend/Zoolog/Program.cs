@@ -26,6 +26,13 @@ var jwtKey = builder.Configuration["Jwt:Key"];
 var jwtIssuer = builder.Configuration["Jwt:Issuer"] ?? "Zoolog";
 var jwtAudience = builder.Configuration["Jwt:Audience"] ?? "ZoologClient";
 
+if (string.IsNullOrWhiteSpace(jwtKey) && builder.Environment.IsDevelopment())
+{
+    // Local development without user-secrets: use a random per-run key (tokens expire on restart).
+    jwtKey = Convert.ToBase64String(System.Security.Cryptography.RandomNumberGenerator.GetBytes(48));
+    builder.Configuration["Jwt:Key"] = jwtKey;
+}
+
 if (string.IsNullOrWhiteSpace(jwtKey))
 {
     throw new InvalidOperationException("JWT key is missing. Set it with: dotnet user-secrets set \"Jwt:Key\" \"your-long-secret-key\"");
@@ -78,16 +85,15 @@ using (var scope = app.Services.CreateScope())
     Console.WriteLine($"[DB-DIAGNOSE] Provider: {dbContext.Database.ProviderName}");
     Console.WriteLine($"[DB-DIAGNOSE] Datenbank: {connection.Database}");
     Console.WriteLine($"[DB-DIAGNOSE] DataSource/Server: {connection.DataSource}");
-    Console.WriteLine($"[DB-DIAGNOSE] ConnectionString: {connection.ConnectionString}");
     Console.WriteLine("==================================================");
 }
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
-    //app.UseExceptionHandler("/Home/Error");
+    app.UseExceptionHandler("/Home/Error");
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-    //app.UseHsts();
+    app.UseHsts();
 }
 
 if (app.Environment.IsDevelopment())

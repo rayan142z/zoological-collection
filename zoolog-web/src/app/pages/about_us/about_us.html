@@ -1,13 +1,12 @@
 <section class="about-hero">
   <div class="hero-content">
-    <span class="hero-eyebrow">Über uns</span>
+    <span class="hero-eyebrow">{{ 'Über uns' | t }}</span>
     <h1 class="hero-title">
-      Wir bewahren,<br />
-      <em>was bleibt.</em>
+      {{ 'Wir bewahren,' | t }}<br />
+      <em>{{ 'was bleibt.' | t }}</em>
     </h1>
     <p class="hero-subtitle">
-      Die Zoologische Sammlung ist ein lebendiges Archiv der Natur — ein Ort, an dem
-      wissenschaftliche Neugier auf jahrhundertealte Präparate trifft.
+      {{ 'Die Zoologische Sammlung ist ein lebendiges Archiv der Natur — ein Ort, an dem wissenschaftliche Neugier auf jahrhundertealte Präparate trifft.' | t }}
     </p>
   </div>
   <div class="hero-visual">
@@ -31,8 +30,8 @@
 <section class="about-values">
   <div class="container">
     <div class="values-header">
-      <h2 class="section-title center">Was uns antreibt</h2>
-      <p class="section-subtitle">Drei Prinzipien leiten unsere Arbeit jeden Tag.</p>
+      <h2 class="section-title center">{{ 'Was uns antreibt' | t }}</h2>
+      <p class="section-subtitle">{{ 'Drei Prinzipien leiten unsere Arbeit jeden Tag.' | t }}</p>
     </div>
     <div class="values-grid">
       @for (value of values(); track value.title; let i = $index) {
@@ -40,8 +39,8 @@
           <div class="value-icon-wrap">
             <span class="value-icon">{{ value.icon }}</span>
           </div>
-          <h3 class="value-title">{{ value.title }}</h3>
-          <p class="value-desc">{{ value.description }}</p>
+          <h3 class="value-title">{{ value.title | t }}</h3>
+          <p class="value-desc">{{ value.description | t }}</p>
         </div>
       }
     </div>
@@ -52,25 +51,25 @@
   <div class="container">
     <div class="contact-inner">
       <div class="contact-text">
-        <h2 class="section-title">Besuchen Sie uns</h2>
+        <h2 class="section-title">{{ 'Besuchen Sie uns' | t }}</h2>
         <div class="contact-detail">
           <span class="contact-icon">📍</span>
           <div>
-            <strong>Adresse</strong>
+            <strong>{{ 'Adresse' | t }}</strong>
             <p>Adolf-Reichwein-Straße 2, 57076 Siegen</p>
           </div>
         </div>
         <div class="contact-detail">
           <span class="contact-icon">🕐</span>
           <div>
-            <strong>Öffnungszeiten</strong>
-            <p>Di – Fr: 9–17 Uhr &nbsp;|&nbsp; Sa – So: 10–16 Uhr</p>
+            <strong>{{ 'Öffnungszeiten' | t }}</strong>
+            <p>{{ 'Di – Fr: 9–17 Uhr  |  Sa – So: 10–16 Uhr' | t }}</p>
           </div>
         </div>
         <div class="contact-detail">
           <span class="contact-icon">✉️</span>
           <div>
-            <strong>E-Mail</strong>
+            <strong>{{ 'E-Mail' | t }}</strong>
             <p>info&#64;zoologische-sammlung.de</p>
           </div>
         </div>
